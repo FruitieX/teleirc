@@ -1,0 +1,40 @@
+var config = {};
+
+/* irc configuration */
+
+// irc nick to use
+config.nick = "myTelegramBot";
+// irc channel to join
+config.chan = "#examplechan";
+
+// time between irc reconnect attempts
+config.reconnectDelay = 5000;
+
+// time it takes for a irc server connection to timeout
+config.timeoutDelay = 15000;
+
+// time between PING messages to irc server, must be lower than timeoutDelay
+config.pingDelay = 10000;
+
+config.server = {
+    "name": "qnet",
+    "address": "irc.quakenet.org",
+    "port": 6667,
+};
+
+/* telegram configuration */
+
+// path to telegram-cli binary
+config.tgcli_path = "/home/rasse/src/tg/bin/telegram-cli";
+
+// path to telegram server pubkey
+config.tgpubkey_path = "/home/rasse/src/tg/tg-server.pub";
+
+// telegram group chat name
+config.tgchat = "myAwesomeGroupChat";
+
+// telegram name used by the configured tel number, checked to prevent sending
+// a message from irc -> telegram -> back to irc
+config.tgnick = "Firstname Lastname";
+
+module.exports = config;
