@@ -25,7 +25,7 @@ var handleTgLine = function(line) {
             if(line.indexOf('irc: ') === 0)
                 return;
 
-        sendIrcMsg(name + ': ' + line);
+        sendIrcMsg('<' + name + '>: ' + line);
     }
 };
 
@@ -58,7 +58,7 @@ var recvdIrcMsg = function(serverName, cmd, chan, nick, msgString, noBroadcast) 
     if(firstWord.indexOf(config.nick) !== -1) {
         // remove first word
         msgString = msgString.substr(msgString.indexOf(' ') + 1);
-        telegram.stdin.write('irc: ' + nick + ': ' + msgString + '\n');
+        telegram.stdin.write('irc: <' + nick + '>: ' + msgString + '\n');
     }
 };
 
