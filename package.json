@@ -1,0 +1,22 @@
+{
+    "name": "teleirc",
+    "description": "Telegram <-> IRC gateway.",
+    "version": "0.0.2",
+    "private": true,
+    "licenses": [
+        {
+            "type": "MIT"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/FruitieX/teleirc.git"
+        }
+    ],
+    "bugs": "https://github.com/FruitieX/teleirc/issues",
+    "homepage": "https://github.com/FruitieX/teleirc",
+    "dependencies": {
+        "irc": "~0.3.7"
+    }
+}
