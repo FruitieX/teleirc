@@ -1,8 +1,60 @@
 #!/usr/bin/env node
 
 var config = require(process.env.HOME + "/.teleircConfig.js");
-var net = require("net");
 var spawn = require("child_process").spawn;
+var irc = require('irc');
+
+var irc_client = irc.Client(config.server.address, config.nick, {
+    secure: config.server.secure || false,
+    port: config.server.port,
+    userName: config.nick,
+    realName: 'Telegram IRC Bot (teleirc)',
+    channels: [config.chan]
+});
+
+irc.on('registered', function(message) {
+    console.info('Connected to IRC server.');
+
+    // Store the nickname assigned by the server
+    config.realNick = message.args[0];
+    console.info('Using nickname: ' + config.realNick);
+});
+
+irc.on('error', function(error) {
+    // Error 421 comes up a lot on Mozilla servers, but isn't a problem.
+    if (error.rawCommand !== '421') {
+        return;
+    }
+
+    console.error(error);
+    if (error.hasOwnProperty('stack')) {
+        console.error(error.stack);
+    }
+});
+
+// React to users quitting the IRC server
+irc.on('quit', function(user) {
+    if (user == config.nick) {
+        irc.send('NICK', config.nick);
+        config.realNick = config.nick
+    }
+});
+
+/* Receive, parse, and handle messages from IRC.
+ * - `user`: The nick of the user that send the message.
+ * - `channel`: The channel the message was received in. Note, this might not be
+ * a real channel, because it could be a PM. But this function ignores
+ * those messages anyways.
+ * - `message`: The text of the message sent.
+ */
+irc.on('message', function(user, channel, message){
+    var cmdRe = new RegExp('^' + config.realNick + '[:,]? +(.*)$', 'i');
+    var match = cmdRe.exec(message);
+    if (match) {
+        var message = match[1].trim();
+        telegram.stdin.write('irc: <' + user + '>: ' + message + '\n');
+    }
+});
 
 var handleTgLine = function(line) {
     if(line.match(new RegExp('\\[\\d\\d:\\d\\d\\]  ' + config.tgchat + ' .* >>> .*'))) {
@@ -50,141 +102,7 @@ telegram.stdout.on('data', function(data) {
 });
 telegram.stdin.write('chat_with_peer ' + config.tgchat + '\n');
 
-var ircServer;
-
-var recvdIrcMsg = function(serverName, cmd, chan, nick, msgString, noBroadcast) {
-    // check if first word contains config.nick, ie. is a hilight
-    var firstWord = msgString.substr(0, msgString.indexOf(' '));
-    if(firstWord.indexOf(config.nick) !== -1) {
-        // remove first word
-        msgString = msgString.substr(msgString.indexOf(' ') + 1);
-        telegram.stdin.write('irc: <' + nick + '>: ' + msgString + '\n');
-    }
-};
-
 var sendIrcMsg = function(msg) {
-    ircServer.send('PRIVMSG ' + config.chan + ' :' + msg);
+    irc_client.say(config.chan, msg)
 };
 
-var handleIrcLine = function(line, server, ircServer) {
-    var tokens = line.split(' ');
-
-    //console.log(server.name + ': ' + line);
-    if(tokens[0] === "PING") {
-        //console.log('got PING, sending PONG to ' + tokens[1].substr(1));
-        ircServer.send("PONG " + tokens[1].substr(1));
-    } else if (tokens[0][0] === ":") {
-        var prefix = tokens[0].substr(1);
-        var nick = prefix.substr(0, prefix.indexOf('!'));
-        var cmd = tokens[1];
-        var chan = tokens[2];
-        chan = chan.replace(':', '');
-
-        var chanLongName = server.name + ':' + chan;
-        chanLongName = chanLongName.toLowerCase();
-
-        if(cmd === "PRIVMSG") {
-            tokens.shift(); tokens.shift(); tokens.shift();
-            var msg = tokens.join(' ').substr(1);
-
-            if(chan.toLowerCase() === config.chan.toLowerCase()) {
-                recvdIrcMsg(server.name, "message", chan, nick, msg);
-            }
-        }
-    } else {
-        console.log("got unknown msg on " + server.name + ": " + line);
-    }
-};
-
-var ircConnect = function(serverConfig) {
-    var buffer = "";
-
-    ircServer = net.connect({
-        "port": serverConfig.port,
-        "host": serverConfig.address
-    }, function() {
-        // logging
-        console.log('connected to irc server');
-
-        var passString = "";
-        if(serverConfig.password)
-            passString = "PASS " + serverConfig.password + "\r\n";
-
-        ircServer.write(passString +
-                     "NICK " + (serverConfig.nick || config.nick) + "\r\n" +
-                     "USER " + (serverConfig.nick || config.nick) + " " +
-                     "localhost " + serverConfig.address + " :" +
-                     (serverConfig.nick || config.nick) + "\r\n" +
-                     "JOIN " + config.chan + "\r\n");
-
-        ircServer.resetPingTimer();
-    });
-
-    ircServer.send = function(data) {
-        //console.log("sending data to IRC: " + data);
-        ircServer.write(data + '\r\n');
-    };
-
-    ircServer.on('data', function(data) {
-        ircServer.resetPingTimer();
-
-        buffer += data.toString('utf8');
-        var lastNL = buffer.lastIndexOf('\n');
-
-        // have we received at least one whole line? else wait for more data
-        if(lastNL !== -1) {
-            var recvdLines = buffer.substr(0, lastNL + 1).split('\r\n');
-            buffer = buffer.substr(lastNL + 1);
-
-            for(var i = 0; i < recvdLines.length; i++) {
-                if(recvdLines[i] !== '') {
-                    //console.log('irc server sent ' + recvdLines[i]);
-                    handleIrcLine(recvdLines[i], serverConfig, ircServer);
-                }
-            }
-        }
-    });
-
-    ircServer.reconnect = function(message) {
-        // cleanup
-        clearTimeout(ircServer.pingTimer);
-        ircServer.removeAllListeners('end');
-        ircServer.removeAllListeners('close');
-        ircServer.removeAllListeners('error');
-
-        ircServer.destroy();
-
-        // delay reconnect by config.reconnectDelay ms
-        ircServer.reconnectTimer = setTimeout(function() {
-            console.log(serverConfig.name + ': reconnecting...');
-            ircConnect(serverConfig);
-        }, config.reconnectDelay);
-    };
-
-    ircServer.on('end', function() {
-        ircServer.reconnect(serverConfig.name + ': connection to irc ended.');
-    });
-    ircServer.on('close', function() {
-        ircServer.reconnect(serverConfig.name + ': connection to irc closed.');
-    });
-    ircServer.on('error', function(err) {
-        ircServer.reconnect(serverConfig.name + ': irc socket error: ' + err.code);
-    });
-
-    // call whenever irc server sends data to postpone timeout timers
-    ircServer.resetPingTimer = function() {
-        // ping the server after config.pingDelay of inactivity
-        clearTimeout(ircServer.pingTimer);
-        ircServer.pingTimer = setTimeout(function() {
-            ircServer.send('PING ' + ircServer.config.address);
-        }, config.pingDelay);
-    };
-
-    ircServer.setTimeout(config.timeoutDelay, function() {
-        ircServer.reconnect(serverConfig.name + ': connection to irc timed out.');
-    });
-
-    ircServer.config = serverConfig;
-};
-
-ircConnect(config.server);
