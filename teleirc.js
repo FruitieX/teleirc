@@ -40,21 +40,9 @@ irc_client.on('quit', function(user) {
     }
 });
 
-/* Receive, parse, and handle messages from IRC.
- * - `user`: The nick of the user that send the message.
- * - `channel`: The channel the message was received in. Note, this might not be
- * a real channel, because it could be a PM. But this function ignores
- * those messages anyways.
- * - `message`: The text of the message sent.
- */
-irc_client.on('message', function(user, channel, message){
-    var cmdRe = new RegExp('^' + config.realNick + '[:,]? +(.*)$', 'i');
-    var match = cmdRe.exec(message);
-    if (match) {
-        var message = match[1].trim();
-        telegram.stdin.write('irc: <' + user + '>: ' + message + '\n');
-    }
-});
+var sendIrcMsg = function(msg) {
+    irc_client.say(config.chan, msg)
+};
 
 var handleTgLine = function(line) {
     if(line.match(new RegExp('\\[\\d\\d:\\d\\d\\]  ' + config.tgchat + ' .* >>> .*'))) {
@@ -102,7 +90,19 @@ telegram.stdout.on('data', function(data) {
 });
 telegram.stdin.write('chat_with_peer ' + config.tgchat + '\n');
 
-var sendIrcMsg = function(msg) {
-    irc_client.say(config.chan, msg)
-};
+/* Receive, parse, and handle messages from IRC.
+ * - `user`: The nick of the user that send the message.
+ * - `channel`: The channel the message was received in. Note, this might not be
+ * a real channel, because it could be a PM. But this function ignores
+ * those messages anyways.
+ * - `message`: The text of the message sent.
+ */
+irc_client.on('message', function(user, channel, message){
+    var cmdRe = new RegExp('^' + config.realNick + '[:,]? +(.*)$', 'i');
+    var match = cmdRe.exec(message);
+    if (match) {
+        var message = match[1].trim();
+        telegram.stdin.write('irc: <' + user + '>: ' + message + '\n');
+    }
+});
 
