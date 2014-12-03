@@ -4,7 +4,7 @@ var config = require(process.env.HOME + "/.teleircConfig.js");
 var spawn = require("child_process").spawn;
 var irc = require('irc');
 
-var irc_client = irc.Client(config.server.address, config.nick, {
+var irc_client = new irc.Client(config.server.address, config.nick, {
     secure: config.server.secure || false,
     port: config.server.port,
     userName: config.nick,
@@ -12,7 +12,7 @@ var irc_client = irc.Client(config.server.address, config.nick, {
     channels: [config.chan]
 });
 
-irc.on('registered', function(message) {
+irc_client.on('registered', function(message) {
     console.info('Connected to IRC server.');
 
     // Store the nickname assigned by the server
@@ -20,7 +20,7 @@ irc.on('registered', function(message) {
     console.info('Using nickname: ' + config.realNick);
 });
 
-irc.on('error', function(error) {
+irc_client.on('error', function(error) {
     // Error 421 comes up a lot on Mozilla servers, but isn't a problem.
     if (error.rawCommand !== '421') {
         return;
@@ -33,9 +33,9 @@ irc.on('error', function(error) {
 });
 
 // React to users quitting the IRC server
-irc.on('quit', function(user) {
+irc_client.on('quit', function(user) {
     if (user == config.nick) {
-        irc.send('NICK', config.nick);
+        irc_client.send('NICK', config.nick);
         config.realNick = config.nick
     }
 });
@@ -47,7 +47,7 @@ irc.on('quit', function(user) {
  * those messages anyways.
  * - `message`: The text of the message sent.
  */
-irc.on('message', function(user, channel, message){
+irc_client.on('message', function(user, channel, message){
     var cmdRe = new RegExp('^' + config.realNick + '[:,]? +(.*)$', 'i');
     var match = cmdRe.exec(message);
     if (match) {
