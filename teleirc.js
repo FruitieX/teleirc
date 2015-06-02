@@ -4,6 +4,8 @@ var config = require(process.env.HOME + "/.teleircConfig.js");
 var spawn = require("child_process").spawn;
 var irc = require('irc');
 
+config.tgchat_nick = config.tgchat.replace(/\s+/, '_')
+
 var irc_client = new irc.Client(config.server.address, config.nick, {
     secure: config.server.secure || false,
     port: config.server.port,
@@ -41,13 +43,15 @@ irc_client.on('quit', function(user) {
 });
 
 var sendIrcMsg = function(msg) {
+    console.log('irc msg: ' + msg)
     irc_client.say(config.chan, msg)
 };
 
 var handleTgLine = function(line) {
+    console.log('TG line: ' + line);
     if(line.match(new RegExp('\\[\\d\\d:\\d\\d\\]  ' + config.tgchat + ' .* >>> .*'))) {
         line = line.split(' ');
-        line.shift(); line.shift(); line.shift();
+        line.shift(); line.shift(); line.shift(); line.shift();
 
         // line now contains [Firstname, Lastname, ..., >>>, msgword1, msgword2, ...]
         var name = "";
@@ -65,6 +69,7 @@ var handleTgLine = function(line) {
             if(line.indexOf('irc: ') === 0)
                 return;
 
+        console.log(name, line)
         sendIrcMsg('<' + name + '>: ' + line);
     }
 };
@@ -88,7 +93,7 @@ telegram.stdout.on('data', function(data) {
         }
     }
 });
-telegram.stdin.write('chat_with_peer ' + config.tgchat + '\n');
+telegram.stdin.write('chat_with_peer ' + config.tgchat_nick + '\n');
 
 /* Receive, parse, and handle messages from IRC.
  * - `user`: The nick of the user that send the message.
@@ -98,10 +103,12 @@ telegram.stdin.write('chat_with_peer ' + config.tgchat + '\n');
  * - `message`: The text of the message sent.
  */
 irc_client.on('message', function(user, channel, message){
+    console.log(user, channel, message);
     var cmdRe = new RegExp('^' + config.realNick + '[:,]? +(.*)$', 'i');
     var match = cmdRe.exec(message);
     if (match) {
         var message = match[1].trim();
+        console.log(user, message);
         telegram.stdin.write('irc: <' + user + '>: ' + message + '\n');
     }
 });
