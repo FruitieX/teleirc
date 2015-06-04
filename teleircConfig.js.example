@@ -13,6 +13,7 @@ config.server = {
     "name": "qnet",
     "address": "irc.quakenet.org",
     "port": 6667,
+    "secure": false // use ssl?
 };
 
 /* telegram configuration */
