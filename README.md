@@ -15,7 +15,7 @@ Setup
     cd teleirc
     npm install
     cp teleircConfig.js.example ~/.teleircConfig.js
-    $EDITOR ~/.teleircConfig.js
+    $EDITOR ~/.teleircConfig.js # note that you have to change most config variables!
     node teleirc.js
 
 Note that before running `teleirc`, you should have ran
