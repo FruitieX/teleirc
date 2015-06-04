@@ -11,6 +11,9 @@ Telegram <-> IRC gateway.
 Setup
 -----
 
+    git clone https://github.com/FruitieX/teleirc
+    cd teleirc
+    npm install
     cp teleircConfig.js.example ~/.teleircConfig.js
     $EDITOR ~/.teleircConfig.js
     node teleirc.js
