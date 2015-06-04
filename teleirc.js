@@ -43,15 +43,15 @@ irc_client.on('quit', function(user) {
 });
 
 var sendIrcMsg = function(msg) {
-    console.log('irc msg: ' + msg)
+    console.log('Relaying to IRC: ' + msg)
     irc_client.say(config.chan, msg)
 };
 
 var handleTgLine = function(line) {
-    console.log('TG line: ' + line);
     if(line.match(new RegExp('\\[\\d\\d:\\d\\d\\]  ' + config.tgchat + ' .* >>> .*'))) {
+        console.log('TG message: ' + line);
         line = line.split(' ');
-        line.shift(); line.shift(); line.shift(); line.shift();
+        line.shift(); line.shift(); line.shift();
 
         // line now contains [Firstname, Lastname, ..., >>>, msgword1, msgword2, ...]
         var name = "";
@@ -69,7 +69,6 @@ var handleTgLine = function(line) {
             if(line.indexOf('irc: ') === 0)
                 return;
 
-        console.log(name, line)
         sendIrcMsg('<' + name + '>: ' + line);
     }
 };
@@ -93,7 +92,6 @@ telegram.stdout.on('data', function(data) {
         }
     }
 });
-telegram.stdin.write('chat_with_peer ' + config.tgchat_nick + '\n');
 
 /* Receive, parse, and handle messages from IRC.
  * - `user`: The nick of the user that send the message.
@@ -102,14 +100,18 @@ telegram.stdin.write('chat_with_peer ' + config.tgchat_nick + '\n');
  * those messages anyways.
  * - `message`: The text of the message sent.
  */
-irc_client.on('message', function(user, channel, message){
-    console.log(user, channel, message);
+irc_client.on('message', function(user, channel, message) {
     var cmdRe = new RegExp('^' + config.realNick + '[:,]? +(.*)$', 'i');
     var match = cmdRe.exec(message);
-    if (match) {
-        var message = match[1].trim();
-        console.log(user, message);
-        telegram.stdin.write('irc: <' + user + '>: ' + message + '\n');
+    console.log('IRC message: ' + user + ': ' + message);
+    if (config.relayAll) {
+        var tgMsg = 'msg ' + config.tgchat_nick + ' irc: <' + user + '>: ' + message;
+        console.log('Relaying to TG: ' + tgMsg);
+        telegram.stdin.write(tgMsg + '\n');
+    } else if (match) {
+        message = match[1].trim();
+        var tgMsg = 'msg ' + config.tgchat_nick + ' irc: <' + user + '>: ' + message;
+        console.log('Relaying to TG: ' + tgMsg);
+        telegram.stdin.write(tgMsg + '\n');
     }
 });
-

@@ -6,15 +6,8 @@ var config = {};
 config.nick = "myTelegramBot";
 // irc channel to join
 config.chan = "#examplechan";
-
-// time between irc reconnect attempts
-config.reconnectDelay = 5000;
-
-// time it takes for a irc server connection to timeout
-config.timeoutDelay = 15000;
-
-// time between PING messages to irc server, must be lower than timeoutDelay
-config.pingDelay = 10000;
+// is highlighting the bot needed to relay a message?
+config.relayAll = false;
 
 config.server = {
     "name": "qnet",
