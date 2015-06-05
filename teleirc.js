@@ -6,15 +6,15 @@ var irc = require('irc');
 
 config.tgchat_nick = config.tgchat.replace(/\s+/, '_')
 
-var irc_client = new irc.Client(config.server.address, config.nick, {
+var irc_client = new irc.Client(config.server.address, config.server.nick, {
     debug: config.server.debug,
     secure: config.server.secure,
     selfSigned: config.server.selfSigned,
     certExpired: config.server.certExpired,
     port: config.server.port,
-    userName: config.nick,
+    userName: config.server.nick,
     realName: 'Telegram IRC Bot (teleirc)',
-    channels: [config.chan]
+    channels: [config.server.chan]
 });
 
 irc_client.on('registered', function(message) {
@@ -39,15 +39,15 @@ irc_client.on('error', function(error) {
 
 // React to users quitting the IRC server
 irc_client.on('quit', function(user) {
-    if (user == config.nick) {
-        irc_client.send('NICK', config.nick);
-        config.realNick = config.nick
+    if (user == config.server.nick) {
+        irc_client.send('NICK', config.server.nick);
+        config.realNick = config.server.nick
     }
 });
 
 var sendIrcMsg = function(msg) {
     console.log('Relaying to IRC: ' + msg)
-    irc_client.say(config.chan, msg)
+    irc_client.say(config.server.chan, msg)
 };
 
 var handleTgLine = function(line) {
@@ -104,15 +104,12 @@ telegram.stdout.on('data', function(data) {
  * - `message`: The text of the message sent.
  */
 irc_client.on('message', function(user, channel, message) {
-    var cmdRe = new RegExp('^' + config.realNick + '[:,]? +(.*)$', 'i');
-    var match = cmdRe.exec(message);
+    var match = config.hilight_re.exec(message);
     console.log('IRC message: ' + user + ': ' + message);
-    if (config.relayAll) {
-        var tgMsg = 'msg ' + config.tgchat_nick + ' irc: <' + user + '>: ' + message;
-        console.log('Relaying to TG: ' + tgMsg);
-        telegram.stdin.write(tgMsg + '\n');
-    } else if (match) {
+    if (match) {
         message = match[1].trim();
+    }
+    if (match || config.relayAll) {
         var tgMsg = 'msg ' + config.tgchat_nick + ' irc: <' + user + '>: ' + message;
         console.log('Relaying to TG: ' + tgMsg);
         telegram.stdin.write(tgMsg + '\n');

@@ -1,24 +1,30 @@
 var config = {};
 
-/* irc configuration */
+/**
+ * irc configuration
+ */
 
-// irc nick to use
-config.nick = "exampleTgBot";
-// irc channel to join
-config.chan = "#examplechan";
+config.server = {
+    "address": "irc.quakenet.org",  // irc server address
+    "port": 6667,                   // irc server port
+    "nick": "exampleTgBot",         // irc nick to use
+    "chan": "#examplechan",         // irc channel to join
+    "secure": false,                // use ssl when connecting?
+    "selfSigned": false,            // accept self-signed certificates?
+    "certExpired": false,           // accept expired certificates?
+    "debug": false                  // enable node-irc debugging?
+};
+
 // relay all messages or only hilighted ones?
 config.relayAll = false;
 
-config.server = {
-    "debug": false,
-    "address": "irc.quakenet.org",
-    "port": 6667,
-    "secure": false, // use ssl?
-    "selfSigned": false, // accept self-signed certificates?
-    "certExpired": false // accept expired certificates?
-};
+// hilight detection regexp, with irc message as input
+// message within first capturing paretheses, (.*) in default, is relayed to TG
+config.hilight_re = new RegExp('^' + config.realNick + '[:,]? +(.*)$', 'i');
 
-/* telegram configuration */
+/**
+ * telegram configuration
+ */
 
 // path to telegram-cli binary
 config.tgcli_path = "/home/rasse/src/tg/bin/telegram-cli";
