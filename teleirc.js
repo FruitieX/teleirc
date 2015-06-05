@@ -1,7 +1,22 @@
 #!/usr/bin/env node
 
-var config = require(process.env.HOME + "/.teleircConfig.js");
-var spawn = require("child_process").spawn;
+var assert = require('assert');
+var config = require(process.env.HOME + '/.teleircConfig.js');
+
+// check that required config options are set
+var checkConfigMsg = ', check teleircConfig.js.example for an example';
+assert(config.server, 'config.server block missing' + checkConfigMsg);
+assert(config.server.address, 'config.server.address not set' + checkConfigMsg);
+assert(config.server.port, 'config.server.port not set' + checkConfigMsg);
+assert(config.server.nick, 'config.server.nick not set' + checkConfigMsg);
+assert(config.server.chan, 'config.server.chan not set' + checkConfigMsg);
+assert(config.hilight_re, 'config.hilight_re not set' + checkConfigMsg);
+assert(config.tgcli_path, 'config.tgcli_path not set' + checkConfigMsg);
+assert(config.tgpubkey_path, 'config.tgpubkey_path not set' + checkConfigMsg);
+assert(config.tgchat, 'config.tgchat not set' + checkConfigMsg);
+assert(config.tgnick, 'config.tgnick not set' + checkConfigMsg);
+
+var spawn = require('child_process').spawn;
 var irc = require('irc');
 
 config.tgchat_nick = config.tgchat.replace(/\s+/, '_')
@@ -57,7 +72,7 @@ var handleTgLine = function(line) {
         line.shift(); line.shift(); line.shift();
 
         // line now contains [Firstname, Lastname, ..., >>>, msgword1, msgword2, ...]
-        var name = "";
+        var name = '';
         temp = line.shift();
         while(temp !== '>>>') {
             name += temp;
@@ -77,7 +92,7 @@ var handleTgLine = function(line) {
 };
 
 var telegram = spawn(config.tgcli_path, ['-R', '-C', '-W', '-k', config.tgpubkey_path]);
-var stdoutBuf = "";
+var stdoutBuf = '';
 telegram.stdout.on('data', function(data) {
     stdoutBuf += data.toString('utf8');
     var lastNL = stdoutBuf.lastIndexOf('\n');
