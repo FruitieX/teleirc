@@ -7,7 +7,10 @@ var irc = require('irc');
 config.tgchat_nick = config.tgchat.replace(/\s+/, '_')
 
 var irc_client = new irc.Client(config.server.address, config.nick, {
-    secure: config.server.secure || false,
+    debug: config.server.debug,
+    secure: config.server.secure,
+    selfSigned: config.server.selfSigned,
+    certExpired: config.server.certExpired,
     port: config.server.port,
     userName: config.nick,
     realName: 'Telegram IRC Bot (teleirc)',

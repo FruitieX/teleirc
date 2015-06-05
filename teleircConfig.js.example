@@ -3,17 +3,19 @@ var config = {};
 /* irc configuration */
 
 // irc nick to use
-config.nick = "myTelegramBot";
+config.nick = "exampleTgBot";
 // irc channel to join
 config.chan = "#examplechan";
-// is highlighting the bot needed to relay a message?
+// relay all messages or only hilighted ones?
 config.relayAll = false;
 
 config.server = {
-    "name": "qnet",
+    "debug": false,
     "address": "irc.quakenet.org",
     "port": 6667,
-    "secure": false // use ssl?
+    "secure": false, // use ssl?
+    "selfSigned": false, // accept self-signed certificates?
+    "certExpired": false // accept expired certificates?
 };
 
 /* telegram configuration */
