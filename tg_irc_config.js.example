@@ -1,0 +1,49 @@
+var config = {};
+
+
+//////////////////
+//  IRC config  //
+//////////////////
+
+config.irc_nick = 'tgBot';
+config.irc_server = 'irc.cs.hut.fi';
+config.irc_channel = '!channel password';
+config.irc_channel_id = '!1EYQ9channel';
+config.irc_options = {
+    userName: 'bot',
+    realName: 'Telegram IRC Bot',
+    port: 6667,
+    localAddress: null,
+    debug: true,
+    showErrors: false,
+    autoRejoin: false,
+    autoConnect: true,
+    channels: [config.irc_channel],
+    secure: false,
+    selfSigned: false,
+    certExpired: false,
+    floodProtection: false,
+    floodProtectionDelay: 1000,
+    sasl: false,
+    stripColors: false,
+    channelPrefixes: "&#!",
+    messageSplit: 512,
+    encoding: ''
+};
+config.irc_hilight_re = new RegExp('^' + config.irc_nick + '[:,]? +(.*)$', 'i');
+config.irc_relay_all = false;
+
+
+
+/////////////////
+//  TG config  //
+/////////////////
+
+config.tg_nick = 'FirstnameLastname';
+config.tg_chat = 'TelegramChat';
+config.tg_cli_path = '/home/user/tg/bin/telegram-cli';
+config.tg_pubkey_path = '/home/user/tg/tg-server.pub';
+
+
+
+module.exports = config;

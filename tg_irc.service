@@ -1,0 +1,11 @@
+[Unit]
+Description=tg_irc
+After=network.target oidentd.socket
+
+[Service]
+ExecStart=/usr/bin/env node /home/user/teleirc/tg_irc.js
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
