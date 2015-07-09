@@ -41,8 +41,8 @@ config.irc_relay_all = false;
 
 config.tg_nick = 'FirstnameLastname';
 config.tg_chat = 'TelegramChat';
-config.tg_cli_path = '/home/user/tg/bin/telegram-cli';
-config.tg_pubkey_path = '/home/user/tg/tg-server.pub';
+config.tg_chat_id = 123456;
+config.tg_bot_token = '<BOT TOKEN>';
 
 
 

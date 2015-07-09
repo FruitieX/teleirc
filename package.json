@@ -1,7 +1,7 @@
 {
     "name": "tg_irc",
     "description": "Telegram <-> IRC gateway",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "private": true,
     "licenses": [
         {
@@ -17,6 +17,7 @@
     "bugs": "https://github.com/warbaque/tg_irc/issues",
     "homepage": "https://github.com/warbaque/tg_irc",
     "dependencies": {
-        "irc": "~0.3.12"
+        "irc": "~0.3.12",
+        "telegram-bot": "~0.2.0"
     }
 }
