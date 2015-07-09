@@ -49,6 +49,8 @@ var tg_send_msg = function(msg) {
 //////////////////
 
 client.on('message', function(user, channel, message) {
+    if (config.irc_channel_id !== channel)
+        return;
     //console.log('IRC: ' + user + ': ' + message);
     var match = config.irc_hilight_re.exec(message);
     if (match || config.irc_relay_all) {
@@ -67,7 +69,12 @@ client.on('message', function(user, channel, message) {
 //////////////////
 
 tg.on('message', function(msg) {
-    if (!msg.text) return;
+    if (config.tg_chat !== msg.chat.title)
+        return;
+    console.log('chat_id: ' + msg.chat.id);
+    config.tg_chat_id = msg.chat.id;
+    if (!msg.text)
+        return;
     var text = '<' + msg.from.first_name + msg.from.last_name + '>: ' + msg.text;
     irc_send_msg(text);
 });
