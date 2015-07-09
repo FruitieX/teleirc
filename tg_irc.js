@@ -36,6 +36,7 @@ var tg = new telegram(config.tg_bot_token);
 tg.start();
 
 var tg_send_msg = function(msg) {
+    console.log('  >> relaying to TG: ' + msg);
     tg.sendMessage({
         text: msg,
         chat_id: config.tg_chat_id
@@ -57,9 +58,18 @@ client.on('message', function(user, channel, message) {
         if (match)
             message = match[1].trim();
         var tg_msg = '<' + user + '>: ' + message;
-        console.log('  >> relaying to TG: ' + tg_msg);
         tg_send_msg(tg_msg);
     }
+});
+
+client.on('topic', function(channel, topic, nick)
+{
+    if (config.irc_channel_id !== channel)
+        return;
+    var tg_msg  = '* Topic for channel ' + config.irc_channel.split(' ')[0]
+                + ':\n' + topic.split(' | ').join('\n')
+                + '\n* set by ' + nick.split('!')[0];
+    tg_send_msg(tg_msg);
 });
 
 
