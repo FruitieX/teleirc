@@ -62,8 +62,14 @@ client.on('message', function(user, channel, message) {
     }
 });
 
+// ignore first topic event when joining channel
+var first_topic_event = true;
 client.on('topic', function(channel, topic, nick)
 {
+    if (first_topic_event) {
+        first_topic_event = false;
+        return;
+    }
     if (config.irc_channel_id !== channel)
         return;
     var tg_msg  = '* Topic for channel ' + config.irc_channel.split(' ')[0]
@@ -85,6 +91,8 @@ tg.on('message', function(msg) {
     config.tg_chat_id = msg.chat.id;
     if (!msg.text)
         return;
-    var text = '<' + msg.from.first_name + msg.from.last_name + '>: ' + msg.text;
+    var user    = msg.from.first_name ? msg.from.first_name : ''
+                + msg.from.last_name ? msg.from.last_name : '';
+    var text = '<' + user + '>: ' + msg.text;
     irc_send_msg(text);
 });
