@@ -7,7 +7,8 @@ var config = {};
 config.server = {
     'address': 'irc.quakenet.org',  // irc server address
     'port': 6667,                   // irc server port
-    'nick': 'exampleTgBot',         // irc nick to use
+    'nick': 'TEST_TgBot',         // irc nick to use
+    'password': '?????',         // irc nick to use
     'chan': '#examplechan',         // irc channel to join
     'secure': false,                // use ssl when connecting?
     'selfSigned': false,            // accept self-signed certificates?
