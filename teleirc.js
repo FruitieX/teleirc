@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 var assert = require('assert');
-var config = require(process.env.HOME + '/.teleircTESTConfig.js');
+var config = require(process.env.HOME + '/.teleircConfig.js');
 
 // check that required config options are set
-var checkConfigMsg = ', check teleircTESTConfig.js.example for an example';
+var checkConfigMsg = ', check teleircConfig.js.example for an example';
 assert(config.server, 'config.server block missing' + checkConfigMsg);
 assert(config.server.address, 'config.server.address not set' + checkConfigMsg);
 assert(config.server.port, 'config.server.port not set' + checkConfigMsg);
