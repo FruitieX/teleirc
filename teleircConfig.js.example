@@ -8,6 +8,7 @@ config.server = {
     'address': 'irc.quakenet.org',  // irc server address
     'port': 6667,                   // irc server port
     'nick': 'exampleTgBot',         // irc nick to use
+    'password': '?????',            // irc password to use (requires manual nick registration before using this option, can be ignored)
     'chan': '#examplechan',         // irc channel to join
     'secure': false,                // use ssl when connecting?
     'selfSigned': false,            // accept self-signed certificates?

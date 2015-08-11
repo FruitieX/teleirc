@@ -24,6 +24,7 @@ config.tgchat_nick = config.tgchat.replace(/\s+/, '_')
 var irc_client = new irc.Client(config.server.address, config.server.nick, {
     debug: config.server.debug,
     secure: config.server.secure,
+    password: config.server.password,
     selfSigned: config.server.selfSigned,
     certExpired: config.server.certExpired,
     port: config.server.port,
