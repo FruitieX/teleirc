@@ -11,6 +11,11 @@ Telegram <-> IRC gateway.
 Setup
 -----
 
+First set up your bot via the "BotFather" telegram user. Save your bot token
+somewhere for now. Remember to allow the bot to see all messages via the
+`/setprivacy` command to BotFather, otherwise only messages starting with a
+slash are visible.
+
     git clone https://github.com/FruitieX/teleirc
     cd teleirc
     npm install
