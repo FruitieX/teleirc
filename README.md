@@ -27,7 +27,10 @@ When you're done, launch teleirc with:
 
     npm start
     
-Optional: For your convenience, there is an included systemd unit file in `teleirc.service`.
+Optional:
+
+- For your convenience, there is an included systemd unit file in `teleirc.service`.
+- You can change your Telegram Bot's profile picture with the `/setuserpic` BotFather command.
 
 Special thanks
 --------------
