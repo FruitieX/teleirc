@@ -3,27 +3,33 @@ teleirc
 
 Telegram <-> IRC gateway.
 
-* Uses the `node-telegram-bot` library for Telegram communication
-* IRC communication via martynsmith's `node-irc` module
-* All Telegram messages sent to IRC channel
+* Uses the [node-telegram-bot](https://github.com/orzFly/node-telegram-bot) library for Telegram communication
+* IRC communication via martynsmith's [node-irc](https://github.com/martynsmith/node-irc) module
+* All Telegram messages are sent to IRC channel
 * IRC messages sent to Telegram only when bot is hilighted (configurable)
 
 Setup
 -----
 
-First set up your bot via the "BotFather" telegram user. Save your bot token
-somewhere for now. Remember to allow the bot to see all messages via the
-`/setprivacy` command to BotFather, otherwise only messages starting with a
-slash are visible.
-
     git clone https://github.com/FruitieX/teleirc
     cd teleirc
     npm install
     cp teleirc_config.js.example ~/.teleirc_config.js
-    $EDITOR ~/.teleircConfig.js # note that you have to change most config variables!
-    node teleirc.js
+
+Next, set up your bot via the [BotFather](https://telegram.me/botfather) Telegram user.
+Save your bot token in `~/.teleirc_config.js`. Remember to allow the bot to see all messages via the
+`/setprivacy` command to `BotFather`, otherwise only messages starting with a
+slash are visible to teleirc.
+
+Now read through the rest of `~/.teleirc_config.js` and change the configuration as appropriate.
+
+When you're done, launch teleirc with:
+
+    npm start
+    
+Optional: For your convenience, there is an included systemd unit file in `teleirc.service`.
 
 Special thanks
 --------------
 
-Thanks to @warbaque for implementation with TG Bot API!
+Thanks to [warbaque](https://github.com/warbaque) for an implementation using Telegram Bot API!
