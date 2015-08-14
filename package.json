@@ -1,8 +1,10 @@
 {
   "name": "teleirc",
   "description": "Telegram <-> IRC gateway.",
-  "version": "0.0.2",
-  "private": true,
+  "scripts": {
+    "start": "node teleirc.js"
+  },
+  "version": "0.1.0",
   "licenses": [
     {
       "type": "MIT"
