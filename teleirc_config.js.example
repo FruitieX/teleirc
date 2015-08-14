@@ -1,0 +1,50 @@
+var config = {};
+
+/////////////////
+//  TG config  //
+/////////////////
+
+config.tg_bot_token = 'YOUR_BOT_TOKEN_HERE';
+config.tg_chat = 'YOUR_TELEGRAM_GROUP_CHAT_NAME';
+
+//////////////////
+//  IRC config  //
+//////////////////
+
+config.irc_nick = 'MyBot';
+config.irc_server = 'irc.cs.hut.fi';
+config.irc_channel = '#mychannel';
+config.irc_channel_pwd = 'mypassword'; // leave empty for no password
+
+// see https://node-irc.readthedocs.org/en/latest/API.html#client for documentation
+config.irc_options = {
+    userName: 'bot',
+    realName: 'Telegram IRC Bot',
+    port: 6667,
+    localAddress: null,
+    debug: true,
+    showErrors: false,
+    autoRejoin: false,
+    autoConnect: true,
+    channels: config.irc_channel_pwd ?
+        [config.irc_channel + ' ' + config.irc_channel_pwd] :
+        [config.irc_channel],
+    secure: false,
+    selfSigned: false,
+    certExpired: false,
+    floodProtection: false,
+    floodProtectionDelay: 1000,
+    sasl: false,
+    stripColors: false,
+    channelPrefixes: "&#!",
+    messageSplit: 512,
+    encoding: ''
+};
+
+// relay all messages or only hilights
+config.irc_relay_all = false;
+
+// regex for detecting a hilight
+config.irc_hilight_re = new RegExp('^' + config.irc_nick + '[:,]? +(.*)$', 'i');
+
+module.exports = config;

@@ -1,133 +1,128 @@
 #!/usr/bin/env node
 
-var assert = require('assert');
-var config = require(process.env.HOME + '/.teleircConfig.js');
+var fs = require('fs');
+var nodeirc = require('irc');
+var telegram = require('telegram-bot');
 
-// check that required config options are set
-var checkConfigMsg = ', check teleircConfig.js.example for an example';
-assert(config.server, 'config.server block missing' + checkConfigMsg);
-assert(config.server.address, 'config.server.address not set' + checkConfigMsg);
-assert(config.server.port, 'config.server.port not set' + checkConfigMsg);
-assert(config.server.nick, 'config.server.nick not set' + checkConfigMsg);
-assert(config.server.chan, 'config.server.chan not set' + checkConfigMsg);
-assert(config.hilight_re, 'config.hilight_re not set' + checkConfigMsg);
-assert(config.tgcli_path, 'config.tgcli_path not set' + checkConfigMsg);
-assert(config.tgpubkey_path, 'config.tgpubkey_path not set' + checkConfigMsg);
-assert(config.tgchat, 'config.tgchat not set' + checkConfigMsg);
-assert(config.tgnick, 'config.tgnick not set' + checkConfigMsg);
+// configs
+var config = require(process.env.HOME + '/.teleirc_config.js');
 
-var spawn = require('child_process').spawn;
-var irc = require('irc');
+var tg_chat_id = null;
+if (!tg_chat_id) {
+    // try to read tg_chat_id from disk, otherwise get it from first conversation
+    try {
+        tg_chat_id = fs.readFileSync(process.env.HOME + '/.teleirc_chat_id');
+        console.log('Using chat_id: ' + tg_chat_id);
+    } catch(e) {
+        console.log('\n');
+        console.log('NOTE!');
+        console.log('=====');
+        console.log('~/.teleirc_chat_id file not found!');
+        console.log('Please add your Telegram bot to a Telegram group and have');
+        console.log('someone send a message to that group.');
+        console.log('teleirc will then automatically store your group chat_id.\n\n');
+    }
+}
 
-config.tgchat_nick = config.tgchat.replace(/\s+/, '_')
+//////////////////
+//  IRC Client  //
+//////////////////
 
-var irc_client = new irc.Client(config.server.address, config.server.nick, {
-    debug: config.server.debug,
-    secure: config.server.secure,
-    password: config.server.password,
-    selfSigned: config.server.selfSigned,
-    certExpired: config.server.certExpired,
-    port: config.server.port,
-    userName: config.server.nick,
-    realName: 'Telegram IRC Bot (teleirc)',
-    channels: [config.server.chan]
+var irc = new nodeirc.Client(config.irc_server, config.irc_nick, config.irc_options);
+
+irc.on('error', function(error) {
+    console.log('error: ', error);
 });
 
-irc_client.on('registered', function(message) {
-    console.info('Connected to IRC server.');
+var irc_send_msg = function(msg) {
+    console.log('  >> relaying to IRC: ' + msg);
+    irc.say(config.irc_channel, msg);
+};
 
-    // Store the nickname assigned by the server
-    config.realNick = message.args[0];
-    console.info('Using nickname: ' + config.realNick);
-});
-
-irc_client.on('error', function(error) {
-    // Error 421 comes up a lot on Mozilla servers, but isn't a problem.
-    if (error.rawCommand !== '421') {
+irc.on('message', function(user, channel, message) {
+    // is this from the correct channel?
+    if (config.irc_channel.toLowerCase() !== channel.toLowerCase()) {
         return;
     }
 
-    console.error(error);
-    if (error.hasOwnProperty('stack')) {
-        console.error(error.stack);
-    }
-});
-
-// React to users quitting the IRC server
-irc_client.on('quit', function(user) {
-    if (user == config.server.nick) {
-        irc_client.send('NICK', config.server.nick);
-        config.realNick = config.server.nick
-    }
-});
-
-var sendIrcMsg = function(msg) {
-    console.log('Relaying to IRC: ' + msg)
-    irc_client.say(config.server.chan, msg)
-};
-
-var handleTgLine = function(line) {
-    if(line.match(new RegExp('\\[\\d\\d:\\d\\d\\]  ' + config.tgchat + ' .* >>> .*'))) {
-        console.log('TG message: ' + line);
-        line = line.split(' ');
-        line.shift(); line.shift(); line.shift();
-
-        // line now contains [Firstname, Lastname, ..., >>>, msgword1, msgword2, ...]
-        var name = '';
-        temp = line.shift();
-        while(temp !== '>>>') {
-            name += temp;
-            temp = line.shift();
+    var match = config.irc_hilight_re.exec(message);
+    if (match || config.irc_relay_all) {
+        if (match) {
+            message = match[1].trim();
         }
-
-        line = line.join(' ');
-
-        // check if msg was sent by bot telegram account && starts with 'irc: '
-        // then don't send the msg back to irc
-        if(name === config.tgnick.replace(' ', ''))
-            if(line.indexOf('irc: ') === 0)
-                return;
-
-        sendIrcMsg('<' + name + '>: ' + line);
+        var text = '<' + user + '>: ' + message;
+        tg_send_msg(text);
     }
+});
+
+// ignore first topic event when joining channel
+var first_topic_event = true;
+irc.on('topic', function(channel, topic, nick) {
+    // is this from the correct channel?
+    if (config.irc_channel.toLowerCase() !== channel.toLowerCase()) {
+        return;
+    }
+
+    if (first_topic_event) {
+        first_topic_event = false;
+        return;
+    }
+
+    var text  = '* Topic for channel ' + config.irc_channel.split(' ')[0]
+                + ':\n' + topic.split(' | ').join('\n')
+                + '\n* set by ' + nick.split('!')[0];
+    tg_send_msg(text);
+});
+
+//////////////////
+//  TG bot API  //
+//////////////////
+
+var tg = new telegram(config.tg_bot_token);
+tg.start();
+
+var tg_send_msg = function(msg) {
+    console.log('  >> relaying to TG: ' + msg);
+
+    if (!tg_chat_id) {
+        var err = 'Error: No chat_id set! Add me to a Telegram group ' +
+                  'and say hi so I can find your chat_id!';
+        irc_send_msg(err);
+        console.log(err);
+        return;
+    }
+
+    tg.sendMessage({
+        text: msg,
+        chat_id: parseInt(tg_chat_id)
+    });
 };
 
-var telegram = spawn(config.tgcli_path, ['-R', '-C', '-W', '-k', config.tgpubkey_path]);
-var stdoutBuf = '';
-telegram.stdout.on('data', function(data) {
-    stdoutBuf += data.toString('utf8');
-    var lastNL = stdoutBuf.lastIndexOf('\n');
+tg.on('message', function(msg) {
+    if (config.tg_chat !== msg.chat.title) {
+        return;
+    }
 
-    // have we received at least one whole line? else wait for more data
-    if(lastNL !== -1) {
-        var recvdLines = stdoutBuf.substr(0, lastNL + 1).split('\n');
-        stdoutBuf = stdoutBuf.substr(lastNL + 1);
+    if (!tg_chat_id) {
+        tg_chat_id = msg.chat.id;
 
-        for(var i = 0; i < recvdLines.length; i++) {
-            if(recvdLines[i] !== '') {
-                //console.log('irc server sent ' + recvdLines[i]);
-                handleTgLine(recvdLines[i]);
+        console.log('storing chat ID: ' + msg.chat.id);
+        fs.writeFile(process.env.HOME + '/.teleirc_chat_id', msg.chat.id, function(err) {
+            if (err) {
+                console.log('error while storing chat ID:');
+                console.log(err);
+            } else {
+                console.log('successfully stored chat ID in ~/.teleirc_chat_id');
             }
-        }
+        });
     }
-});
 
-/* Receive, parse, and handle messages from IRC.
- * - `user`: The nick of the user that send the message.
- * - `channel`: The channel the message was received in. Note, this might not be
- * a real channel, because it could be a PM. But this function ignores
- * those messages anyways.
- * - `message`: The text of the message sent.
- */
-irc_client.on('message', function(user, channel, message) {
-    var match = config.hilight_re.exec(message);
-    console.log('IRC message: ' + user + ': ' + message);
-    if (match) {
-        message = match[1].trim();
+    if (!msg.text) {
+        return;
     }
-    if (match || config.relayAll) {
-        var tgMsg = 'msg ' + config.tgchat_nick + ' irc: <' + user + '>: ' + message;
-        console.log('Relaying to TG: ' + tgMsg);
-        telegram.stdin.write(tgMsg + '\n');
-    }
+
+    var user = msg.from.first_name ? msg.from.first_name : ''
+             + msg.from.last_name ? msg.from.last_name : '';
+    var text = '<' + user + '>: ' + msg.text;
+    irc_send_msg(text);
 });
