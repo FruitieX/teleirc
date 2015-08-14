@@ -4,8 +4,8 @@ var config = {};
 //  TG config  //
 /////////////////
 
-config.tg_chat = 'YOUR_TELEGRAM_GROUP_CHAT_NAME';
 config.tg_bot_token = 'YOUR_BOT_TOKEN_HERE';
+config.tg_chat = 'YOUR_TELEGRAM_GROUP_CHAT_NAME';
 
 //////////////////
 //  IRC config  //
