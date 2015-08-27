@@ -1,23 +1,24 @@
 {
   "name": "teleirc",
-  "description": "Telegram <-> IRC gateway.",
+  "description": "Telegram <-> IRC gateway",
   "scripts": {
+    "prestart": "npm install",
     "start": "node teleirc.js"
   },
-  "version": "0.1.0",
+  "version": "0.2.0",
   "licenses": [
     {
       "type": "MIT"
     }
   ],
-  "repositories": [
+  "repository": [
     {
       "type": "git",
-      "url": "https://github.com/FruitieX/teleirc.git"
+      "url": "https://github.com/warbaque/teleirc.git"
     }
   ],
-  "bugs": "https://github.com/FruitieX/teleirc/issues",
-  "homepage": "https://github.com/FruitieX/teleirc",
+  "bugs": "https://github.com/warbaque/teleirc/issues",
+  "homepage": "https://github.com/warbaque/teleirc",
   "dependencies": {
     "irc": "~0.3.12",
     "telegram-bot": "^0.2.0"

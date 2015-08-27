@@ -1,20 +1,32 @@
 var config = {};
 
-/////////////////
-//  TG config  //
-/////////////////
+function Channel (irc_channel, tg_chat, irc_channel_pwd, irc_channel_id) {
+    this.irc_channel     = irc_channel_id ? irc_channel_id : irc_channel;
+    this.irc_channel_pwd = irc_channel_pwd;
+    this.tg_chat         = tg_chat;
+}
 
-config.tg_bot_token = 'YOUR_BOT_TOKEN_HERE';
-config.tg_chat = 'YOUR_TELEGRAM_GROUP_CHAT_NAME';
+
+/////////////////////
+//  General config //
+/////////////////////
+
+config.channels = [
+    new Channel('#channel1', 'Tg_Chat_1'                         ),
+    new Channel('#channel2', 'Tg_Chat_2', 'passwd'               ),
+    new Channel('!channel3', 'Tg_Chat_3', ''      , '!channel_id'),
+    new Channel('!channel4', 'Tg_Chat_4', 'passwd', '!channel_id')
+]
+
+config.tg_bot_token = '<BOT TOKEN>';
+
 
 //////////////////
 //  IRC config  //
 //////////////////
 
-config.irc_nick = 'MyBot';
+config.irc_nick = 'tgBot';
 config.irc_server = 'irc.cs.hut.fi';
-config.irc_channel = '#mychannel';
-config.irc_channel_pwd = 'mypassword'; // leave empty for no password
 
 // see https://node-irc.readthedocs.org/en/latest/API.html#client for documentation
 config.irc_options = {
@@ -22,13 +34,11 @@ config.irc_options = {
     realName: 'Telegram IRC Bot',
     port: 6667,
     localAddress: null,
-    debug: true,
+    debug: false,
     showErrors: false,
     autoRejoin: false,
     autoConnect: true,
-    channels: config.irc_channel_pwd ?
-        [config.irc_channel + ' ' + config.irc_channel_pwd] :
-        [config.irc_channel],
+    channels: [], // auto generated, do not touch
     secure: false,
     selfSigned: false,
     certExpired: false,
@@ -41,10 +51,8 @@ config.irc_options = {
     encoding: ''
 };
 
-// relay all messages or only hilights
 config.irc_relay_all = false;
-
-// regex for detecting a hilight
-config.irc_hilight_re = new RegExp('^' + config.irc_nick + '[:,]? +(.*)$', 'i');
+regex = '^ *(?:' + config.irc_nick + '[:,]?|!) +(.*\\S.*)$';
+config.irc_hilight_re = new RegExp(regex, 'i');
 
 module.exports = config;
