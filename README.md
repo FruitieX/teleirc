@@ -1,4 +1,4 @@
-tg_irc
+teleirc
 ======
 
 Telegram <-> IRC gateway
@@ -11,10 +11,10 @@ Telegram <-> IRC gateway
 Setup
 -----
 
-    git clone https://github.com/warbaque/tg_irc && cd tg_irc
+    git clone https://github.com/warbaque/teleirc && cd teleirc
     npm install
-    mkdir ~/.tg_irc && cp tg_irc_config.js.example ~/.tg_irc/config.js
-    $EDITOR ~/.tg_irc/config.js
+    mkdir ~/.teleirc && cp teleirc_config.js.example ~/.teleirc/config.js
+    $EDITOR ~/.teleirc/config.js
     npm start
 
-Note that before running `tg_irc`, you should create your Telegram bot first (https://core.telegram.org/bots#botfather)
+Note that before running `teleirc`, you should create your Telegram bot first (https://core.telegram.org/bots#botfather)

@@ -10,7 +10,7 @@ var telegram = require('telegram-bot');
 /////////////////////////
 
 
-var config = require(process.env.HOME + '/.tg_irc/config.js');
+var config = require(process.env.HOME + '/.teleirc/config.js');
 
 // channel option lookup
 var lookup = function (type, channel, arr) {
@@ -41,7 +41,7 @@ var get_chat_ids = function (arr) {
     console.log('=====');
     var id_missing = false;
     try {
-        var json = JSON.parse(fs.readFileSync(process.env.HOME + '/.tg_irc/chat_ids'));
+        var json = JSON.parse(fs.readFileSync(process.env.HOME + '/.teleirc/chat_ids'));
         for (var i=0; i<arr.length; ++i) {
             var key = arr[i].tg_chat;
             if (key in json) {
@@ -54,14 +54,14 @@ var get_chat_ids = function (arr) {
             }
         }
     } catch(e) {
-        console.log('~/.tg_irc/chat_ids file not found!');
+        console.log('~/.teleirc/chat_ids file not found!');
         id_missing = true;
     }
     if (id_missing) {
         console.log(
             '\nPlease add your Telegram bot to a Telegram group and have' +
             '\nsomeone send a message to that group.' +
-            '\ntg_irc will then automatically store your group chat_id.');
+            '\nteleirc will then automatically store your group chat_id.');
     }
     console.log('\n');
     return result;
@@ -167,12 +167,12 @@ tg.on('message', function(msg) {
 
         console.log('storing chat ID: ' + msg.chat.id);
         var json = JSON.stringify(tg_chat_ids);
-        fs.writeFile(process.env.HOME + '/.tg_irc/chat_ids', json, function(err) {
+        fs.writeFile(process.env.HOME + '/.teleirc/chat_ids', json, function(err) {
             if (err) {
                 console.log('error while storing chat ID:');
                 console.log(err);
             } else {
-                console.log('successfully stored chat ID in ~/.tg_irc/chat_ids');
+                console.log('successfully stored chat ID in ~/.teleirc/chat_ids');
             }
         });
     }

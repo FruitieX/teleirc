@@ -1,9 +1,9 @@
 [Unit]
-Description=tg_irc
+Description=teleirc
 After=network.target oidentd.socket
 
 [Service]
-ExecStart=/usr/bin/env node /home/user/teleirc/tg_irc.js
+ExecStart=/usr/bin/env node /home/user/teleirc/teleirc.js
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
 
