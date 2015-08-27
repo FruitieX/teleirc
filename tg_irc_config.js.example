@@ -1,5 +1,25 @@
 var config = {};
 
+function Channel (irc_channel, tg_chat, irc_channel_pwd, irc_channel_id) {
+    this.irc_channel     = irc_channel_id ? irc_channel_id : irc_channel;
+    this.irc_channel_pwd = irc_channel_pwd;
+    this.tg_chat         = tg_chat;
+}
+
+
+/////////////////////
+//  General config //
+/////////////////////
+
+config.channels = [
+    new Channel('#channel1', 'Tg_Chat_1'                         ),
+    new Channel('#channel2', 'Tg_Chat_2', 'passwd'               ),
+    new Channel('!channel3', 'Tg_Chat_3', ''      , '!channel_id'),
+    new Channel('!channel4', 'Tg_Chat_4', 'passwd', '!channel_id')
+]
+
+config.tg_bot_token = '<BOT TOKEN>';
+
 
 //////////////////
 //  IRC config  //
@@ -7,18 +27,17 @@ var config = {};
 
 config.irc_nick = 'tgBot';
 config.irc_server = 'irc.cs.hut.fi';
-config.irc_channel = '!channel password';
-config.irc_channel_id = '!1EYQ9channel';
+
 config.irc_options = {
     userName: 'bot',
     realName: 'Telegram IRC Bot',
     port: 6667,
     localAddress: null,
-    debug: true,
+    debug: false,
     showErrors: false,
     autoRejoin: false,
     autoConnect: true,
-    channels: [config.irc_channel],
+    channels: [], // auto generated, do not touch
     secure: false,
     selfSigned: false,
     certExpired: false,
@@ -30,20 +49,8 @@ config.irc_options = {
     messageSplit: 512,
     encoding: ''
 };
-config.irc_hilight_re = new RegExp('^' + config.irc_nick + '[:,]? +(.*)$', 'i');
+regex = '^ *(?:' + config.irc_nick + '[:,]?|!) +(.*\\S.*)$';
+config.irc_hilight_re = new RegExp(regex, 'i');
 config.irc_relay_all = false;
-
-
-
-/////////////////
-//  TG config  //
-/////////////////
-
-config.tg_nick = 'FirstnameLastname';
-config.tg_chat = 'TelegramChat';
-config.tg_chat_id = 123456;
-config.tg_bot_token = '<BOT TOKEN>';
-
-
 
 module.exports = config;
