@@ -32,10 +32,7 @@ var get_channels = function (arr) {
 }
 
 // tries to read chat ids from a file
-var get_chat_ids = function (arr) {
-    var result = {};
-    // try to read tg_chat_ids from disk
-    // otherwise get it from first conversation
+var read_chat_ids = function (arr) {
     console.log('\n');
     console.log('NOTE!');
     console.log('=====');
@@ -45,7 +42,7 @@ var get_chat_ids = function (arr) {
         for (var i=0; i<arr.length; ++i) {
             var key = arr[i].tg_chat;
             if (key in json) {
-                result[key] = json[key];
+                arr[i]['tg_chat_id'] = json[key];
                 console.log('id found for:', key, ':', json[key]);
             }
             else {
@@ -64,11 +61,28 @@ var get_chat_ids = function (arr) {
             '\nteleirc will then automatically store your group chat_id.');
     }
     console.log('\n');
-    return result;
+}
+
+var write_chat_ids = function () {
+    var json = {}
+    for (var i=0; i<config.channels.length; ++i) {
+        if (config.channels[i].tg_chat_id) {
+            json[config.channels[i].tg_chat] = config.channels[i].tg_chat_id;
+        }
+    }
+    var json = JSON.stringify(json);
+    fs.writeFile(process.env.HOME + '/.teleirc/chat_ids', json, function(err) {
+        if (err) {
+            console.log('error while storing chat ID:');
+            console.log(err);
+        } else {
+            console.log('successfully stored chat ID in ~/.teleirc/chat_ids');
+        }
+    });
 }
 
 config.irc_options.channels = get_channels(config.channels);
-tg_chat_ids = get_chat_ids(config.channels);
+read_chat_ids(config.channels);
 
 
 //////////////////
@@ -97,7 +111,7 @@ tg.start();
 var tg_send_msg = function(conf, msg) {
     console.log('  >> relaying to TG: ' + msg);
 
-    if (!tg_chat_ids[conf.tg_chat]) {
+    if (!conf.tg_chat_id) {
         var err = 'Error: No chat_id set! Add me to a Telegram group '
                 + 'and say hi so I can find your chat_id!';
         irc_send_msg(conf.irc_channel_id, err);
@@ -107,7 +121,7 @@ var tg_send_msg = function(conf, msg) {
 
     tg.sendMessage({
         text: msg,
-        chat_id: tg_chat_ids[conf.tg_chat]
+        chat_id: conf.tg_chat_id
     });
 };
 
@@ -162,19 +176,10 @@ tg.on('message', function(msg) {
         return;
     }
 
-    if (!tg_chat_ids[conf.tg_chat]) {
-        tg_chat_ids[conf.tg_chat] = msg.chat.id;
-
+    if (!conf.tg_chat_id) {
         console.log('storing chat ID: ' + msg.chat.id);
-        var json = JSON.stringify(tg_chat_ids);
-        fs.writeFile(process.env.HOME + '/.teleirc/chat_ids', json, function(err) {
-            if (err) {
-                console.log('error while storing chat ID:');
-                console.log(err);
-            } else {
-                console.log('successfully stored chat ID in ~/.teleirc/chat_ids');
-            }
-        });
+        conf.tg_chat_id = msg.chat.id;
+        write_chat_ids();
     }
 
     if (!msg.text) {
