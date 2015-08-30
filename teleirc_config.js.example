@@ -1,7 +1,8 @@
 var config = {};
 
 function Channel (irc_channel, tg_chat, irc_channel_pwd, irc_channel_id) {
-    this.irc_channel     = irc_channel_id ? irc_channel_id : irc_channel;
+    this.irc_channel     = irc_channel;
+    this.irc_channel_id  = irc_channel_id ? irc_channel_id : irc_channel;
     this.irc_channel_pwd = irc_channel_pwd;
     this.tg_chat         = tg_chat;
 }
