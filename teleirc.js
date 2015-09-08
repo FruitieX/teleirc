@@ -129,7 +129,8 @@ tg.on('message', function(msg) {
     } else if (msg.photo) {
       var text = '(Image, ' + msg.photo.slice(-1)[0].width + 'x' + msg.photo.slice(-1)[0].height + ')'
     } else if (msg.sticker) {
-      var text = '(Sticker)' +    } else if (msg.video) {
+      var text = '(Sticker)'
+    } else if (msg.video) {
       var text = '(Video, ' + msg.video.duration + 's)'
     } else if (msg.voice) {
       var text = '(Voice, ' + msg.audio.duration + 's)'
