@@ -17,9 +17,9 @@ Setup
     cp teleirc_config.js.example ~/.teleirc_config.js
 
 Next, set up your bot via the [BotFather](https://telegram.me/botfather) Telegram user.
-Save your bot token in `~/.teleirc_config.js`. Remember to allow the bot to see all messages via the
+Save your bot token in `~/.teleirc_config.js`. **Remember to allow the bot to see all messages via the
 `/setprivacy` command to `BotFather`, otherwise only messages starting with a
-slash are visible to teleirc.
+slash are visible to teleirc.**
 
 Now read through the rest of `~/.teleirc_config.js` and change the configuration as appropriate.
 
