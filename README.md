@@ -15,9 +15,10 @@ Setup
     npm install
     mkdir ~/.teleirc && cp teleirc_config.js.example ~/.teleirc/config.js
     $EDITOR ~/.teleirc/config.js
-    npm start
 
 Before running `teleirc`, set up your bot via the [BotFather](https://telegram.me/botfather) Telegram user. Save your bot token in `~/.teleirc/config.js`. Remember to allow the bot to see all messages via the `/setprivacy` command to `BotFather`, otherwise only messages starting with a slash are visible to teleirc.
+
+    npm start
 
 Optional:
 

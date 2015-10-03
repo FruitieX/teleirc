@@ -182,12 +182,33 @@ tg.on('message', function(msg) {
         write_chat_ids();
     }
 
-    if (!msg.text) {
-        return;
-    }
-
     var user = msg.from.first_name ? msg.from.first_name : ''
              + msg.from.last_name ? msg.from.last_name : '';
-    var text = '<' + user + '>: ' + msg.text;
-    irc_send_msg(conf.irc_channel_id, text);
+
+    var text;
+
+    if (msg.reply_to_message && msg.text) {
+      text = '@' + msg.reply_to_message.from.username + ', ' + msg.text
+    } else if (msg.audio) {
+      text = '(Audio)'
+    } else if (msg.document) {
+      text = '(Document)'
+    } else if (msg.photo) {
+      text = '(Image, ' + msg.photo.slice(-1)[0].width + 'x' + msg.photo.slice(-1)[0].height + ')'
+    } else if (msg.sticker) {
+      text = '(Sticker)'
+    } else if (msg.video) {
+      text = '(Video, ' + msg.video.duration + 's)'
+    } else if (msg.voice) {
+      text = '(Voice, ' + msg.audio.duration + 's)'
+    } else if (msg.contact) {
+      text = '(Contact, ' + "\"" + msg.contact.first_name + " " + msg.contact.last_name + "\"" + ", " + msg.contact.phone_number + ")"
+    } else if (msg.location) {
+      text = '(Location, lon: ' + msg.location.longitude + ", lat: " + msg.location.latitude + ")"
+    } else {
+      text = msg.text;
+    }
+
+
+    irc_send_msg(conf.irc_channel_id, '<' + user + '>: ' + text);
 });
