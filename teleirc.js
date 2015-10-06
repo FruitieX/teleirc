@@ -4,25 +4,86 @@ var fs = require('fs');
 var nodeirc = require('irc');
 var telegram = require('telegram-bot');
 
-// configs
-var config = require(process.env.HOME + '/.teleirc_config.js');
 
-var tg_chat_id = null;
-if (!tg_chat_id) {
-    // try to read tg_chat_id from disk, otherwise get it from first conversation
-    try {
-        tg_chat_id = fs.readFileSync(process.env.HOME + '/.teleirc_chat_id');
-        console.log('Using chat_id: ' + tg_chat_id);
-    } catch(e) {
-        console.log('\n');
-        console.log('NOTE!');
-        console.log('=====');
-        console.log('~/.teleirc_chat_id file not found!');
-        console.log('Please add your Telegram bot to a Telegram group and have');
-        console.log('someone send a message to that group.');
-        console.log('teleirc will then automatically store your group chat_id.\n\n');
-    }
+/////////////////////////
+//  Config and helpers //
+/////////////////////////
+
+
+var config = require(process.env.HOME + '/.teleirc/config.js');
+
+// channel option lookup
+var lookup = function (type, channel, arr) {
+    return arr.filter(function (obj) {
+        return obj[type] === channel;
+    })[0];
 }
+
+// generates channel list for irc_options
+var get_channels = function (arr) {
+    var result = [];
+    for (var i=0; i<arr.length; ++i) {
+        var channel = arr[i].irc_channel_pwd ?
+            arr[i].irc_channel + ' ' + arr[i].irc_channel_pwd :
+            arr[i].irc_channel;
+        result.push(channel);
+    }
+    return result;
+}
+
+// tries to read chat ids from a file
+var read_chat_ids = function (arr) {
+    console.log('\n');
+    console.log('NOTE!');
+    console.log('=====');
+    var id_missing = false;
+    try {
+        var json = JSON.parse(fs.readFileSync(process.env.HOME + '/.teleirc/chat_ids'));
+        for (var i=0; i<arr.length; ++i) {
+            var key = arr[i].tg_chat;
+            if (key in json) {
+                arr[i]['tg_chat_id'] = json[key];
+                console.log('id found for:', key, ':', json[key]);
+            }
+            else {
+                console.log('id not found:', key);
+                id_missing = true;
+            }
+        }
+    } catch(e) {
+        console.log('~/.teleirc/chat_ids file not found!');
+        id_missing = true;
+    }
+    if (id_missing) {
+        console.log(
+            '\nPlease add your Telegram bot to a Telegram group and have' +
+            '\nsomeone send a message to that group.' +
+            '\nteleirc will then automatically store your group chat_id.');
+    }
+    console.log('\n');
+}
+
+var write_chat_ids = function () {
+    var json = {}
+    for (var i=0; i<config.channels.length; ++i) {
+        if (config.channels[i].tg_chat_id) {
+            json[config.channels[i].tg_chat] = config.channels[i].tg_chat_id;
+        }
+    }
+    var json = JSON.stringify(json);
+    fs.writeFile(process.env.HOME + '/.teleirc/chat_ids', json, function(err) {
+        if (err) {
+            console.log('error while storing chat ID:');
+            console.log(err);
+        } else {
+            console.log('successfully stored chat ID in ~/.teleirc/chat_ids');
+        }
+    });
+}
+
+config.irc_options.channels = get_channels(config.channels);
+read_chat_ids(config.channels);
+
 
 //////////////////
 //  IRC Client  //
@@ -34,14 +95,44 @@ irc.on('error', function(error) {
     console.log('error: ', error);
 });
 
-var irc_send_msg = function(msg) {
+var irc_send_msg = function(irc_channel_id, msg) {
     console.log('  >> relaying to IRC: ' + msg);
-    irc.say(config.irc_channel, msg);
+    irc.say(irc_channel_id, msg);
 };
 
+
+//////////////////
+//  TG bot API  //
+//////////////////
+
+var tg = new telegram(config.tg_bot_token);
+tg.start();
+
+var tg_send_msg = function(conf, msg) {
+    console.log('  >> relaying to TG: ' + msg);
+
+    if (!conf.tg_chat_id) {
+        var err = 'Error: No chat_id set! Add me to a Telegram group '
+                + 'and say hi so I can find your chat_id!';
+        irc_send_msg(conf.irc_channel_id, err);
+        console.log(err);
+        return;
+    }
+
+    tg.sendMessage({
+        text: msg,
+        chat_id: conf.tg_chat_id
+    });
+};
+
+
+//////////////////
+//  IRC >>> TG  //
+//////////////////
+
 irc.on('message', function(user, channel, message) {
-    // is this from the correct channel?
-    if (config.irc_channel.toLowerCase() !== channel.toLowerCase()) {
+    var conf = lookup('irc_channel_id', channel, config.channels);
+    if (!conf) {
         return;
     }
 
@@ -51,70 +142,44 @@ irc.on('message', function(user, channel, message) {
             message = match[1].trim();
         }
         var text = '<' + user + '>: ' + message;
-        tg_send_msg(text);
+        tg_send_msg(conf, text);
     }
 });
 
-// ignore first topic event when joining channel
-var first_topic_event = true;
 irc.on('topic', function(channel, topic, nick) {
-    // is this from the correct channel?
-    if (config.irc_channel.toLowerCase() !== channel.toLowerCase()) {
+    var conf = lookup('irc_channel_id', channel, config.channels)
+    if (!conf) {
         return;
     }
 
-    if (first_topic_event) {
-        first_topic_event = false;
+    // ignore first topic event when joining channel
+    // (doesn't handle rejoins yet)
+    if (!conf.send_topic) {
+        conf.send_topic = true;
         return;
     }
 
-    var text  = '* Topic for channel ' + config.irc_channel.split(' ')[0]
-                + ':\n' + topic.split(' | ').join('\n')
-                + '\n* set by ' + nick.split('!')[0];
-    tg_send_msg(text);
+    var text = '* Topic for channel ' + conf.irc_channel
+             + ':\n' + topic.split(' | ').join('\n')
+             + '\n* set by ' + nick.split('!')[0];
+    tg_send_msg(conf, text);
 });
 
+
 //////////////////
-//  TG bot API  //
+//  TG >>> IRC  //
 //////////////////
-
-var tg = new telegram(config.tg_bot_token);
-tg.start();
-
-var tg_send_msg = function(msg) {
-    console.log('  >> relaying to TG: ' + msg);
-
-    if (!tg_chat_id) {
-        var err = 'Error: No chat_id set! Add me to a Telegram group ' +
-                  'and say hi so I can find your chat_id!';
-        irc_send_msg(err);
-        console.log(err);
-        return;
-    }
-
-    tg.sendMessage({
-        text: msg,
-        chat_id: parseInt(tg_chat_id)
-    });
-};
 
 tg.on('message', function(msg) {
-    if (config.tg_chat !== msg.chat.title) {
+    var conf = lookup('tg_chat', msg.chat.title, config.channels);
+    if (!conf) {
         return;
     }
 
-    if (!tg_chat_id) {
-        tg_chat_id = msg.chat.id;
-
+    if (!conf.tg_chat_id) {
         console.log('storing chat ID: ' + msg.chat.id);
-        fs.writeFile(process.env.HOME + '/.teleirc_chat_id', msg.chat.id, function(err) {
-            if (err) {
-                console.log('error while storing chat ID:');
-                console.log(err);
-            } else {
-                console.log('successfully stored chat ID in ~/.teleirc_chat_id');
-            }
-        });
+        conf.tg_chat_id = msg.chat.id;
+        write_chat_ids();
     }
 
     var user = msg.from.first_name ? msg.from.first_name : ''
@@ -144,5 +209,6 @@ tg.on('message', function(msg) {
       text = msg.text;
     }
 
-    irc_send_msg('<' + user + '>: ' + text);
+
+    irc_send_msg(conf.irc_channel_id, '<' + user + '>: ' + text);
 });
