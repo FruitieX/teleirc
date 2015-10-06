@@ -24,7 +24,7 @@ in `~/.teleirc/config.js`. **Remember to allow the bot to see all messages via
 the `/setprivacy` command to `BotFather`, otherwise only messages starting with
 a slash are visible to teleirc.**
 
-Now run `teleirc` simply with the following command:
+Now simply run `teleirc` with the following command:
 
     teleirc
 
