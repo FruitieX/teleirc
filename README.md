@@ -28,6 +28,11 @@ Now simply run `teleirc` with the following command:
 
     teleirc
 
+Note: *IRC -> Telegram* messages only work after the bot has received at least
+one chat message from your Telegram group (it needs to know the Telegram
+internal variable `chat_id`, which it also conveniently stores in a file as
+soon as it's known)
+
 Optional:
 
 - For your convenience, there is an included systemd unit file in
