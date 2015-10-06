@@ -1,12 +1,23 @@
 #!/usr/bin/env node
 
 var fs = require('fs');
+var mkdirp = require('mkdirp');
 var nodeirc = require('irc');
 var Telegram = require('telegram-bot');
 
 /////////////////////////
 //  Config and helpers //
 /////////////////////////
+
+if (process.argv[2] === '--genconfig') {
+    mkdirp(process.env.HOME + '/.teleirc');
+    var defaultConfig = fs.readFileSync(__dirname + '/config.js.example');
+
+    var configPath = process.env.HOME + '/.teleirc/config.js';
+    fs.writeFileSync(configPath, defaultConfig);
+    console.log('Wrote default configuration to ' + configPath + ', go edit it NOW!');
+    process.exit(0);
+}
 
 var config = require(process.env.HOME + '/.teleirc/config.js');
 
