@@ -14,9 +14,8 @@ Telegram <-> IRC gateway
 Setup
 -----
 
-    git clone https://github.com/warbaque/teleirc && cd teleirc
-    npm install
-    mkdir ~/.teleirc && cp config.js.example ~/.teleirc/config.js
+    npm install -g teleirc
+    teleirc --genconfig
     $EDITOR ~/.teleirc/config.js
 
 Before running `teleirc`, set up your bot via the
@@ -25,7 +24,7 @@ in `~/.teleirc/config.js`. **Remember to allow the bot to see all messages via
 the `/setprivacy` command to `BotFather`, otherwise only messages starting with
 a slash are visible to teleirc.**
 
-    npm start
+    teleirc
 
 Optional:
 
@@ -33,3 +32,13 @@ Optional:
   `teleirc.service`.
 - You can change your Telegram Bot's profile picture with the `/setuserpic`
   BotFather command.
+
+Running from git
+----------------
+
+    git clone https://github.com/FruitieX/teleirc
+    cd teleirc
+    npm install
+
+Then follow the rest of the instructions under `Setup`. Instead of using
+the `teleirc` command, use `node teleirc.js` inside the repo.
