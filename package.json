@@ -3,7 +3,8 @@
   "description": "Telegram <-> IRC gateway",
   "scripts": {
     "prestart": "npm install",
-    "start": "node teleirc.js"
+    "start": "node teleirc.js",
+    "test": "NODE_ENV=test ./node_modules/mocha/bin/mocha"
   },
   "version": "0.2.0",
   "licenses": [
@@ -22,5 +23,11 @@
   "dependencies": {
     "irc": "~0.3.12",
     "telegram-bot": "^0.2.0"
+  },
+  "devDependencies": {
+    "jscs": "^2.2.1",
+    "mocha": "^2.3.3",
+    "mocha-jscs": "^4.0.0",
+    "mocha-jshint": "^2.2.3"
   }
 }

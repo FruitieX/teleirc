@@ -7,7 +7,6 @@ function Channel (irc_channel, tg_chat, irc_channel_pwd, irc_channel_id) {
     this.tg_chat         = tg_chat;
 }
 
-
 /////////////////////
 //  General config //
 /////////////////////
@@ -21,7 +20,6 @@ config.channels = [
 
 config.tg_bot_token = '<BOT TOKEN>';
 
-
 //////////////////
 //  IRC config  //
 //////////////////
@@ -29,7 +27,8 @@ config.tg_bot_token = '<BOT TOKEN>';
 config.irc_nick = 'tgBot';
 config.irc_server = 'irc.cs.hut.fi';
 
-// see https://node-irc.readthedocs.org/en/latest/API.html#client for documentation
+// see https://node-irc.readthedocs.org/en/latest/API.html#client for
+// documentation
 config.irc_options = {
     userName: 'bot',
     realName: 'Telegram IRC Bot',

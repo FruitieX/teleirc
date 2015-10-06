@@ -1,0 +1,92 @@
+[
+    {
+        "album": "dummyAlbum1",
+        "albumArt": null,
+        "artist": "dummyArtist1",
+        "backendName": "dummyBackend",
+        "duration": "317000",
+        "format": "opus",
+        "hmac": "dummyHmac1",
+        "prepared": true,
+        "score": 137.55496215820312,
+        "songID": "dummySong1",
+        "timeAdded": 1426544145629,
+        "title": "dummyTitle1",
+        "userID": "dummyClient"
+    },
+    {
+        "album": "dummyAlbum2",
+        "albumArt": null,
+        "artist": "dummyArtist2",
+        "backendName": "dummyBackend",
+        "downVotes": {},
+        "duration": "302000",
+        "format": "opus",
+        "hmac": "dummyHmac2",
+        "oldness": 5,
+        "score": 177.30935668945312,
+        "songID": "dummySong2",
+        "timeAdded": 1426544145629,
+        "title": "dummyTitle2",
+        "upVotes": {
+            "dummyClient": true
+        },
+        "userID": "dummyClient"
+    },
+    {
+        "album": "dummyAlbum3",
+        "albumArt": null,
+        "artist": "dummyArtist3",
+        "backendName": "dummyBackend",
+        "duration": "191000",
+        "format": "opus",
+        "hmac": "dummyHmac3",
+        "score": 343.02227783203125,
+        "songID": "dummySong3",
+        "timeAdded": 1426544145630,
+        "title": "dummyTitle3",
+        "userID": "dummyClient"
+    },
+    {
+        "album": "dummyAlbum4",
+        "albumArt": null,
+        "artist": "dummyArtist4",
+        "backendName": "dummyBackend",
+        "duration": "454000",
+        "format": "opus",
+        "hmac": "dummyHmac4",
+        "score": 55.62825393676758,
+        "songID": "dummySong4",
+        "timeAdded": 1426544145630,
+        "title": "dummyTitle4",
+        "userID": "dummyClient"
+    },
+    {
+        "album": "dummyAlbum5",
+        "albumArt": null,
+        "artist": "dummyArtist5",
+        "backendName": "dummyBackend",
+        "duration": "285000",
+        "format": "opus",
+        "hmac": "dummyHmac5",
+        "score": 53.24725341796875,
+        "songID": "dummySong5",
+        "timeAdded": 1426544145631,
+        "title": "dummyTitle5",
+        "userID": "dummyClient"
+    },
+    {
+        "album": "dummyAlbum6",
+        "albumArt": null,
+        "artist": "dummyArtist6",
+        "backendName": "dummyBackend",
+        "duration": "488000",
+        "format": "opus",
+        "hmac": "dummyHmac6",
+        "score": 175.5480194091797,
+        "songID": "dummySong6",
+        "timeAdded": 1426544145631,
+        "title": "dummyTitle6",
+        "userID": "dummyClient"
+    }
+]

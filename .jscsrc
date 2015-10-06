@@ -1,0 +1,13 @@
+{
+    "preset": "google",
+
+    "requireParenthesesAroundIIFE": true,
+    "maximumLineLength": 100,
+    "validateLineBreaks": "LF",
+    "validateIndentation": 4,
+    "requireCamelCaseOrUpperCaseIdentifiers": false,
+
+    "excludeFiles": [
+        "node_modules/**"
+    ]
+}
