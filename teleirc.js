@@ -137,7 +137,6 @@ var tg_send_msg = function(conf, msg) {
 //////////////////
 //  IRC >>> TG  //
 //////////////////
-
 irc.on('message', function(user, channel, message) {
     var conf = lookup('irc_channel_id', channel, config.channels);
     if (!conf) {
@@ -150,6 +149,22 @@ irc.on('message', function(user, channel, message) {
             message = match[1].trim();
         }
         var text = '<' + user + '>: ' + message;
+        tg_send_msg(conf, text);
+    }
+});
+
+irc.on('action', function(user, channel, message) {
+    var conf = lookup('irc_channel_id', channel, config.channels);
+    if (!conf) {
+        return;
+    }
+
+    var match = config.irc_hilight_re.exec(message);
+    if (match || config.irc_relay_all) {
+        if (match) {
+            message = match[1].trim();
+        }
+        var text = '*' + user + ': ' + message + '*';
         tg_send_msg(conf, text);
     }
 });
