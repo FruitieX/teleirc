@@ -3,7 +3,7 @@ teleirc
 
 Telegram <-> IRC gateway
 
-Features:
+#### Features:
 
 * Supports multiple IRC channel <-> Telegram group pairs
 * Telegram messages are always relayed to the respective IRC channel
