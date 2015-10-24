@@ -95,7 +95,7 @@ module.exports = function() {
 
     try {
         config = require(process.env.HOME + '/.teleirc/config.js');
-    } catch(e) {
+    } catch (e) {
         console.error('ERROR while reading config:\n' + e + '\n\nPlease make sure ' +
                       'it exists and is valid. Run "teleirc --genconfig" to ' +
                       'generate a default config.');
