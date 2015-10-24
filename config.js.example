@@ -1,10 +1,12 @@
 var config = {};
+module.exports = config;
 
 /////////////////////
 //  General config //
 /////////////////////
 
-config.tg_bot_token = '<BOT TOKEN>';
+// paste the bot API token you got from BotFather here:
+config.tg_bot_token = 'YOUR-BOT-TOKEN';
 
 //////////////////
 //  IRC config  //
@@ -14,25 +16,28 @@ config.irc_nick = 'tgBot';
 config.irc_server = 'irc.cs.hut.fi';
 
 config.channels = [
+    // example of a barebones IRC channel:
+    // '#channel1' will be bridged to a Telegram group called 'Tg_Chat_1'
     {
         irc_channel: '#channel1',
-        tg_chat: 'Name_Of_Telegram_Chat1'
+        tg_chat: 'Tg_Chat_1'
     },
+
+    // example of a password-protected IRC channel:
     {
         irc_channel: '#channel2',
-        tg_chat: 'Name_Of_Telegram_Chat2',
+        tg_chat: 'Tg_Chat_2',
         password: 'passwd'
     },
+
+    // example of an IRC channel with an alias:
+    // channel name will be displayed as '!channel3' instead of '!XXXXXchannel3'
     {
         irc_channel: '!XXXXXchannel3',
-        channel_alias: '!channel3', // display channel name as !channel3 instead of !XXXXXchannel3
-        tg_chat: 'Name_Of_Telegram_Chat3',
+        channel_alias: '!channel3',
+        tg_chat: 'Tg_Chat_3',
         password: 'passwd'
     }
-    new Channel('#channel1', 'Tg_Chat_1'                         ),
-    new Channel('#channel2', 'Tg_Chat_2', 'passwd'               ),
-    new Channel('!channel3', 'Tg_Chat_3', ''      , '!channel_id'),
-    new Channel('!channel4', 'Tg_Chat_4', 'passwd', '!channel_id')
 ]
 
 // see https://node-irc.readthedocs.org/en/latest/API.html#client for
@@ -59,8 +64,11 @@ config.irc_options = {
     encoding: ''
 };
 
+// if you wish to relay every irc message to telegram, set this to true.
+// if false, then only lines matching irc_hilight_re will be relayed
 config.irc_relay_all = false;
-regex = '^ *(?:' + config.irc_nick + '[:,]?|!) +(.*\\S.*)$';
-config.irc_hilight_re = new RegExp(regex, 'i');
 
-module.exports = config;
+// the default hilight regexp will match lines containing the bot nick, or
+// lines starting with '! '
+var regex = '^ *(?:' + config.irc_nick + '[:,]?|!) +(.*\\S.*)$';
+config.irc_hilight_re = new RegExp(regex, 'i');
