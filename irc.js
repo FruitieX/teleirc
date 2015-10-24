@@ -3,7 +3,7 @@ var tg = require('./tg');
 
 var lookupChannel = function(chanName, channels) {
     return channels.filter(function(channel) {
-        return channel['ircChan'] === chanName;
+        return channel.ircChan === chanName;
     })[0];
 };
 

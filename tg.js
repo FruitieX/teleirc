@@ -62,7 +62,7 @@ module.exports = function(config, sendTo) {
 
     tg.on('message', function(msg) {
         var channel = config.channels.filter(function(channel) {
-            return channel['tgGroup'] === msg.chat.title;
+            return channel.tgGroup === msg.chat.title;
         })[0];
 
         if (!channel) {
