@@ -4,6 +4,7 @@ var fs = require('fs');
 var mkdirp = require('mkdirp');
 var nodeirc = require('irc');
 var Telegram = require('telegram-bot');
+var parseConfig = require('./parseConfig');
 
 /////////////////////////
 //  Config and helpers //
@@ -15,11 +16,12 @@ if (process.argv[2] === '--genconfig') {
 
     var configPath = process.env.HOME + '/.teleirc/config.js';
     fs.writeFileSync(configPath, defaultConfig);
-    console.log('Wrote default configuration to ' + configPath + ', go edit it NOW!');
+    console.log('Wrote default configuration to ' + configPath +
+                ', please edit it before re-running');
     process.exit(0);
 }
 
-var config = require(process.env.HOME + '/.teleirc/config.js');
+var config = parseConfig();
 
 // channel option lookup
 var lookup = function(type, channel, arr) {
