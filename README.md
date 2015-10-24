@@ -1,7 +1,7 @@
 teleirc
 =======
 
-Telegram <-> IRC gateway
+[Telegram](https://telegram.org/) <-> IRC gateway
 
 #### Features:
 
