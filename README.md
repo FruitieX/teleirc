@@ -14,8 +14,8 @@ Features:
 * IRC communication via martynsmith's
   [node-irc](https://github.com/martynsmith/node-irc) module
 
-Setup
------
+Quick start
+-----------
 
 Make sure you've installed Node.js.
 
