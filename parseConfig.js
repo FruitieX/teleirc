@@ -1,4 +1,6 @@
 var _ = require('lodash');
+var fs = require('fs');
+var mkdirp = require('mkdirp');
 
 var warnDeprecated = function(oldOpt, newOpt) {
     console.warn('WARNING: detected usage of deprecated config option "' + oldOpt + '", ' +
@@ -10,25 +12,25 @@ var warnDeprecated = function(oldOpt, newOpt) {
 var parseDeprecatedOptions = function(config) {
 
     // check the contents of the channels array for old options
-    _.forEach(config.channels, function(channel) {
+    _.forEach(config.channels, function(channel, i) {
         _.forEach(channel, function(value, key) {
             if (key === 'irc_channel') {
-                config.channels[channel].chanAlias = value;
+                config.channels[i].chanAlias = value;
                 warnDeprecated(key, 'chanAlias');
                 return;
             }
             if (key === 'irc_channel_id') {
-                config.channels[channel].ircChan = value;
+                config.channels[i].ircChan = value;
                 warnDeprecated(key, 'ircChan');
                 return;
             }
             if (key === 'irc_channel_pwd') {
-                config.channels[channel].chanPwd = value;
+                config.channels[i].chanPwd = value;
                 warnDeprecated(key, 'chanPwd');
                 return;
             }
             if (key === 'tg_chat') {
-                config.channels[channel].tgGroup = value;
+                config.channels[i].tgGroup = value;
                 warnDeprecated(key, 'tgGroup');
                 return;
             }
@@ -89,7 +91,16 @@ if (process.argv[2] === '--genconfig') {
 }
 
 module.exports = function() {
-    var config = require(process.env.HOME + '/.teleirc/config.js');
+    var config;
+
+    try {
+        config = require(process.env.HOME + '/.teleirc/config.js');
+    } catch(e) {
+        console.error('ERROR while reading config:\n' + e + '\n\nPlease make sure ' +
+                      'it exists and is valid. Run "teleirc --genconfig" to ' +
+                      'generate a default config.');
+        process.exit(1);
+    }
 
     config = parseDeprecatedOptions(config);
     config = _.defaults(config, defaultConfig);

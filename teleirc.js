@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 var fs = require('fs');
-var mkdirp = require('mkdirp');
 var nodeirc = require('irc');
 var Telegram = require('telegram-bot');
 var parseConfig = require('./parseConfig');
