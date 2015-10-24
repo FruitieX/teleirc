@@ -6,43 +6,42 @@ module.exports = config;
 /////////////////////
 
 // paste the bot API token you got from BotFather here:
-config.tg_bot_token = 'YOUR-BOT-TOKEN';
+config.tgToken = 'YOUR-BOT-TOKEN';
 
 //////////////////
 //  IRC config  //
 //////////////////
 
-config.irc_nick = 'tgBot';
-config.irc_server = 'irc.cs.hut.fi';
+config.ircNick = 'tgBot';
+config.ircServer = 'irc.cs.hut.fi';
 
 config.channels = [
     // example of a barebones IRC channel:
-    // '#channel1' will be bridged to a Telegram group called 'Tg_Chat_1'
+    // '#channel1' will be bridged to a Telegram group called 'Tg_Group_1'
     {
-        irc_channel: '#channel1',
-        tg_chat: 'Tg_Chat_1'
+        ircChan: '#channel1',
+        tgGroup: 'Tg_Group_1'
     },
 
     // example of a password-protected IRC channel:
     {
-        irc_channel: '#channel2',
-        tg_chat: 'Tg_Chat_2',
-        password: 'passwd'
+        ircChan: '#channel2',
+        chanPwd: 'passwd'
+        tgGroup: 'Tg_Group_2',
     },
 
     // example of an IRC channel with an alias:
     // channel name will be displayed as '!channel3' instead of '!XXXXXchannel3'
     {
-        irc_channel: '!XXXXXchannel3',
-        channel_alias: '!channel3',
-        tg_chat: 'Tg_Chat_3',
-        password: 'passwd'
+        ircChan: '!XXXXXchannel3',
+        chanAlias: '!channel3',
+        tgGroup: 'Tg_Group_3',
     }
 ]
 
 // see https://node-irc.readthedocs.org/en/latest/API.html#client for
 // documentation
-config.irc_options = {
+config.ircOptions = {
     userName: 'bot',
     realName: 'Telegram IRC Bot',
     port: 6667,
@@ -65,10 +64,10 @@ config.irc_options = {
 };
 
 // if you wish to relay every irc message to telegram, set this to true.
-// if false, then only lines matching irc_hilight_re will be relayed
-config.irc_relay_all = false;
+// if false, then only lines matching config.hlRegexp will be relayed
+config.ircRelayAll = false;
 
 // the default hilight regexp will match lines containing the bot nick, or
 // lines starting with '! '
-var regex = '^ *(?:' + config.irc_nick + '[:,]?|!) +(.*\\S.*)$';
-config.irc_hilight_re = new RegExp(regex, 'i');
+var regex = '^ *(?:' + config.ircNick + '[:,]?|!) +(.*\\S.*)$';
+config.hlRegexp = new RegExp(regex, 'i');
