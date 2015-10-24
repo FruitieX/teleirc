@@ -1,9 +1,9 @@
 var _ = require('lodash');
 
-var warnDeprecated = function(old, new) {
-    console.warn('WARNING: detected usage of deprecated config option "' + old + '", ' +
+var warnDeprecated = function(oldOpt, newOpt) {
+    console.warn('WARNING: detected usage of deprecated config option "' + oldOpt + '", ' +
                  'support for it will be dropped in a future version! Consider ' +
-                 'migrating to the new "' + new + '" option instead.');
+                 'migrating to the new "' + newOpt + '" option instead.');
 };
 
 // support old config options for a few versions, but warn about their usage
