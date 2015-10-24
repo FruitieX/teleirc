@@ -67,15 +67,32 @@ var parseDeprecatedOptions = function(config) {
             warnDeprecated(option, 'hlRegexp');
             return;
         }
+        if (option === 'send_topic') {
+            config.sendTopic = value;
+            warnDeprecated(option, 'sendTopic');
+            return;
+        }
     });
 
     return config;
 };
 
+var defaultConfig = fs.readFileSync(__dirname + '/config.js.example');
+if (process.argv[2] === '--genconfig') {
+    mkdirp(process.env.HOME + '/.teleirc');
+
+    var configPath = process.env.HOME + '/.teleirc/config.js';
+    fs.writeFileSync(configPath, defaultConfig);
+    console.log('Wrote default configuration to ' + configPath +
+                ', please edit it before re-running');
+    process.exit(0);
+}
+
 module.exports = function() {
     var config = require(process.env.HOME + '/.teleirc/config.js');
 
     config = parseDeprecatedOptions(config);
+    config = _.defaults(config, defaultConfig);
 
     return config;
 };

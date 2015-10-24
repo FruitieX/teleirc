@@ -10,17 +10,6 @@ var parseConfig = require('./parseConfig');
 //  Config and helpers //
 /////////////////////////
 
-if (process.argv[2] === '--genconfig') {
-    mkdirp(process.env.HOME + '/.teleirc');
-    var defaultConfig = fs.readFileSync(__dirname + '/config.js.example');
-
-    var configPath = process.env.HOME + '/.teleirc/config.js';
-    fs.writeFileSync(configPath, defaultConfig);
-    console.log('Wrote default configuration to ' + configPath +
-                ', please edit it before re-running');
-    process.exit(0);
-}
-
 var config = parseConfig();
 
 // channel option lookup
@@ -30,15 +19,17 @@ var lookup = function(type, channel, arr) {
     })[0];
 };
 
-// generates channel list for irc_options
+// generates channel list for ircOptions
 var getChannels = function(arr) {
     var result = [];
+
     for (var i = 0; i < arr.length; i++) {
-        var channel = arr[i].irc_channel_pwd ?
-            arr[i].irc_channel + ' ' + arr[i].irc_channel_pwd :
-            arr[i].irc_channel;
+        var channel = arr[i].chanPwd ?
+                      arr[i].ircChan + ' ' + arr[i].chanPwd :
+                      arr[i].ircChan;
         result.push(channel);
     }
+
     return result;
 };
 
@@ -48,25 +39,25 @@ var readChatIds = function(arr) {
     console.log('NOTE!');
     console.log('=====');
 
-    var id_missing = false;
+    var idMissing = false;
     try {
         var json = JSON.parse(fs.readFileSync(process.env.HOME + '/.teleirc/chat_ids'));
         for (var i = 0; i < arr.length; i++) {
-            var key = arr[i].tg_chat;
+            var key = arr[i].tgGroup;
             if (key in json) {
-                arr[i].tg_chat_id = json[key];
+                arr[i].tgChatId = json[key];
                 console.log('id found for:', key, ':', json[key]);
             } else {
                 console.log('id not found:', key);
-                id_missing = true;
+                idMissing = true;
             }
         }
     } catch (e) {
         console.log('~/.teleirc/chat_ids file not found!');
-        id_missing = true;
+        idMissing = true;
     }
 
-    if (id_missing) {
+    if (idMissing) {
         console.log(
             '\nPlease add your Telegram bot to a Telegram group and have' +
             '\nsomeone send a message to that group.' +
@@ -79,8 +70,8 @@ var readChatIds = function(arr) {
 var writeChatIds = function() {
     var json = {};
     for (var i = 0; i < config.channels.length; i++) {
-        if (config.channels[i].tg_chat_id) {
-            json[config.channels[i].tg_chat] = config.channels[i].tg_chat_id;
+        if (config.channels[i].tgChatId) {
+            json[config.channels[i].tgGroup] = config.channels[i].tgChatId;
         }
     }
     json = JSON.stringify(json);
@@ -94,45 +85,45 @@ var writeChatIds = function() {
     });
 };
 
-config.irc_options.channels = getChannels(config.channels);
+config.ircOptions.channels = getChannels(config.channels);
 readChatIds(config.channels);
 
 //////////////////
 //  IRC Client  //
 //////////////////
 
-var irc = new nodeirc.Client(config.irc_server, config.irc_nick, config.irc_options);
+var irc = new nodeirc.Client(config.ircServer, config.ircNick, config.ircOptions);
 
 irc.on('error', function(error) {
     console.log('error: ', error);
 });
 
-var irc_send_msg = function(irc_channel_id, msg) {
+var ircSendMsg = function(ircChan, msg) {
     console.log('  >> relaying to IRC: ' + msg);
-    irc.say(irc_channel_id, msg);
+    irc.say(ircChan, msg);
 };
 
 //////////////////
 //  TG bot API  //
 //////////////////
 
-var tg = new Telegram(config.tg_bot_token);
+var tg = new Telegram(config.tgToken);
 tg.start();
 
-var tg_send_msg = function(conf, msg) {
+var tgSendMsg = function(conf, msg) {
     console.log('  >> relaying to TG: ' + msg);
 
-    if (!conf.tg_chat_id) {
+    if (!conf.tgChatId) {
         var err = 'Error: No chat_id set! Add me to a Telegram group ' +
                   'and say hi so I can find your chat_id!';
-        irc_send_msg(conf.irc_channel_id, err);
+        ircSendMsg(conf.ircChan, err);
         console.log(err);
         return;
     }
 
     tg.sendMessage({
         text: msg,
-        chat_id: conf.tg_chat_id
+        chat_id: conf.tgChatId
     });
 };
 
@@ -140,54 +131,54 @@ var tg_send_msg = function(conf, msg) {
 //  IRC >>> TG  //
 //////////////////
 irc.on('message', function(user, channel, message) {
-    var conf = lookup('irc_channel_id', channel, config.channels);
+    var conf = lookup('ircChan', channel, config.channels);
     if (!conf) {
         return;
     }
 
-    var match = config.irc_hilight_re.exec(message);
-    if (match || config.irc_relay_all) {
+    var match = config.hlRegexp.exec(message);
+    if (match || config.ircRelayAll) {
         if (match) {
             message = match[1].trim();
         }
         var text = '<' + user + '>: ' + message;
-        tg_send_msg(conf, text);
+        tgSendMsg(conf, text);
     }
 });
 
 irc.on('action', function(user, channel, message) {
-    var conf = lookup('irc_channel_id', channel, config.channels);
+    var conf = lookup('ircChan', channel, config.channels);
     if (!conf) {
         return;
     }
 
-    var match = config.irc_hilight_re.exec(message);
-    if (match || config.irc_relay_all) {
+    var match = config.hlRegexp.exec(message);
+    if (match || config.ircRelayAll) {
         if (match) {
             message = match[1].trim();
         }
         var text = '*' + user + ': ' + message + '*';
-        tg_send_msg(conf, text);
+        tgSendMsg(conf, text);
     }
 });
 
 irc.on('topic', function(channel, topic, nick) {
-    var conf = lookup('irc_channel_id', channel, config.channels);
+    var conf = lookup('ircChan', channel, config.channels);
     if (!conf) {
         return;
     }
 
     // ignore first topic event when joining channel
     // (doesn't handle rejoins yet)
-    if (!conf.send_topic) {
-        conf.send_topic = true;
+    if (!conf.sendTopic) {
+        conf.sendTopic = true;
         return;
     }
 
-    var text = '* Topic for channel ' + conf.irc_channel +
+    var text = '* Topic for channel ' + conf.chanAlias || conf.ircChan +
                ':\n' + topic.split(' | ').join('\n') +
                '\n* set by ' + nick.split('!')[0];
-    tg_send_msg(conf, text);
+    tgSendMsg(conf, text);
 });
 
 //////////////////
@@ -195,14 +186,14 @@ irc.on('topic', function(channel, topic, nick) {
 //////////////////
 
 tg.on('message', function(msg) {
-    var conf = lookup('tg_chat', msg.chat.title, config.channels);
+    var conf = lookup('tgGroup', msg.chat.title, config.channels);
     if (!conf) {
         return;
     }
 
-    if (!conf.tg_chat_id) {
+    if (!conf.tgChatId) {
         console.log('storing chat ID: ' + msg.chat.id);
-        conf.tg_chat_id = msg.chat.id;
+        conf.tgChatId = msg.chat.id;
         writeChatIds();
     }
 
@@ -237,5 +228,5 @@ tg.on('message', function(msg) {
         text = msg.text;
     }
 
-    irc_send_msg(conf.irc_channel_id, '<' + user + '>: ' + text);
+    ircSendMsg(conf.ircChan, '<' + user + '>: ' + text);
 });

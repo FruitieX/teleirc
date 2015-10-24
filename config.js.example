@@ -8,6 +8,9 @@ module.exports = config;
 // paste the bot API token you got from BotFather here:
 config.tgToken = 'YOUR-BOT-TOKEN';
 
+// send IRC topic changes to Telegram
+config.sendTopic = true;
+
 //////////////////
 //  IRC config  //
 //////////////////
