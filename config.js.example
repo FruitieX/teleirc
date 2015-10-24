@@ -11,6 +11,10 @@ config.tgToken = 'YOUR-BOT-TOKEN';
 // send IRC topic changes to Telegram
 config.sendTopic = true;
 
+// send an IRC message if someone sends media (eg. stickers, photos, etc)
+// on a Telegram group
+config.showMedia = true;
+
 //////////////////
 //  IRC config  //
 //////////////////

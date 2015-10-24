@@ -82,6 +82,12 @@ module.exports = function(config, sendTo) {
         var user = msg.from.first_name ? msg.from.first_name : '' +
                    msg.from.last_name ? msg.from.last_name : '';
 
+        // skip posts containing media if it's configured off
+        if ((msg.audio || msg.document || msg.photo || msg.sticker || msg.video ||
+            msg.voice || msg.contact || msg.location) && !config.showMedia) {
+            return;
+        }
+
         var text;
 
         if (msg.reply_to_message && msg.text) {
