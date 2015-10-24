@@ -2,13 +2,6 @@ var Telegram = require('telegram-bot');
 var fs = require('fs');
 var irc = require('./irc');
 
-// channel option lookup
-var lookup = function(type, channel, arr) {
-    return arr.filter(function(obj) {
-        return obj[type] === channel;
-    })[0];
-};
-
 // tries to read chat ids from a file
 var readChatIds = function(arr) {
     console.log('\n');
@@ -68,14 +61,17 @@ module.exports = function(config, sendTo) {
     readChatIds(config.channels);
 
     tg.on('message', function(msg) {
-        var conf = lookup('tgGroup', msg.chat.title, config.channels);
-        if (!conf) {
+        var channel = config.channels.filter(function(channel) {
+            return channel['tgGroup'] === msg.chat.title;
+        })[0];
+
+        if (!channel) {
             return;
         }
 
-        if (!conf.tgChatId) {
+        if (!channel.tgChatId) {
             console.log('storing chat ID: ' + msg.chat.id);
-            conf.tgChatId = msg.chat.id;
+            channel.tgChatId = msg.chat.id;
             writeChatIds(config);
         }
 
@@ -116,23 +112,23 @@ module.exports = function(config, sendTo) {
             text = msg.text;
         }
 
-        sendTo.irc(conf.ircChan, '<' + user + '>: ' + text);
+        sendTo.irc(channel.ircChan, '<' + user + '>: ' + text);
     });
 
-    sendTo.tg = function(conf, msg) {
+    sendTo.tg = function(channel, msg) {
         console.log('  >> relaying to TG: ' + msg);
 
-        if (!conf.tgChatId) {
+        if (!channel.tgChatId) {
             var err = 'ERROR: No chat_id set! Add me to a Telegram group ' +
                       'and say hi so I can find your group\'s chat_id!';
-            sendTo.irc(conf.ircChan, err);
+            sendTo.irc(channel.ircChan, err);
             console.error(err);
             return;
         }
 
         tg.sendMessage({
             text: msg,
-            chat_id: conf.tgChatId
+            chat_id: channel.tgChatId
         });
     };
 };

@@ -1,10 +1,9 @@
 var Irc = require('irc');
 var tg = require('./tg');
 
-// channel option lookup
-var lookup = function(type, channel, arr) {
-    return arr.filter(function(obj) {
-        return obj[type] === channel;
+var lookupChannel = function(chanName, channels) {
+    return channels.filter(function(channel) {
+        return channel['ircChan'] === chanName;
     })[0];
 };
 
@@ -13,10 +12,10 @@ var getChannels = function(arr) {
     var result = [];
 
     for (var i = 0; i < arr.length; i++) {
-        var channel = arr[i].chanPwd ?
-                      arr[i].ircChan + ' ' + arr[i].chanPwd :
-                      arr[i].ircChan;
-        result.push(channel);
+        var chanName = arr[i].chanPwd ?
+                       arr[i].ircChan + ' ' + arr[i].chanPwd :
+                       arr[i].ircChan;
+        result.push(chanName);
     }
 
     return result;
@@ -30,9 +29,10 @@ module.exports = function(config, sendTo) {
     irc.on('error', function(error) {
         console.error('IRC ERROR: ' + error);
     });
-    irc.on('message', function(user, channel, message) {
-        var conf = lookup('ircChan', channel, config.channels);
-        if (!conf) {
+
+    irc.on('message', function(user, chanName, message) {
+        var channel = lookupChannel(chanName, config.channels);
+        if (!channel) {
             return;
         }
 
@@ -42,13 +42,13 @@ module.exports = function(config, sendTo) {
                 message = match[1].trim();
             }
             var text = '<' + user + '>: ' + message;
-            sendTo.tg(conf, text);
+            sendTo.tg(channel, text);
         }
     });
 
-    irc.on('action', function(user, channel, message) {
-        var conf = lookup('ircChan', channel, config.channels);
-        if (!conf) {
+    irc.on('action', function(user, chanName, message) {
+        var channel = lookupChannel(chanName, config.channels);
+        if (!channel) {
             return;
         }
 
@@ -58,31 +58,31 @@ module.exports = function(config, sendTo) {
                 message = match[1].trim();
             }
             var text = '*' + user + ': ' + message + '*';
-            sendTo.tg(conf, text);
+            sendTo.tg(channel, text);
         }
     });
 
-    irc.on('topic', function(channel, topic, nick) {
-        var conf = lookup('ircChan', channel, config.channels);
-        if (!conf) {
+    irc.on('topic', function(chanName, topic, nick) {
+        var channel = lookupChannel(chanName, config.channels);
+        if (!channel) {
             return;
         }
 
         // ignore first topic event when joining channel
         // (doesn't handle rejoins yet)
-        if (!conf.sendTopic) {
-            conf.sendTopic = true;
+        if (!config.sendTopic || !channel.firstTopicRcvd) {
+            channel.firstTopicRcvd = true;
             return;
         }
 
-        var text = '* Topic for channel ' + conf.chanAlias || conf.ircChan +
+        var text = '* Topic for channel ' + channel.chanAlias || channel.ircChan +
                    ':\n' + topic.split(' | ').join('\n') +
                    '\n* set by ' + nick.split('!')[0];
-        sendTo.tg(conf, text);
+        sendTo.tg(channel, text);
     });
 
-    sendTo.irc = function(ircChan, msg) {
+    sendTo.irc = function(chanName, msg) {
         console.log('  >> relaying to IRC: ' + msg);
-        irc.say(ircChan, msg);
+        irc.say(chanName, msg);
     };
 };
