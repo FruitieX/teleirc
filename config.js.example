@@ -1,22 +1,8 @@
 var config = {};
 
-function Channel (irc_channel, tg_chat, irc_channel_pwd, irc_channel_id) {
-    this.irc_channel     = irc_channel;
-    this.irc_channel_id  = irc_channel_id ? irc_channel_id : irc_channel;
-    this.irc_channel_pwd = irc_channel_pwd;
-    this.tg_chat         = tg_chat;
-}
-
 /////////////////////
 //  General config //
 /////////////////////
-
-config.channels = [
-    new Channel('#channel1', 'Tg_Chat_1'                         ),
-    new Channel('#channel2', 'Tg_Chat_2', 'passwd'               ),
-    new Channel('!channel3', 'Tg_Chat_3', ''      , '!channel_id'),
-    new Channel('!channel4', 'Tg_Chat_4', 'passwd', '!channel_id')
-]
 
 config.tg_bot_token = '<BOT TOKEN>';
 
@@ -26,6 +12,28 @@ config.tg_bot_token = '<BOT TOKEN>';
 
 config.irc_nick = 'tgBot';
 config.irc_server = 'irc.cs.hut.fi';
+
+config.channels = [
+    {
+        irc_channel: '#channel1',
+        tg_chat: 'Name_Of_Telegram_Chat1'
+    },
+    {
+        irc_channel: '#channel2',
+        tg_chat: 'Name_Of_Telegram_Chat2',
+        password: 'passwd'
+    },
+    {
+        irc_channel: '!XXXXXchannel3',
+        channel_alias: '!channel3', // display channel name as !channel3 instead of !XXXXXchannel3
+        tg_chat: 'Name_Of_Telegram_Chat3',
+        password: 'passwd'
+    }
+    new Channel('#channel1', 'Tg_Chat_1'                         ),
+    new Channel('#channel2', 'Tg_Chat_2', 'passwd'               ),
+    new Channel('!channel3', 'Tg_Chat_3', ''      , '!channel_id'),
+    new Channel('!channel4', 'Tg_Chat_4', 'passwd', '!channel_id')
+]
 
 // see https://node-irc.readthedocs.org/en/latest/API.html#client for
 // documentation
