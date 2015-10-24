@@ -3,35 +3,33 @@ teleirc
 
 Telegram <-> IRC gateway
 
+Features:
+
+* Supports multiple IRC channel <-> Telegram group pairs
+* Telegram messages are always relayed to the respective IRC channel
+* IRC messages can be configured either to be relayed every time, or only
+  when the bot is hilighted via a configurable regexp
 * Telegram communication via
   [node-telegram-bot](https://github.com/orzFly/node-telegram-bot) library
 * IRC communication via martynsmith's
   [node-irc](https://github.com/martynsmith/node-irc) module
-* All Telegram messages are sent to IRC channel
-* IRC messages sent to Telegram only when bot is hilighted or if message is
-  prefixed with "! " (configurable)
 
 Setup
 -----
 
-    npm install -g teleirc
-    teleirc --genconfig
-    $EDITOR ~/.teleirc/config.js
+Make sure you've installed Node.js.
 
-Before running `teleirc`, set up your bot via the
-[BotFather](https://telegram.me/botfather) Telegram user. Save your bot token
-in `~/.teleirc/config.js`. **Remember to allow the bot to see all messages via
-the `/setprivacy` command to `BotFather`, otherwise only messages starting with
-a slash are visible to teleirc.**
-
-Now simply run `teleirc` with the following command:
-
-    teleirc
-
-Note: *IRC -> Telegram* messages only work after the bot has received at least
-one chat message from your Telegram group (it needs to know the Telegram
-internal variable `chat_id`, which it also conveniently stores in a file as
-soon as it's known)
+1. Install the teleirc npm module with `npm install -g teleirc` (might need sudo)
+2. Generate a default config using `teleirc --genconfig`
+3. Set up your bot with [BotFather](https://telegram.me/botfather)
+4. Use the `/setprivacy` command with `BotFather` to allow the bot to
+   see all Telegram messages
+5. Edit the default config `$EDITOR ~/.teleirc/config.js`
+6. Run `teleirc`
+7. Invite your bot to any Telegram groups you've configured it for
+8. Greet your bot once on each of your Telegram groups :tada:! This is needed
+   to fetch (and store!) an internally used group ID, making communication
+   from IRC to the correct Telegram group possible.
 
 Optional:
 
@@ -40,12 +38,12 @@ Optional:
 - You can change your Telegram Bot's profile picture with the `/setuserpic`
   BotFather command.
 
-Running from git
-----------------
+Developer install (from git)
+----------------------------
 
     git clone https://github.com/FruitieX/teleirc
     cd teleirc
     npm install
 
-Then follow the rest of the instructions under `Setup`. Instead of using
-the `teleirc` command, use `node teleirc.js` inside the repo.
+Then follow the instructions under `Setup`, with the exception of step 1.
+Also, instead of using the `teleirc` command, use `node teleirc.js` inside the repo.
