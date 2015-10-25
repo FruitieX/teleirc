@@ -1,10 +1,10 @@
 ![Logo](/logo.png)
 
-[Telegram](https://telegram.org/) <-> IRC gateway
+[Telegram](https://telegram.org/) ↔ IRC gateway
 
 #### Features:
 
-* Supports multiple IRC channel <-> Telegram group pairs
+* Supports multiple IRC channel ↔ Telegram group pairs
 * Telegram messages are always relayed to the respective IRC channel
 * IRC messages can be configured either to be relayed every time, or only
   when the bot is hilighted via a configurable regexp
