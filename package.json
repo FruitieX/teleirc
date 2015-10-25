@@ -10,7 +10,7 @@
     "start": "node teleirc.js",
     "test": "NODE_ENV=test ./node_modules/mocha/bin/mocha"
   },
-  "version": "0.2.3",
+  "version": "0.3.0",
   "licenses": [
     {
       "type": "MIT"
@@ -26,6 +26,7 @@
   "homepage": "https://github.com/FruitieX/teleirc",
   "dependencies": {
     "irc": "~0.3.12",
+    "lodash": "^3.10.1",
     "mkdirp": "^0.5.1",
     "telegram-bot": "^0.2.0"
   },

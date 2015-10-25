@@ -1,35 +1,54 @@
 var config = {};
-
-function Channel (irc_channel, tg_chat, irc_channel_pwd, irc_channel_id) {
-    this.irc_channel     = irc_channel;
-    this.irc_channel_id  = irc_channel_id ? irc_channel_id : irc_channel;
-    this.irc_channel_pwd = irc_channel_pwd;
-    this.tg_chat         = tg_chat;
-}
+module.exports = config;
 
 /////////////////////
 //  General config //
 /////////////////////
 
-config.channels = [
-    new Channel('#channel1', 'Tg_Chat_1'                         ),
-    new Channel('#channel2', 'Tg_Chat_2', 'passwd'               ),
-    new Channel('!channel3', 'Tg_Chat_3', ''      , '!channel_id'),
-    new Channel('!channel4', 'Tg_Chat_4', 'passwd', '!channel_id')
-]
+// paste the bot API token you got from BotFather here:
+config.tgToken = 'YOUR-BOT-TOKEN';
 
-config.tg_bot_token = '<BOT TOKEN>';
+// send IRC topic changes to Telegram
+config.sendTopic = true;
+
+// send an IRC message if someone sends media (eg. stickers, photos, etc)
+// on a Telegram group
+config.showMedia = true;
 
 //////////////////
 //  IRC config  //
 //////////////////
 
-config.irc_nick = 'tgBot';
-config.irc_server = 'irc.cs.hut.fi';
+config.ircNick = 'tgBot';
+config.ircServer = 'irc.cs.hut.fi';
+
+config.channels = [
+    // example of a barebones IRC channel:
+    // '#channel1' will be bridged to a Telegram group called 'Tg_Group_1'
+    {
+        ircChan: '#channel1',
+        tgGroup: 'Tg_Group_1'
+    },
+
+    // example of a password-protected IRC channel:
+    {
+        ircChan: '#channel2',
+        chanPwd: 'passwd'
+        tgGroup: 'Tg_Group_2',
+    },
+
+    // example of an IRC channel with an alias:
+    // channel name will be displayed as '!channel3' instead of '!XXXXXchannel3'
+    {
+        ircChan: '!XXXXXchannel3',
+        chanAlias: '!channel3',
+        tgGroup: 'Tg_Group_3',
+    }
+]
 
 // see https://node-irc.readthedocs.org/en/latest/API.html#client for
 // documentation
-config.irc_options = {
+config.ircOptions = {
     userName: 'bot',
     realName: 'Telegram IRC Bot',
     port: 6667,
@@ -51,8 +70,11 @@ config.irc_options = {
     encoding: ''
 };
 
-config.irc_relay_all = false;
-regex = '^ *(?:' + config.irc_nick + '[:,]?|!) +(.*\\S.*)$';
-config.irc_hilight_re = new RegExp(regex, 'i');
+// if you wish to relay every irc message to telegram, set this to true.
+// if false, then only lines matching config.hlRegexp will be relayed
+config.ircRelayAll = false;
 
-module.exports = config;
+// the default hilight regexp will match lines containing the bot nick, or
+// lines starting with '! '
+var regex = '^ *(?:' + config.ircNick + '[:,]?|!) +(.*\\S.*)$';
+config.hlRegexp = new RegExp(regex, 'i');
