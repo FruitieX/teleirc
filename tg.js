@@ -108,6 +108,10 @@ module.exports = function(config, sendTo) {
         } else if (msg.location) {
             text = '(Location, lon: ' + msg.location.longitude +
                             ', lat: ' + msg.location.latitude + ')';
+        } else if (msg.new_chat_participant) {
+            text = '(Added: ' + msg.new_chat_participant.first_name + ')';
+        } else if (msg.left_chat_participant) {
+            text = '(Removed: ' + msg.left_chat_participant.first_name + ')';
         } else {
             text = msg.text;
         }
