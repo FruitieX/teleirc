@@ -1,17 +1,17 @@
 ![Logo](/logo.png)
 
-[Telegram](https://telegram.org/) ↔ IRC gateway
+A simple [Telegram](https://telegram.org/) ↔ IRC gateway.
 
 #### Features:
 
 * Supports multiple IRC channel ↔ Telegram group pairs
-* Telegram messages are always relayed to the respective IRC channel
-* IRC messages can be configured either to be relayed every time, or only
+* Telegram messages are always relayed to their respective IRC channel
+* IRC messages can be configured either to be relayed always, or only
   when the bot is hilighted via a configurable regexp
-* Telegram communication via
+* Telegram communication via the
   [node-telegram-bot](https://github.com/orzFly/node-telegram-bot) library
-* IRC communication via martynsmith's
-  [node-irc](https://github.com/martynsmith/node-irc) module
+* IRC communication via the
+  [node-irc](https://github.com/martynsmith/node-irc) library
 
 Quick start
 -----------
