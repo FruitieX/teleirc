@@ -1,5 +1,4 @@
-teleirc
-=======
+![Logo](/logo.png)
 
 [Telegram](https://telegram.org/) <-> IRC gateway
 
@@ -36,7 +35,7 @@ Optional:
 - For your convenience, there is an included systemd unit file in
   `teleirc.service`.
 - You can change your Telegram Bot's profile picture with the `/setuserpic`
-  BotFather command.
+  BotFather command. [Here's](/icon.png) an example icon for you.
 
 Developer install (from git)
 ----------------------------
