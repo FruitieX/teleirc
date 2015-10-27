@@ -2,6 +2,8 @@
 
 A simple [Telegram](https://telegram.org/) ↔ IRC gateway.
 
+[Changelog](https://fruitiex.org/blog/tag/teleirc/)
+
 #### Features:
 
 * Supports multiple IRC channel ↔ Telegram group pairs
