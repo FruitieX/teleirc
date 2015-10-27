@@ -1,4 +1,4 @@
-var Telegram = require('telegram-bot');
+var Telegram = require('node-telegram-bot-api');
 var fs = require('fs');
 var irc = require('./irc');
 
@@ -55,8 +55,7 @@ var writeChatIds = function(config) {
 };
 
 module.exports = function(config, sendTo) {
-    var tg = new Telegram(config.tgToken);
-    tg.start();
+    var tg = new Telegram(config.tgToken,{polling: true});
 
     readChatIds(config.channels);
 
