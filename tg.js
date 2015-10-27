@@ -129,9 +129,6 @@ module.exports = function(config, sendTo) {
             return;
         }
 
-        tg.sendMessage({
-            text: msg,
-            chat_id: channel.tgChatId
-        });
+        tg.sendMessage(channel.tgChatId, msg);
     };
 };
