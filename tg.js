@@ -92,8 +92,15 @@ module.exports = function(config, sendTo) {
         } else if (msg.document) {
             text = '(Document)';
         } else if (msg.photo) {
-            text = '(Image, ' + msg.photo.slice(-1)[0].width + 'x' +
-                                msg.photo.slice(-1)[0].height + ')';
+            var fileid = msg.photo[msg.photo.length - 1].file_id;
+            var promise = tg.getFileLink(fileid);
+            promise.then(function(path) {
+                console.log(path);
+                sendTo.irc(channel.ircChan, '<' + user + '>: ' + path);
+                return path;
+            });
+            return;
+
         } else if (msg.sticker) {
             text = '(Sticker)';
         } else if (msg.video) {
