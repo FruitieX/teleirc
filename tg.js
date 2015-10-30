@@ -75,8 +75,8 @@ module.exports = function(config, sendTo) {
         }
 
         var user = msg.from.first_name ? msg.from.first_name + ' ' : '';
-            user += msg.from.last_name ? msg.from.last_name : '';
-            user += msg.from.username ? '(@' + msg.from.username + ')' : '';
+        user += msg.from.last_name ? msg.from.last_name : '';
+        user += msg.from.username ? '(@' + msg.from.username + ')' : '';
 
         // skip posts containing media if it's configured off
         if ((msg.audio || msg.document || msg.photo || msg.sticker || msg.video ||
