@@ -3,6 +3,7 @@ var fs = require('fs');
 var path = require('path');
 var irc = require('./irc');
 var static = require('node-static');
+var mkdirp = require('mkdirp');
 
 // tries to read chat ids from a file
 var readChatIds = function(arr) {
@@ -74,7 +75,7 @@ var getName = function(user, config) {
 
 var serveFile = function(fileId, config, tg, callback) {
     tg.downloadFile(fileId, process.env.HOME + '/.teleirc/files').then(function(filePath) {
-        callback(config.httpLocation + '/' + path.basepath(filePath));
+        callback(config.httpLocation + '/' + path.basename(filePath));
     });
 };
 
@@ -82,6 +83,7 @@ module.exports = function(config, sendTo) {
     // start HTTP server for media files if configured to do so
     if (config.showMedia) {
         var fileServer = new static.Server(process.env.HOME + '/.teleirc/files');
+        mkdirp(process.env.HOME + '/.teleirc/files');
 
         require('http').createServer(function(req, res) {
             req.addListener('end', function() {
@@ -128,7 +130,7 @@ module.exports = function(config, sendTo) {
             // pick the highest quality photo
             var photo = msg.photo[msg.photo.length - 1];
 
-            tg.getFileLink(photo.file_id).then(function(url) {
+            serveFile(photo.file_id, config, tg, function(url) {
                 sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
                     '(Photo, ' + photo.width + 'x' + photo.height + ') ' + url);
             });
