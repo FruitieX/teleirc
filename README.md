@@ -10,6 +10,7 @@ A simple [Telegram](https://telegram.org/) ↔ IRC gateway.
 * Telegram messages are always relayed to their respective IRC channel
 * IRC messages can be configured either to be relayed always, or only
   when the bot is hilighted via a configurable regexp
+* Supports Telegram media files, URL to file sent to IRC
 
 Quick start
 -----------
