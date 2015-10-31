@@ -54,6 +54,35 @@ var writeChatIds = function(config) {
     });
 };
 
+var getName = function(user) {
+    var name = '';
+
+    if (config.ircTgShowName == 1) {
+        // first_name
+        return user.first_name ? user.first_name + '' : '';
+    } else {
+        if (config.ircTgShowName == 2) {
+            // first_name last_name
+            name = user.first_name ? user.first_name + ' ' : '';
+            return name + user.last_name ? user.last_name : '';
+        } else {
+            if (config.ircTgShowName == 3) {
+                // first_name last_name @username
+                name = user.first_name ? user.first_name + ' ' : '';
+                name += user.last_name ? user.last_name : '';
+                return name + user.username ? '(@' + user.username + ')' : '(No username)';
+            } else {
+                // @username
+                if (user.username === undefined) {
+                    return user.first_name + ' ' + user.last_name;
+                } else {
+                    return '@' + user.username;
+                }
+            }
+        }
+    }
+};
+
 module.exports = function(config, sendTo) {
     var tg = new Telegram(config.tgToken,{polling: true});
 
@@ -74,32 +103,7 @@ module.exports = function(config, sendTo) {
             writeChatIds(config);
         }
 
-        var user;
-
-        if (config.ircTgShowName == 1) {
-            // first_name
-            user = msg.from.first_name ? msg.from.first_name + '' : '';
-        } else {
-            if (config.ircTgShowName == 2) {
-                // first_name last_name
-                user = msg.from.first_name ? msg.from.first_name + ' ' : '';
-                user += msg.from.last_name ? msg.from.last_name : '';
-            } else {
-                if (config.ircTgShowName == 3) {
-                    // first_name last_name @username
-                    user = msg.from.first_name ? msg.from.first_name + ' ' : '';
-                    user += msg.from.last_name ? msg.from.last_name : '';
-                    user += msg.from.username ? '(@' + msg.from.username + ')' : '(No username)';
-                } else {
-                    // @username
-                    if (msg.from.username === undefined) {
-                        user = msg.from.first_name + ' ' + msg.from.last_name;
-                    } else {
-                        user = '@' + msg.from.username;
-                    }
-                }
-            }
-        }
+        var name = getName(msg.from);
 
         // skip posts containing media if it's configured off
         if ((msg.audio || msg.document || msg.photo || msg.sticker || msg.video ||
@@ -120,7 +124,7 @@ module.exports = function(config, sendTo) {
             var promise = tg.getFileLink(fileid);
             promise.then(function(path) {
                 console.log(path);
-                sendTo.irc(channel.ircChan, '<' + user + '>: ' + path);
+                sendTo.irc(channel.ircChan, '<' + name + '>: ' + path);
                 return path;
             });
             return;
@@ -146,7 +150,7 @@ module.exports = function(config, sendTo) {
             text = msg.text;
         }
 
-        sendTo.irc(channel.ircChan, '<' + user + '>: ' + text);
+        sendTo.irc(channel.ircChan, '<' + name + '>: ' + text);
     });
 
     sendTo.tg = function(channel, msg) {
