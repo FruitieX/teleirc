@@ -19,12 +19,16 @@ config.showMedia = true;
 //  IRC config  //
 //////////////////
 
-// Mode to show who's sended the message
-// 1 - first_name
-// 2(default) - first_name last_name
-// 3 - first_name last_name(@username)
-// 4 - @username
-config.ircTgShowName = 2;
+// formatting of Telegram usernames on IRC.
+// the following placeholders are available:
+//
+// - %firstName% (first name of sender)
+// - %lastName% (last name of sender)
+// - %username% (optional Telegram username of sender)
+config.nameFormat = '%username%';
+
+// fallback format string for %username% if sender lacks username
+config.usernameFallbackFormat = '%firstName% %lastName%';
 
 config.ircNick = 'tgBot';
 config.ircServer = 'irc.cs.hut.fi';

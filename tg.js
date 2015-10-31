@@ -55,32 +55,19 @@ var writeChatIds = function(config) {
 };
 
 var getName = function(user) {
-    var name = '';
+    var name = config.nameFormat;
 
-    if (config.ircTgShowName == 1) {
-        // first_name
-        return user.first_name ? user.first_name + '' : '';
+    if (user.username) {
+        name = name.replace('%username%', user.username, 'g');
     } else {
-        if (config.ircTgShowName == 2) {
-            // first_name last_name
-            name = user.first_name ? user.first_name + ' ' : '';
-            return name + user.last_name ? user.last_name : '';
-        } else {
-            if (config.ircTgShowName == 3) {
-                // first_name last_name @username
-                name = user.first_name ? user.first_name + ' ' : '';
-                name += user.last_name ? user.last_name : '';
-                return name + user.username ? '(@' + user.username + ')' : '(No username)';
-            } else {
-                // @username
-                if (user.username === undefined) {
-                    return user.first_name + ' ' + user.last_name;
-                } else {
-                    return '@' + user.username;
-                }
-            }
-        }
+        // if user lacks username, use fallback format string instead
+        name = name.replace('%username%', config.usernameFallbackFormat, 'g');
     }
+
+    name = name.replace('%firstName%', user.first_name, 'g');
+    name = name.replace('%lastName%', user.last_name, 'g');
+
+    return name;
 };
 
 module.exports = function(config, sendTo) {
