@@ -74,8 +74,32 @@ module.exports = function(config, sendTo) {
             writeChatIds(config);
         }
 
-        var user = msg.from.first_name ? msg.from.first_name : '' +
-                   msg.from.last_name ? msg.from.last_name : '';
+        var user;
+
+        if (config.ircTgShowName == 1) {
+            // first_name
+            user = msg.from.first_name ? msg.from.first_name + '' : '';
+        } else {
+            if (config.ircTgShowName == 2) {
+                // first_name last_name
+                user = msg.from.first_name ? msg.from.first_name + ' ' : '';
+                user += msg.from.last_name ? msg.from.last_name : '';
+            } else {
+                if (config.ircTgShowName == 3) {
+                    // first_name last_name @username
+                    user = msg.from.first_name ? msg.from.first_name + ' ' : '';
+                    user += msg.from.last_name ? msg.from.last_name : '';
+                    user += msg.from.username ? '(@' + msg.from.username + ')' : '(No username)';
+                } else {
+                    // @username
+                    if (msg.from.username === undefined) {
+                        user = msg.from.first_name + ' ' + msg.from.last_name;
+                    } else {
+                        user = '@' + msg.from.username;
+                    }
+                }
+            }
+        }
 
         // skip posts containing media if it's configured off
         if ((msg.audio || msg.document || msg.photo || msg.sticker || msg.video ||
