@@ -11,9 +11,15 @@ config.tgToken = 'YOUR-BOT-TOKEN';
 // send IRC topic changes to Telegram
 config.sendTopic = true;
 
-// send an IRC message if someone sends media (eg. stickers, photos, etc)
-// on a Telegram group
+// enable HTTP server which hosts sent media files, links to files are
+// forwarded to IRC
 config.showMedia = true;
+
+// HTTP server port
+config.httpPort = 9090;
+
+// HTTP server location, URLs are generated from this
+config.httpLocation = 'http://mydomain.com' + ':' + config.httpPort;
 
 //////////////////
 //  IRC config  //

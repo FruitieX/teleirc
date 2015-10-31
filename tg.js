@@ -1,6 +1,8 @@
 var Telegram = require('node-telegram-bot-api');
 var fs = require('fs');
+var path = require('path');
 var irc = require('./irc');
+var static = require('node-static');
 
 // tries to read chat ids from a file
 var readChatIds = function(arr) {
@@ -70,8 +72,25 @@ var getName = function(user, config) {
     return name;
 };
 
+var serveFile = function(fileId, config, tg, callback) {
+    tg.downloadFile(fileId, process.env.HOME + '/.teleirc/files').then(function(filePath) {
+        callback(config.httpLocation + '/' + path.basepath(filePath));
+    });
+};
+
 module.exports = function(config, sendTo) {
-    var tg = new Telegram(config.tgToken,{polling: true});
+    // start HTTP server for media files if configured to do so
+    if (config.showMedia) {
+        var fileServer = new static.Server(process.env.HOME + '/.teleirc/files');
+
+        require('http').createServer(function(req, res) {
+            req.addListener('end', function() {
+                fileServer.serve(req, res);
+            }).resume();
+        }).listen(config.httpPort);
+    }
+
+    var tg = new Telegram(config.tgToken, {polling: true});
 
     readChatIds(config.channels);
 
@@ -114,7 +133,7 @@ module.exports = function(config, sendTo) {
                     '(Photo, ' + photo.width + 'x' + photo.height + ') ' + url);
             });
         } else if (msg.sticker) {
-            tg.getFileLink(msg.sticker.file_id).then(function(url) {
+            serveFile(msg.sticker.file_id, config, tg, function(url) {
                 sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
                     '(Sticker, ' + msg.sticker.width + 'x' + msg.sticker.height + ') ' + url);
             });
