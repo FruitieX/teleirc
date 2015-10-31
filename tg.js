@@ -76,24 +76,24 @@ module.exports = function(config, sendTo) {
 
         var user;
 
-        if(config.ircTgShowName == 1){
-          // first_name
-          user = msg.from.first_name ? msg.from.first_name + '' : '';
+        if (config.ircTgShowName == 1) {
+            // first_name
+            user = msg.from.first_name ? msg.from.first_name + '' : '';
         }else{
-          if(config.ircTgShowName == 2){
-            // first_name last_name
-            user = msg.from.first_name ? msg.from.first_name + ' ' : '';
-            user += msg.from.last_name ? msg.from.last_name : '';
-          }else{
-            if(config.ircTgShowName == 3){
-              // first_name last_name @username
+          if (config.ircTgShowName == 2) {
+              // first_name last_name
               user = msg.from.first_name ? msg.from.first_name + ' ' : '';
               user += msg.from.last_name ? msg.from.last_name : '';
-              user += msg.from.username ? '(@' + msg.from.username + ')' : '(No username)';
-            }else{
-              // @username
-              user = msg.from.username ? '@' + msg.from.username : msg.from.first_name+' '+msg.from.last_name;
-            }
+          }else{
+              if (config.ircTgShowName == 3) {
+                  // first_name last_name @username
+                  user = msg.from.first_name ? msg.from.first_name + ' ' : '';
+                  user += msg.from.last_name ? msg.from.last_name : '';
+                  user += msg.from.username ? '(@' + msg.from.username + ')' : '(No username)';
+              }else{
+                  // @username
+                  user = msg.from.username ? '@' + msg.from.username : msg.from.first_name+' '+msg.from.last_name;
+              }
           }
         }
 
