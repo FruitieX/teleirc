@@ -92,7 +92,7 @@ module.exports = function(config, sendTo) {
                     user += msg.from.username ? '(@' + msg.from.username + ')' : '(No username)';
                 } else {
                     // @username
-                    if (msg.from.username == NULL) {
+                    if (msg.from.username == undefined) {
                         user = msg.from.first_name + ' ' + msg.from.last_name;
                     } else {
                         user = '@' + msg.from.username;
