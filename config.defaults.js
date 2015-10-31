@@ -44,8 +44,8 @@ config.channels = [
     // example of a password-protected IRC channel:
     {
         ircChan: '#channel2',
-        chanPwd: 'passwd'
-        tgGroup: 'Tg_Group_2',
+        chanPwd: 'passwd',
+        tgGroup: 'Tg_Group_2'
     },
 
     // example of an IRC channel with an alias:
@@ -53,9 +53,9 @@ config.channels = [
     {
         ircChan: '!XXXXXchannel3',
         chanAlias: '!channel3',
-        tgGroup: 'Tg_Group_3',
+        tgGroup: 'Tg_Group_3'
     }
-]
+];
 
 // see https://node-irc.readthedocs.org/en/latest/API.html#client for
 // documentation
@@ -76,7 +76,7 @@ config.ircOptions = {
     floodProtectionDelay: 1000,
     sasl: false,
     stripColors: false,
-    channelPrefixes: "&#!",
+    channelPrefixes: '&#!',
     messageSplit: 512,
     encoding: ''
 };

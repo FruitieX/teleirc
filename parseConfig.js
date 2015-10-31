@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
+var defaultConfig = require('./config.defaults');
 
 var warnDeprecated = function(oldOpt, newOpt) {
     console.warn('WARNING: detected usage of deprecated config option "' + oldOpt + '", ' +
@@ -79,12 +80,13 @@ var parseDeprecatedOptions = function(config) {
     return config;
 };
 
-var defaultConfig = fs.readFileSync(__dirname + '/config.js.example');
 if (process.argv[2] === '--genconfig') {
     mkdirp(process.env.HOME + '/.teleirc');
 
+    // read default config using readFile to include comments
+    var config = fs.readFileSync(__dirname + '/config.defaults.js');
     var configPath = process.env.HOME + '/.teleirc/config.js';
-    fs.writeFileSync(configPath, defaultConfig);
+    fs.writeFileSync(configPath, config);
     console.log('Wrote default configuration to ' + configPath +
                 ', please edit it before re-running');
     process.exit(0);

@@ -54,7 +54,7 @@ var writeChatIds = function(config) {
     });
 };
 
-var getName = function(user) {
+var getName = function(user, config) {
     var name = config.nameFormat;
 
     if (user.username) {
@@ -97,46 +97,46 @@ module.exports = function(config, sendTo) {
         }
 
         if (msg.reply_to_message && msg.text) {
-            sendTo.irc(channel.ircChan, '<' + getName(msg.from) + '>: ' +
-                '@' + getName(msg.reply_to_message.from) + ', ' + msg.text);
+            sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
+                '@' + getName(msg.reply_to_message.from, config) + ', ' + msg.text);
         } else if (msg.audio) {
-            sendTo.irc(channel.ircChan, '<' + getName(msg.from) + '>: ' +
+            sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
                 '(Audio)');
         } else if (msg.document) {
-            sendTo.irc(channel.ircChan, '<' + getName(msg.from) + '>: ' +
+            sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
                 '(Document)');
         } else if (msg.photo) {
             var fileid = msg.photo[msg.photo.length - 1].file_id;
             tg.getFileLink(fileid).then(function(path) {
-                sendTo.irc(channel.ircChan, '<' + getName(msg.from) + '>: ' +
+                sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
                     '(Photo) ' + path);
             });
         } else if (msg.sticker) {
-            sendTo.irc(channel.ircChan, '<' + getName(msg.from) + '>: ' +
+            sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
                 '(Sticker)');
         } else if (msg.video) {
-            sendTo.irc(channel.ircChan, '<' + getName(msg.from) + '>: ' +
+            sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
                 '(Video, ' + msg.video.duration + 's)');
         } else if (msg.voice) {
-            sendTo.irc(channel.ircChan, '<' + getName(msg.from) + '>: ' +
+            sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
                 '(Voice, ' + msg.audio.duration + 's)');
         } else if (msg.contact) {
-            sendTo.irc(channel.ircChan, '<' + getName(msg.from) + '>: ' +
+            sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
                 '(Contact, ' + '"' + msg.contact.first_name + ' ' +
                 msg.contact.last_name + '", ' +
                 msg.contact.phone_number + ')');
         } else if (msg.location) {
-            sendTo.irc(channel.ircChan, '<' + getName(msg.from) + '>: ' +
+            sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
                 '(Location, ' + 'lon: ' + msg.location.longitude +
                               ', lat: ' + msg.location.latitude + ')');
         } else if (msg.new_chat_participant) {
-            sendTo.irc(channel.ircChan, getName(msg.new_chat_participant) +
-                ' was added by: ' + getName(msg.from));
+            sendTo.irc(channel.ircChan, getName(msg.new_chat_participant, config) +
+                ' was added by: ' + getName(msg.from, config));
         } else if (msg.left_chat_participant) {
-            sendTo.irc(channel.ircChan, getName(msg.left_chat_participant) +
-                ' was removed by: ' + getName(msg.from));
+            sendTo.irc(channel.ircChan, getName(msg.left_chat_participant, config) +
+                ' was removed by: ' + getName(msg.from, config));
         } else {
-            sendTo.irc(channel.ircChan, '<' + getName(msg.from) + '>: ' + msg.text);
+            sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' + msg.text);
         }
     });
 
