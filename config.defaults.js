@@ -13,7 +13,7 @@ config.sendTopic = true;
 
 // enable HTTP server which hosts sent media files, links to files are
 // forwarded to IRC
-config.showMedia = true;
+config.showMedia = false;
 
 // HTTP server port
 config.httpPort = 9090;
