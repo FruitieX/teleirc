@@ -106,14 +106,18 @@ module.exports = function(config, sendTo) {
             sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
                 '(Document)');
         } else if (msg.photo) {
-            var fileid = msg.photo[msg.photo.length - 1].file_id;
-            tg.getFileLink(fileid).then(function(path) {
+            // pick the highest quality photo
+            var photo = msg.photo[msg.photo.length - 1];
+
+            tg.getFileLink(photo.file_id).then(function(url) {
                 sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
-                    '(Photo) ' + path);
+                    '(Photo, ' + photo.width + 'x' + photo.height + ') ' + url);
             });
         } else if (msg.sticker) {
-            sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
-                '(Sticker)');
+            tg.getFileLink(msg.sticker.file_id).then(function(url) {
+                sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
+                    '(Sticker, ' + msg.sticker.width + 'x' + msg.sticker.height + ') ' + url);
+            });
         } else if (msg.video) {
             sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
                 '(Video, ' + msg.video.duration + 's)');
