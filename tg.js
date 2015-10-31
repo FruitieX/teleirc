@@ -2,7 +2,7 @@ var Telegram = require('node-telegram-bot-api');
 var fs = require('fs');
 var path = require('path');
 var irc = require('./irc');
-var static = require('node-static');
+var nodeStatic = require('node-static');
 var mkdirp = require('mkdirp');
 
 // tries to read chat ids from a file
@@ -82,7 +82,7 @@ var serveFile = function(fileId, config, tg, callback) {
 module.exports = function(config, sendTo) {
     // start HTTP server for media files if configured to do so
     if (config.showMedia) {
-        var fileServer = new static.Server(process.env.HOME + '/.teleirc/files');
+        var fileServer = new nodeStatic.Server(process.env.HOME + '/.teleirc/files');
         mkdirp(process.env.HOME + '/.teleirc/files');
 
         require('http').createServer(function(req, res) {
