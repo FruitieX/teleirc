@@ -19,6 +19,13 @@ config.showMedia = true;
 //  IRC config  //
 //////////////////
 
+// Mode to show who's sended the message
+// 1 - first_name
+// 2(default) - first_name last_name
+// 3 - first_name last_name(@username)
+// 4 - @username
+config.ircTgShowName = 2;
+
 config.ircNick = 'tgBot';
 config.ircServer = 'irc.cs.hut.fi';
 
