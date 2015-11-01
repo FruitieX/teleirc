@@ -67,8 +67,11 @@ var getName = function(user, config) {
         name = name.replace('%username%', config.usernameFallbackFormat, 'g');
     }
 
-    name = name.replace('%firstName%', user.first_name, 'g');
-    name = name.replace('%lastName%', user.last_name, 'g');
+    name = name.replace('%firstName%', user.first_name || '', 'g');
+    name = name.replace('%lastName%', user.last_name || '', 'g');
+
+    // get rid of leading and trailing whitespace
+    name = name.replace(/(^\s*)|(\s*$)/g, '');
 
     return name;
 };
