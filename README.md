@@ -35,6 +35,10 @@ Optional:
   `teleirc.service`.
 - You can change your Telegram Bot's profile picture with the `/setuserpic`
   BotFather command. [Here's](/icon.png) an example icon for you.
+- You can tell Telegram which commands the teleirc bot supports by using the
+  `/setcommands` BotFather command. You may copy-paste the contents of
+  [`commands.txt`](/commands.txt) to show all supported commands to Telegram
+  clients.
 
 Developer install (from git)
 ----------------------------
