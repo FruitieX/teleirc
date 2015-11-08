@@ -89,6 +89,22 @@ module.exports = function(config, sendTo) {
         sendTo.tg(channel, text);
     });
 
+    sendTo.ircNames = function(channel) {
+        channel = irc.chans[channel.ircChan];
+
+        if (!channel) {
+            return;
+        }
+
+        var names = Object.keys(channel.users);
+
+        names.forEach(function(name, i) {
+            names[i] = channel.users[name] + names[i];
+        });
+
+        return names;
+    };
+
     sendTo.irc = function(chanName, msg) {
         console.log('  >> relaying to IRC: ' + msg);
         irc.say(chanName, msg);
