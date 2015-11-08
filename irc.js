@@ -30,6 +30,13 @@ module.exports = function(config, sendTo) {
         console.error('IRC ERROR: ' + error);
     });
 
+    irc.on('registered', function() {
+        // IRC perform on connect
+        config.ircPerformCmds.forEach(function(cmd) {
+            irc.send.apply(null, cmd.split(' '));
+        });
+    });
+
     irc.on('message', function(user, chanName, message) {
         var channel = lookupChannel(chanName, config.channels);
         if (!channel) {

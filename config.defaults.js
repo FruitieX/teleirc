@@ -39,6 +39,12 @@ config.usernameFallbackFormat = '%firstName% %lastName%';
 config.ircNick = 'tgBot';
 config.ircServer = 'irc.cs.hut.fi';
 
+// array of commands to send to IRC server as soon as we're connected,
+// example: config.ircPerformCmds = [
+//     'PRIVMSG Q@CServe.quakenet.org :AUTH <username> <password>'
+// ]
+config.ircPerformCmds = [];
+
 config.channels = [
     // example of a barebones IRC channel:
     // '#channel1' will be bridged to a Telegram group called 'Tg_Group_1'
