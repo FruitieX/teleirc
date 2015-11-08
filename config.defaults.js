@@ -78,7 +78,7 @@ config.ircOptions = {
     secure: false,
     selfSigned: false,
     certExpired: false,
-    floodProtection: false,
+    floodProtection: true,
     floodProtectionDelay: 1000,
     sasl: false,
     stripColors: false,
