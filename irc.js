@@ -27,7 +27,8 @@ module.exports = function(config, sendTo) {
     var irc = new Irc.Client(config.ircServer, config.ircNick, config.ircOptions);
 
     irc.on('error', function(error) {
-        console.error('IRC ERROR: ' + error);
+        console.error('IRC ERROR:');
+        console.error(error);
     });
 
     irc.on('message', function(user, chanName, message) {
