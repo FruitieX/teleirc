@@ -10,7 +10,7 @@
     "start": "node teleirc.js",
     "test": "NODE_ENV=test ./node_modules/mocha/bin/mocha"
   },
-  "version": "0.3.0",
+  "version": "0.4.0",
   "licenses": [
     {
       "type": "MIT"
