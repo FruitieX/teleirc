@@ -146,6 +146,14 @@ module.exports = function(config, sendTo) {
                 sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
                     '(Photo, ' + photo.width + 'x' + photo.height + ') ' + url);
             });
+        } else if (msg.new_chat_photo) {
+            // pick the highest quality photo
+            var chatPhoto = msg.new_chat_photo[msg.new_chat_photo.length - 1];
+
+            serveFile(chatPhoto.file_id, config, tg, function(url) {
+                sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
+                    '(New chat photo, ' + chatPhoto.width + 'x' + chatPhoto.height + ') ' + url);
+            });
         } else if (msg.sticker) {
             serveFile(msg.sticker.file_id, config, tg, function(url) {
                 sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
