@@ -15,6 +15,10 @@ config.sendTopic = true;
 // forwarded to IRC
 config.showMedia = false;
 
+// Add some randomness to url when realying media
+// Use 0 to disable
+config.mediaRandomLenght = 8;
+
 // HTTP server port
 config.httpPort = 9090;
 
