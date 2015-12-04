@@ -140,10 +140,11 @@ module.exports = function(config, sendTo) {
             msg.voice || msg.contact || msg.location) && !config.showMedia) {
             return;
         }
-
+        var text;
         if (msg.reply_to_message && msg.text) {
+            text = msg.text.replace(/\n/g , '\n<' + getName(msg.from, config) + '>: ');
             sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
-                '@' + getName(msg.reply_to_message.from, config) + ', ' + msg.text);
+                '@' + getName(msg.reply_to_message.from, config) + ', ' + text);
         } else if (msg.audio) {
             sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
                 '(Audio)');
@@ -193,7 +194,8 @@ module.exports = function(config, sendTo) {
             sendTo.irc(channel.ircChan, getName(msg.left_chat_participant, config) +
                 ' was removed by: ' + getName(msg.from, config));
         } else {
-            sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' + msg.text);
+            text = msg.text.replace(/\n/g , '\n<' + getName(msg.from, config) + '>: ');
+            sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' + text);
         }
     });
 
