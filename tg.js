@@ -4,6 +4,7 @@ var path = require('path');
 var irc = require('./irc');
 var nodeStatic = require('node-static');
 var mkdirp = require('mkdirp');
+var crypto = require('crypto');
 
 // tries to read chat ids from a file
 var readChatIds = function(arr) {
@@ -76,9 +77,20 @@ var getName = function(user, config) {
     return name;
 };
 
+function randomValueBase64(len) {
+    return crypto.randomBytes(Math.ceil(len * 3 / 4))
+        .toString('base64')
+        .slice(0, len)
+        .replace(/\+/g, '0')
+        .replace(/\//g, '0');
+}
+
 var serveFile = function(fileId, config, tg, callback) {
-    tg.downloadFile(fileId, process.env.HOME + '/.teleirc/files').then(function(filePath) {
-        callback(config.httpLocation + '/' + path.basename(filePath));
+    var randomString = randomValueBase64(config.mediaRandomLenght);
+    mkdirp(process.env.HOME + '/.teleirc/files/' + randomString);
+    tg.downloadFile(fileId, process.env.HOME + '/.teleirc/files/' +
+                                   randomString).then(function(filePath) {
+        callback(config.httpLocation + '/' + randomString + '/' + path.basename(filePath));
     });
 };
 
