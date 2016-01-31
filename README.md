@@ -53,3 +53,8 @@ Also, instead of using the `teleirc` command, use `node teleirc.js` inside the r
 Use the [`develop`](https://github.com/FruitieX/teleirc/tree/develop) branch for developing, and please also send any pull requests to this branch. The [`master`](https://github.com/FruitieX/teleirc/tree/master) branch contains the latest stable version which is also released on [npm](https://www.npmjs.com/package/teleirc).
 
 Make sure that the unit tests pass before submitting your pull request, using `npm test`.
+
+Docker install
+--------------
+
+See the [README for Docker](Docker_README.md)
