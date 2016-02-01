@@ -49,6 +49,8 @@ Be sure to set up the HTTP API token for the bot you created at the previous ste
 
     sudo docker run --name=teleirc -p 9090:9090 -d --volumes-from=teleirc-data <YOUR_DOCKER_USERNAME>/teleirc
 
+Note: if you want the container to start automatically, add the option `--restart=always` to the command above.
+
   - Invite your bot to any Telegram groups you've configured it for
   - Greet your bot once on each of your Telegram groups :tada:! This is needed to fetch (and store!) an internally used group ID, making communication from IRC to the correct Telegram group possible.
 
