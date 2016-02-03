@@ -146,11 +146,15 @@ module.exports = function(config, sendTo) {
             sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
                 '@' + getName(msg.reply_to_message.from, config) + ', ' + text);
         } else if (msg.audio) {
-            sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
-                '(Audio)');
+            serveFile(msg.audio.file_id, config, tg, function(url) {
+                sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
+                    '(Audio, ' + msg.audio.duration + 's)' + url);
+            });
         } else if (msg.document) {
-            sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
-                '(Document)');
+            serveFile(msg.document.file_id, config, tg, function(url) {
+                sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
+                    '(Document) ' + url);
+            });
         } else if (msg.photo) {
             // pick the highest quality photo
             var photo = msg.photo[msg.photo.length - 1];
@@ -173,11 +177,15 @@ module.exports = function(config, sendTo) {
                     '(Sticker, ' + msg.sticker.width + 'x' + msg.sticker.height + ') ' + url);
             });
         } else if (msg.video) {
-            sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
-                '(Video, ' + msg.video.duration + 's)');
+            serveFile(msg.video.file_id, config, tg, function(url) {
+                sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
+                    '(Video, ' + msg.video.duration + 's)' + url);
+            });
         } else if (msg.voice) {
-            sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
-                '(Voice, ' + msg.audio.duration + 's)');
+            serveFile(msg.voice.file_id, config, tg, function(url) {
+                sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
+                    '(Voice, ' + msg.voice.duration + 's)' + url);
+            });
         } else if (msg.contact) {
             sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
                 '(Contact, ' + '"' + msg.contact.first_name + ' ' +
