@@ -19,9 +19,9 @@ config.showMedia = false;
 // Use 0 to disable
 config.mediaRandomLenght = 8;
 
-// Age in milliseconds after which a Telegram message is not relayed, this
-// prevents spamming the IRC channel if your bot was offline for a long time
-config.maxMsgAge = 60000;
+// Age in seconds after which a Telegram message is not relayed, this prevents
+// spamming the IRC channel if your bot was offline for a long time
+config.maxMsgAge = 60;
 
 // HTTP server port
 config.httpPort = 9090;
