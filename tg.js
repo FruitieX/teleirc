@@ -112,6 +112,12 @@ module.exports = function(config, sendTo) {
     readChatIds(config.channels);
 
     tg.on('message', function(msg) {
+        var age = Math.floor(Date.now() / 1000) - msg.date;
+        if (config.maxMsgAge && age > config.maxMsgAge) {
+            return console.log('skipping ' + age + ' seconds old message! ' +
+                'NOTE: change this behaviour with config.maxMsgAge, also check your system clock');
+        }
+
         var channel = config.channels.filter(function(channel) {
             return channel.tgGroup === msg.chat.title;
         })[0];
