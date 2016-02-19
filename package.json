@@ -25,11 +25,11 @@
   "bugs": "https://github.com/FruitieX/teleirc/issues",
   "homepage": "https://github.com/FruitieX/teleirc",
   "dependencies": {
-    "irc": "~0.3.12",
-    "lodash": "^3.10.1",
+    "irc": "~0.4.1",
+    "lodash": "^4.5.0",
     "mkdirp": "^0.5.1",
     "node-static": "^0.7.7",
-    "node-telegram-bot-api": "^0.15.0"
+    "node-telegram-bot-api": "^0.20.1"
   },
   "devDependencies": {
     "jscs": "^2.2.1",
