@@ -36,6 +36,10 @@ config.httpLocation = 'http://mydomain.com' + ':' + config.httpPort;
 // Colorizes nicks
 config.nickcolor = true;
 
+// If soloUse is true, send all messages without username preview, intented
+// to use telegram as a limited IRC client.
+config.soloUse = false;
+
 // formatting of Telegram usernames on IRC.
 // the following placeholders are available:
 //
