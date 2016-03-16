@@ -5,6 +5,7 @@ var irc = require('./irc');
 var nodeStatic = require('node-static');
 var mkdirp = require('mkdirp');
 var crypto = require('crypto');
+var nickcolor = require('./nickcolor');
 
 // tries to read chat ids from a file
 var readChatIds = function(arr) {
@@ -73,6 +74,10 @@ var getName = function(user, config) {
 
     // get rid of leading and trailing whitespace
     name = name.replace(/(^\s*)|(\s*$)/g, '');
+
+    if (config.nickcolor) {
+        return nickcolor(name);
+    }
 
     return name;
 };
