@@ -6,12 +6,12 @@ var getNameHash = function(name) {
 
     for (var i = 0; i < name.length; ++i) {
         chr = name.charCodeAt(i);
-		// mult by 32
+        // mult by 32
         hash = ((hash << 5) - hash) + chr;
         hash |= 0; // number conversion
     }
 
-	// returns negatives sometimes...
+    // returns negatives sometimes...
     return Math.abs(hash % 14);
 };
 
