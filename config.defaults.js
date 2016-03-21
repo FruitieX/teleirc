@@ -8,10 +8,6 @@ module.exports = config;
 // paste the bot API token you got from BotFather here:
 config.tgToken = 'YOUR-BOT-TOKEN';
 
-// bot username, used for the bot to identify replies to bridged messages.
-// Do not include the @ sign.
-config.username = 'tgBot'
-
 // send IRC topic changes to Telegram
 config.sendTopic = true;
 

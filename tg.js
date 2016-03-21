@@ -5,6 +5,7 @@ var irc = require('./irc');
 var nodeStatic = require('node-static');
 var mkdirp = require('mkdirp');
 var crypto = require('crypto');
+var myUser;
 
 // tries to read chat ids from a file
 var readChatIds = function(arr) {
@@ -123,6 +124,10 @@ module.exports = function(config, sendTo) {
 
     var tg = new Telegram(config.tgToken, {polling: true});
 
+    // Get our own Telegram user
+    tg.getMe().then(function (me) {
+        myUser = me;
+    });
     readChatIds(config.channels);
 
     tg.on('message', function(msg) {
@@ -163,7 +168,7 @@ module.exports = function(config, sendTo) {
         var text;
         if (msg.reply_to_message && msg.text) {
             var replyName;
-            if(msg.reply_to_message.from.username == config.username) {
+            if(msg.reply_to_message.from.username == myUser.username) {
                 replyName = getIRCName(msg.reply_to_message, config);
             } else {
                 replyName = getName(msg.reply_to_message.from, config);
