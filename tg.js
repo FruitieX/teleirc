@@ -93,7 +93,7 @@ var getIRCName = function(msg, config) {
     } else {
         name = results[1];
     }
-    
+
     return name;
 };
 
@@ -130,7 +130,7 @@ module.exports = function(config, sendTo) {
     var tg = new Telegram(config.tgToken, {polling: true});
 
     // Get our own Telegram user
-    tg.getMe().then(function (me) {
+    tg.getMe().then(function(me) {
         myUser = me;
     });
     readChatIds(config.channels);
@@ -173,12 +173,11 @@ module.exports = function(config, sendTo) {
         var text;
         if (msg.reply_to_message && msg.text) {
             var replyName;
-            if(msg.reply_to_message.from.username == myUser.username) {
+            if (msg.reply_to_message.from.username == myUser.username) {
                 replyName = getIRCName(msg.reply_to_message, config);
             } else {
                 replyName = getName(msg.reply_to_message.from, config);
             }
-            
             text = msg.text.replace(/\n/g , '\n<' + getName(msg.from, config) + '>: ');
             sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
                 '@' + replyName + ', ' + text);
