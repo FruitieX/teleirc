@@ -26,6 +26,7 @@
   "homepage": "https://github.com/FruitieX/teleirc",
   "dependencies": {
     "irc": "~0.4.1",
+    "irc-colors": "^1.2.0",
     "lodash": "^4.5.0",
     "mkdirp": "^0.5.1",
     "node-static": "^0.7.7",

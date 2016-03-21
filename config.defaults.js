@@ -33,6 +33,9 @@ config.httpLocation = 'http://mydomain.com' + ':' + config.httpPort;
 //  IRC config  //
 //////////////////
 
+// Colorizes nicks
+config.nickcolor = true;
+
 // formatting of Telegram usernames on IRC.
 // the following placeholders are available:
 //
