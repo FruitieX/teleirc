@@ -95,7 +95,7 @@ var getIRCName = function(msg, config) {
     }
     
     return name;
-}
+};
 
 function randomValueBase64(len) {
     return crypto.randomBytes(Math.ceil(len * 3 / 4))
