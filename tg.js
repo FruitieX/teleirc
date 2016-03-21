@@ -6,7 +6,7 @@ var nodeStatic = require('node-static');
 var mkdirp = require('mkdirp');
 var crypto = require('crypto');
 var nickcolor = require('./nickcolor');
-var myUser;
+var myUser = {};
 
 // tries to read chat ids from a file
 var readChatIds = function(arr) {
