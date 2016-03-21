@@ -6,6 +6,7 @@ var nodeStatic = require('node-static');
 var mkdirp = require('mkdirp');
 var crypto = require('crypto');
 var nickcolor = require('./nickcolor');
+var myUser = {};
 
 // tries to read chat ids from a file
 var readChatIds = function(arr) {
@@ -82,6 +83,20 @@ var getName = function(user, config) {
     return name;
 };
 
+var getIRCName = function(msg, config) {
+    var ircNickMatchRE = /^<(.*)>/;
+    var results = ircNickMatchRE.exec(msg.text);
+    var name;
+    if (!results) {
+        // Fall back to telegram name (i.e. for the topic change message)
+        name = getName(msg.from, config);
+    } else {
+        name = results[1];
+    }
+
+    return name;
+};
+
 function randomValueBase64(len) {
     return crypto.randomBytes(Math.ceil(len * 3 / 4))
         .toString('base64')
@@ -114,6 +129,10 @@ module.exports = function(config, sendTo) {
 
     var tg = new Telegram(config.tgToken, {polling: true});
 
+    // Get our own Telegram user
+    tg.getMe().then(function(me) {
+        myUser = me;
+    });
     readChatIds(config.channels);
 
     tg.on('message', function(msg) {
@@ -153,9 +172,15 @@ module.exports = function(config, sendTo) {
         }
         var text;
         if (msg.reply_to_message && msg.text) {
+            var replyName;
+            if (msg.reply_to_message.from.username == myUser.username) {
+                replyName = getIRCName(msg.reply_to_message, config);
+            } else {
+                replyName = getName(msg.reply_to_message.from, config);
+            }
             text = msg.text.replace(/\n/g , '\n<' + getName(msg.from, config) + '>: ');
             sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
-                '@' + getName(msg.reply_to_message.from, config) + ', ' + text);
+                '@' + replyName + ', ' + text);
         } else if (msg.audio) {
             serveFile(msg.audio.file_id, config, tg, function(url) {
                 sendTo.irc(channel.ircChan, '<' + getName(msg.from, config) + '>: ' +
