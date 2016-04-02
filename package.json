@@ -30,7 +30,7 @@
     "lodash": "^4.5.0",
     "mkdirp": "^0.5.1",
     "node-static": "^0.7.7",
-    "node-telegram-bot-api": "^0.20.1"
+    "node-telegram-bot-api": "^0.21.1"
   },
   "devDependencies": {
     "jscs": "^2.2.1",
