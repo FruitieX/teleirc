@@ -4,6 +4,8 @@ A simple [Telegram](https://telegram.org/) ↔ IRC gateway.
 
 [Changelog](https://fruitiex.org/blog/tag/teleirc/)
 
+[Official Telegram group](https://telegram.me/joinchat/AQWKJwfIHoZ5FvSVu6-QYQ)
+
 [![Build Status](https://travis-ci.org/FruitieX/teleirc.svg?branch=develop)](https://travis-ci.org/FruitieX/teleirc)
 [![npm module](https://img.shields.io/npm/v/teleirc.svg?style=flat)](https://www.npmjs.com/package/teleirc)
 [![dependencies](https://david-dm.org/fruitiex/teleirc.svg)](https://david-dm.org/fruitiex/teleirc#info=Dependencies)
