@@ -83,7 +83,7 @@ module.exports = function(config, sendTo) {
             return;
         }
 
-        var text = '* Topic for channel ' + channel.chanAlias || channel.ircChan +
+        var text = '* Topic for channel ' + (channel.chanAlias || channel.ircChan) +
                    ':\n' + topic.split(' | ').join('\n') +
                    '\n* set by ' + nick.split('!')[0];
         sendTo.tg(channel, text);
