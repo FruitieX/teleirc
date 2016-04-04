@@ -102,7 +102,7 @@ config.ircOptions = {
     floodProtection: true,
     floodProtectionDelay: 1000,
     sasl: false,
-    stripColors: false,
+    stripColors: true,
     channelPrefixes: '&#!',
     messageSplit: 512,
     encoding: ''
