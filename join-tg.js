@@ -7,8 +7,8 @@
 console.log('Join our official Telegram group:\n');
 
 // generated with new Buffer(theUrl, 'ascii').toString('hex')
-var h = '4151574b4a776649486f5a354676535675362d515951';
-var url = 'https://telegram.me/joinchat/';
-url += new Buffer(h, 'hex').toString('ascii');
+var h = '68747470733a2f2f74656c656772616d2e6d652f6a6f696e636' +
+        '861742f4151574b4a776649486f62774d386541645467796e41';
+var url = new Buffer(h, 'hex').toString('ascii');
 
 console.log(url);
