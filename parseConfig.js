@@ -90,6 +90,9 @@ if (process.argv[2] === '--genconfig') {
     console.log('Wrote default configuration to ' + configPath +
                 ', please edit it before re-running');
     process.exit(0);
+} else if (process.argv[2] === '--join-tg') {
+    require('./join-tg');
+    process.exit(0);
 }
 
 module.exports = function() {
