@@ -52,14 +52,14 @@ var writeChatIds = function(config) {
         }
     }
     json = JSON.stringify(json);
-    fs.writeFile(process.env.HOME + '/.teleirc/chat_ids', json, function(err) {
-        if (err) {
-            console.log('error while storing chat ID:');
-            console.log(err);
-        } else {
-            console.log('successfully stored chat ID in ~/.teleirc/chat_ids');
-        }
-    });
+    console.log('INFO: Storing new chatId...');
+    try {
+        fs.writeFileSync(process.env.HOME + '/.teleirc/chat_ids', json);
+        console.log('successfully stored chat ID in ~/.teleirc/chat_ids');
+    } catch (e) {
+        console.log('error while storing chat ID:');
+        console.log(e);
+    }
 };
 
 var getName = function(user, config) {
@@ -138,24 +138,35 @@ module.exports = function(config, sendTo) {
     readChatIds(config.channels);
 
     tg.on('message', function(msg) {
-        var age = Math.floor(Date.now() / 1000) - msg.date;
-        if (config.maxMsgAge && age > config.maxMsgAge) {
-            return console.log('skipping ' + age + ' seconds old message! ' +
-                'NOTE: change this behaviour with config.maxMsgAge, also check your system clock');
-        }
+        console.log('got msg:');
+        console.log(msg);
 
         var channel = config.channels.filter(function(channel) {
             return channel.tgGroup === msg.chat.title;
         })[0];
 
         if (!channel) {
+            console.log('VERBOSE: Telegram group not found in config: "' +
+                        msg.chat.title + '", dropping message...');
             return;
         }
 
-        if (!channel.tgChatId) {
+        // check if message contains a migrate command
+        if (msg.migrate_to_chat_id) {
+            console.log('INFO: chat migrated to supergroup.');
+            channel.tgChatId = msg.migrate_to_chat_id;
+            writeChatIds(config);
+            return console.log('INFO: stored new chatId');
+        } else if (!channel.tgChatId) {
             console.log('storing chat ID: ' + msg.chat.id);
             channel.tgChatId = msg.chat.id;
             writeChatIds(config);
+        }
+
+        var age = Math.floor(Date.now() / 1000) - msg.date;
+        if (config.maxMsgAge && age > config.maxMsgAge) {
+            return console.log('skipping ' + age + ' seconds old message! ' +
+                'NOTE: change this behaviour with config.maxMsgAge, also check your system clock');
         }
 
         if (msg.text && !msg.text.indexOf('/names')) {
@@ -250,9 +261,12 @@ module.exports = function(config, sendTo) {
         } else if (msg.left_chat_participant) {
             sendTo.irc(channel.ircChan, getName(msg.left_chat_participant, config) +
                 ' was removed by: ' + getName(msg.from, config));
-        } else {
+        } else if (msg.text) {
             text = msg.text.replace(/\n/g , '\n' + prefix);
             sendTo.irc(channel.ircChan, prefix + text);
+        } else {
+            console.log('WARNING: unhandled message:');
+            console.log(msg);
         }
     });
 
