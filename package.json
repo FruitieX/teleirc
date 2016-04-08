@@ -11,7 +11,7 @@
     "test": "NODE_ENV=test ./node_modules/mocha/bin/mocha",
     "join-tg": "node join-tg.js"
   },
-  "version": "0.4.0",
+  "version": "0.4.5",
   "licenses": [
     {
       "type": "MIT"
