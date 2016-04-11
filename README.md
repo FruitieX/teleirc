@@ -40,8 +40,8 @@ Make sure you've installed Node.js.
 
 Optional:
 
-- For your convenience, there is an included systemd unit file in
-  `extras/teleirc.service`.
+- For your convenience, there is an included systemd unit file:
+  [teleirc.service](extras/teleirc.service)
 - You can change your Telegram Bot's profile picture with the `/setuserpic`
   BotFather command. [Here's](/extras/icon.png) an example icon for you.
 - You can tell Telegram which commands the teleirc bot supports by using the
@@ -49,22 +49,10 @@ Optional:
   [`commands.txt`](/extras/commands.txt) to show all supported commands to
   Telegram clients.
 
-Developer install (from git)
-----------------------------
+Contributing
+------------
 
-    git clone https://github.com/FruitieX/teleirc
-    cd teleirc
-    npm install
-
-Then follow the instructions under `Setup`, with the exception of step 1.
-Also, instead of using the `teleirc` command, use `node teleirc.js` inside the
-repo.
-
-Use the [`develop`](https://github.com/FruitieX/teleirc/tree/develop) branch
-for developing, and please also send any pull requests to this branch. The
-    [`master`](https://github.com/FruitieX/teleirc/tree/master) branch contains
-    the latest stable version which is also released on
-    [npm](https://www.npmjs.com/package/teleirc).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for developer info
 
 Docker install
 --------------
