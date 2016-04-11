@@ -75,6 +75,11 @@ var parseDeprecatedOptions = function(config) {
             warnDeprecated(option, 'sendTopic');
             return;
         }
+        if (option === 'mediaRandomLenght') {
+            config.mediaRandomLength = value;
+            warnDeprecated(option, 'mediaRandomLenght');
+            return;
+        }
     });
 
     return config;

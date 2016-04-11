@@ -3,13 +3,13 @@
   "description": "Telegram <-> IRC gateway",
   "preferGlobal": true,
   "bin": {
-    "teleirc": "teleirc.js"
+    "teleirc": "bin/teleirc"
   },
   "scripts": {
     "prestart": "npm install",
-    "start": "node teleirc.js",
+    "start": "node bin/teleirc",
     "test": "NODE_ENV=test ./node_modules/mocha/bin/mocha",
-    "join-tg": "node join-tg.js"
+    "join-tg": "node src/join-tg.js"
   },
   "version": "0.4.5",
   "licenses": [

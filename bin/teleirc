@@ -1,0 +1,4 @@
+#!/usr/bin/env node
+
+// launch teleirc
+var teleirc = require('../src/index');
