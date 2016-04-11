@@ -77,7 +77,7 @@ var parseDeprecatedOptions = function(config) {
         }
         if (option === 'mediaRandomLenght') {
             config.mediaRandomLength = value;
-            warnDeprecated(option, 'mediaRandomLenght');
+            warnDeprecated(option, 'mediaRandomLength');
             return;
         }
     });
