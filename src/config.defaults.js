@@ -15,9 +15,9 @@ config.sendTopic = true;
 // forwarded to IRC
 config.showMedia = false;
 
-// Add some randomness to url when realying media
+// Add some randomness to url when relaying media
 // Use 0 to disable
-config.mediaRandomLenght = 8;
+config.mediaRandomLength = 8;
 
 // Age in seconds after which a Telegram message is not relayed, this prevents
 // spamming the IRC channel if your bot was offline for a long time
