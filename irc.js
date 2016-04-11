@@ -49,8 +49,8 @@ module.exports = function(config, sendTo) {
             if (match) {
                 message = match[1].trim();
             }
-            var text = '<' + user + '>: ' + message;
-            sendTo.tg(channel, text);
+
+            sendTo.tg(channel, user, message);
         }
     });
 
@@ -66,7 +66,7 @@ module.exports = function(config, sendTo) {
                 message = match[1].trim();
             }
             var text = '*' + user + ': ' + message + '*';
-            sendTo.tg(channel, text);
+            sendTo.tg(channel, user, message);
         }
     });
 
@@ -86,7 +86,7 @@ module.exports = function(config, sendTo) {
         var text = '* Topic for channel ' + (channel.chanAlias || channel.ircChan) +
                    ':\n' + topic +
                    '\n* set by ' + nick.split('!')[0];
-        sendTo.tg(channel, text);
+        sendTo.tg(channel, null, text);
     });
 
     sendTo.ircNames = function(channel) {

@@ -270,7 +270,7 @@ module.exports = function(config, sendTo) {
         }
     });
 
-    sendTo.tg = function(channel, msg) {
+    sendTo.tg = function(channel, user, msg) {
         if (!channel.tgChatId) {
             var err = 'ERROR: No chat_id set! Add me to a Telegram group ' +
                       'and say hi so I can find your group\'s chat_id!';
@@ -284,7 +284,13 @@ module.exports = function(config, sendTo) {
             msg = msg.replace(rx, '@' + name);
         });
 
-        console.log('  >> relaying to TG: ' + msg);
-        tg.sendMessage(channel.tgChatId, msg);
+        if (user === null) {
+            text = msg;
+        } else {
+            text = '<' + user + '>: ' + msg;
+        }
+
+        console.log('  >> relaying to TG: ' + text);
+        tg.sendMessage(channel.tgChatId, text);
     };
 };
