@@ -63,7 +63,7 @@ var init = function(msgCallback) {
             });
 
             if (message.user) {
-                message.text = '<' + message.user + '>: ' + message.text;
+                message.text = '<' + message.user + '> ' + message.text;
             }
 
             console.log('  >> relaying to TG: ' + message.text);

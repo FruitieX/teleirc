@@ -176,7 +176,7 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
     var text;
     var prefix = '';
     if (!config.soloUse) {
-        prefix = '<' + exports.getName(msg.from, config) + '>: ';
+        prefix = '<' + exports.getName(msg.from, config) + '> ';
     }
     if (msg.reply_to_message && msg.text) {
         var replyName;
