@@ -2,6 +2,7 @@ var _ = require('lodash');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
 var defaultConfig = require('./config.defaults');
+var argv = require('./arguments').argv;
 
 var warnDeprecated = function(oldOpt, newOpt) {
     console.warn('WARNING: detected usage of deprecated config option "' + oldOpt + '", ' +
@@ -85,17 +86,17 @@ var parseDeprecatedOptions = function(config) {
     return config;
 };
 
-if (process.argv[2] === '--genconfig') {
+if (argv.g) {
     mkdirp(process.env.HOME + '/.teleirc');
 
     // read default config using readFile to include comments
     var config = fs.readFileSync(__dirname + '/config.defaults.js');
-    var configPath = process.env.HOME + '/.teleirc/config.js';
+    var configPath = argv.c || (process.env.HOME + '/.teleirc/config.js');
     fs.writeFileSync(configPath, config);
     console.log('Wrote default configuration to ' + configPath +
                 ', please edit it before re-running');
     process.exit(0);
-} else if (process.argv[2] === '--join-tg') {
+} else if (argv.j) {
     require('./join-tg');
     process.exit(0);
 }
@@ -104,7 +105,7 @@ module.exports = function() {
     var config;
 
     try {
-        config = require(process.env.HOME + '/.teleirc/config.js');
+        config = require(argv.c || (process.env.HOME + '/.teleirc/config.js'));
     } catch (e) {
         console.error('ERROR while reading config:\n' + e + '\n\nPlease make sure ' +
                       'it exists and is valid. Run "teleirc --genconfig" to ' +
@@ -114,6 +115,11 @@ module.exports = function() {
 
     config = parseDeprecatedOptions(config);
     config = _.defaults(config, defaultConfig);
+
+    if (argv.v) {
+        // TODO: right now this is our only verbose option
+        config.ircOptions.debug = true;
+    }
 
     return config;
 };
