@@ -1,11 +1,12 @@
 [Unit]
 Description=teleirc
-After=network.target oidentd.socket
+After=network-online.target oidentd.socket
 
 [Service]
 ExecStart=/usr/bin/env node /path/to/teleirc.js
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
+User=USERNAME_YOU_CONFIGURED_TELEIRC_ON
 
 [Install]
 WantedBy=default.target
