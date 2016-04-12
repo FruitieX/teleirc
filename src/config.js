@@ -3,6 +3,8 @@ var fs = require('fs');
 var mkdirp = require('mkdirp');
 var defaultConfig = require('./config.defaults');
 var argv = require('./arguments').argv;
+var path = require('path');
+var os = require('os');
 var logger = require('winston');
 
 var warnDeprecated = function(oldOpt, newOpt) {
@@ -87,12 +89,13 @@ var parseDeprecatedOptions = function(config) {
     return config;
 };
 
+var config;
+var configPath = argv.c || path.join(os.homedir(), '.teleirc', 'config.js');
 if (argv.g) {
-    mkdirp(process.env.HOME + '/.teleirc');
+    mkdirp(path.join(os.homedir(), '/.teleirc'));
 
     // read default config using readFile to include comments
-    var config = fs.readFileSync(__dirname + '/config.defaults.js');
-    var configPath = argv.c || (process.env.HOME + '/.teleirc/config.js');
+    var config = fs.readFileSync(path.join(__dirname, 'config.defaults.js'));
     fs.writeFileSync(configPath, config);
     console.log('Wrote default configuration to ' + configPath +
                 ', please edit it before re-running');
@@ -102,9 +105,6 @@ if (argv.g) {
     process.exit(0);
 }
 
-var config;
-
-var configPath = argv.c || (process.env.HOME + '/.teleirc/config.js');
 try {
     logger.info('using config file from: ' + configPath);
     config = require(configPath);

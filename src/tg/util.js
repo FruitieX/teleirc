@@ -3,9 +3,12 @@ var nickcolor = require('./nickcolor');
 var nodeStatic = require('node-static');
 var fs = require('fs');
 var path = require('path');
+var os = require('os');
 var mkdirp = require('mkdirp');
 var crypto = require('crypto');
 var logger = require('winston');
+
+var chatIdsPath = path.join(os.homedir(), '.teleirc', 'chat_ids');
 
 exports.readChatIds = function(arr) {
     logger.verbose('NOTE!');
@@ -13,7 +16,7 @@ exports.readChatIds = function(arr) {
 
     var idMissing = false;
     try {
-        var json = JSON.parse(fs.readFileSync(process.env.HOME + '/.teleirc/chat_ids'));
+        var json = JSON.parse(fs.readFileSync(chatIdsPath));
         for (var i = 0; i < arr.length; i++) {
             var key = arr[i].tgGroup;
             if (key in json) {
@@ -25,7 +28,7 @@ exports.readChatIds = function(arr) {
             }
         }
     } catch (e) {
-        logger.warn('~/.teleirc/chat_ids file not found!');
+        logger.warn(chatIdsPath + ' file not found!');
         idMissing = true;
     }
 
@@ -46,8 +49,8 @@ exports.writeChatIds = function(config) {
     json = JSON.stringify(json);
     logger.debug('writing to chat_ids file...');
     try {
-        fs.writeFileSync(process.env.HOME + '/.teleirc/chat_ids', json);
-        logger.info('successfully stored chat ID in ~/.teleirc/chat_ids');
+        fs.writeFileSync(chatIdsPath, json);
+        logger.info('successfully stored chat ID in ' + chatIdsPath);
     } catch (e) {
         logger.error('error while storing chat ID:', e);
     }
@@ -99,17 +102,21 @@ exports.randomValueBase64 = function(len) {
 };
 
 exports.serveFile = function(fileId, config, tg, callback) {
+    var filesPath = path.join(os.homedir(), '.teleirc', 'files');
+
     var randomString = exports.randomValueBase64(config.mediaRandomLength);
-    mkdirp(process.env.HOME + '/.teleirc/files/' + randomString);
-    tg.downloadFile(fileId, process.env.HOME + '/.teleirc/files/' + randomString)
+    mkdirp(path.join(filesPath, randomString));
+    tg.downloadFile(fileId, path.join(filesPath, randomString))
     .then(function(filePath) {
         callback(config.httpLocation + '/' + randomString + '/' + path.basename(filePath));
     });
 };
 
 exports.initHttpServer = function() {
-    var fileServer = new nodeStatic.Server(process.env.HOME + '/.teleirc/files');
-    mkdirp(process.env.HOME + '/.teleirc/files');
+    var filesPath = path.join(os.homedir(), '.teleirc', 'files');
+    mkdirp(filesPath);
+
+    var fileServer = new nodeStatic.Server(filesPath);
 
     require('http').createServer(function(req, res) {
         req.addListener('end', function() {
