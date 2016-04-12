@@ -5,6 +5,11 @@ module.exports = config;
 //  General config //
 /////////////////////
 
+// verbosity of console output
+// possible options from most to least verbose:
+// silly, debug, verbose, info, warn, error
+config.logLevel = 'info';
+
 // paste the bot API token you got from BotFather here:
 config.tgToken = 'YOUR-BOT-TOKEN';
 

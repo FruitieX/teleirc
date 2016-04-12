@@ -3,9 +3,10 @@ var fs = require('fs');
 var mkdirp = require('mkdirp');
 var defaultConfig = require('./config.defaults');
 var argv = require('./arguments').argv;
+var logger = require('winston');
 
 var warnDeprecated = function(oldOpt, newOpt) {
-    console.warn('WARNING: detected usage of deprecated config option "' + oldOpt + '", ' +
+    logger.warn('detected usage of deprecated config option "' + oldOpt + '", ' +
                  'support for it will be dropped in a future version! Consider ' +
                  'migrating to the new "' + newOpt + '" option instead.');
 };
@@ -101,25 +102,25 @@ if (argv.g) {
     process.exit(0);
 }
 
-module.exports = function() {
-    var config;
+var config;
 
-    try {
-        config = require(argv.c || (process.env.HOME + '/.teleirc/config.js'));
-    } catch (e) {
-        console.error('ERROR while reading config:\n' + e + '\n\nPlease make sure ' +
-                      'it exists and is valid. Run "teleirc --genconfig" to ' +
-                      'generate a default config.');
-        process.exit(1);
-    }
+var configPath = argv.c || (process.env.HOME + '/.teleirc/config.js');
+try {
+    logger.info('using config file from: ' + configPath);
+    config = require(configPath);
+} catch (e) {
+    logger.error('ERROR while reading config:\n' + e + '\n\nPlease make sure ' +
+                  'it exists and is valid. Run "teleirc --genconfig" to ' +
+                  'generate a default config.');
+    process.exit(1);
+}
 
-    config = parseDeprecatedOptions(config);
-    config = _.defaults(config, defaultConfig);
+config = parseDeprecatedOptions(config);
+config = _.defaults(config, defaultConfig);
 
-    if (argv.v) {
-        // TODO: right now this is our only verbose option
-        config.ircOptions.debug = true;
-    }
+if (argv.v) {
+    // TODO: right now this is our only verbose option
+    config.ircOptions.debug = true;
+}
 
-    return config;
-};
+module.exports = config;

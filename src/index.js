@@ -1,3 +1,4 @@
+var logger = require('./log');
 var argv = require('./arguments').argv;
 var git = require('git-rev-sync');
 var pjson = require('../package.json');
@@ -15,7 +16,9 @@ if (argv.version) {
 
     console.log(version);
 } else {
-    var config = require('./config')();
+    var config = require('./config');
+
+    logger.level = config.logLevel;
 
     var msgCallback = function(message) {
         switch (message.protocol) {
@@ -26,7 +29,7 @@ if (argv.version) {
                 irc.send(message);
                 break;
             default:
-                console.error('unknown protocol: ' + message.protocol);
+                logger.warn('unknown protocol: ' + message.protocol);
         }
     };
 

@@ -1,4 +1,4 @@
-var config = require('../config')();
+var config = require('../config');
 
 exports.lookupChannel = function(chanName, channels) {
     return channels.filter(function(channel) {

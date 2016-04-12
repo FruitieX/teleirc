@@ -1,15 +1,15 @@
-var config = require('../config')();
+var config = require('../config');
 var nickcolor = require('./nickcolor');
 var nodeStatic = require('node-static');
 var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
 var crypto = require('crypto');
+var logger = require('winston');
 
 exports.readChatIds = function(arr) {
-    console.log('\n');
-    console.log('NOTE!');
-    console.log('=====');
+    logger.verbose('NOTE!');
+    logger.verbose('=====');
 
     var idMissing = false;
     try {
@@ -18,25 +18,22 @@ exports.readChatIds = function(arr) {
             var key = arr[i].tgGroup;
             if (key in json) {
                 arr[i].tgChatId = json[key];
-                console.log('id found for:', key, ':', json[key]);
+                logger.info('id found for:', key, ':', json[key]);
             } else {
-                console.log('id not found:', key);
+                logger.warn('id not found:', key);
                 idMissing = true;
             }
         }
     } catch (e) {
-        console.log('~/.teleirc/chat_ids file not found!');
+        logger.warn('~/.teleirc/chat_ids file not found!');
         idMissing = true;
     }
 
     if (idMissing) {
-        console.log(
-            '\nPlease add your Telegram bot to a Telegram group and have' +
-            '\nsomeone send a message to that group.' +
-            '\nteleirc will then automatically store your group chat_id.');
+        logger.warn('Please add your Telegram bot to a Telegram group and have');
+        logger.warn('someone send a message to that group.');
+        logger.warn('teleirc will then automatically store your group chat_id.');
     }
-
-    console.log('\n');
 };
 
 exports.writeChatIds = function(config) {
@@ -47,13 +44,12 @@ exports.writeChatIds = function(config) {
         }
     }
     json = JSON.stringify(json);
-    console.log('INFO: Storing new chatId...');
+    logger.debug('writing to chat_ids file...');
     try {
         fs.writeFileSync(process.env.HOME + '/.teleirc/chat_ids', json);
-        console.log('successfully stored chat ID in ~/.teleirc/chat_ids');
+        logger.info('successfully stored chat ID in ~/.teleirc/chat_ids');
     } catch (e) {
-        console.log('error while storing chat ID:');
-        console.log(e);
+        logger.error('error while storing chat ID:', e);
     }
 };
 
@@ -130,27 +126,27 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
     })[0];
 
     if (!channel) {
-        console.log('VERBOSE: Telegram group not found in config: "' +
+        logger.verbose('Telegram group not found in config: "' +
                     msg.chat.title + '", dropping message...');
         return callback();
     }
 
     // check if message contains a migrate command
     if (msg.migrate_to_chat_id) {
-        console.log('INFO: chat migrated to supergroup.');
+        logger.info('chat migrated to supergroup.');
         channel.tgChatId = msg.migrate_to_chat_id;
         exports.writeChatIds(config);
-        console.log('INFO: stored new chatId');
+        logger.info('stored new chatId');
         return callback();
     } else if (!channel.tgChatId) {
-        console.log('storing chat ID: ' + msg.chat.id);
+        logger.info('storing chat ID: ' + msg.chat.id);
         channel.tgChatId = msg.chat.id;
         exports.writeChatIds(config);
     }
 
     var age = Math.floor(Date.now() / 1000) - msg.date;
     if (config.maxMsgAge && age > config.maxMsgAge) {
-        console.log('skipping ' + age + ' seconds old message! ' +
+        logger.warn('skipping ' + age + ' seconds old message! ' +
             'NOTE: change this behaviour with config.maxMsgAge, also check your system clock');
         return callback();
     }
@@ -283,8 +279,7 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
             text: prefix + text
         });
     } else {
-        console.log('WARNING: unhandled message:');
-        console.log(msg);
+        logger.warn('WARNING: unhandled message:', msg);
         callback();
     }
 };

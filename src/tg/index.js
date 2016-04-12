@@ -1,6 +1,7 @@
 var Telegram = require('node-telegram-bot-api');
-var config = require('../config')();
+var config = require('../config');
 var tgUtil = require('./util');
+var logger = require('winston');
 
 var myUser = {};
 var seenNames = [];
@@ -21,8 +22,7 @@ var init = function(msgCallback) {
         myUser = me;
 
         tg.on('message', function(msg) {
-            console.log('got tg msg:');
-            console.log(msg);
+            logger.debug('got tg msg:', msg);
 
             // track usernames for creating mentions
             if (seenNames.indexOf(msg.from.username) == -1) {
@@ -44,7 +44,7 @@ var init = function(msgCallback) {
     return {
         send: function(message) {
             if (!message.channel.tgChatId) {
-                var err = 'ERROR: No chat_id set! Add me to a Telegram group ' +
+                var err = 'No chat_id set! Add me to a Telegram group ' +
                           'and say hi so I can find your group\'s chat_id!';
 
                 msgCallback({
@@ -53,7 +53,7 @@ var init = function(msgCallback) {
                     text: err
                 });
 
-                console.error(err);
+                logger.error(err);
                 return;
             }
 
@@ -66,7 +66,7 @@ var init = function(msgCallback) {
                 message.text = '<' + message.user + '> ' + message.text;
             }
 
-            console.log('  >> relaying to TG: ' + message.text);
+            logger.verbose('>> relaying to TG:', message.text);
             tg.sendMessage(message.channel.tgChatId, message.text);
         }
     };
