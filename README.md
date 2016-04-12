@@ -3,7 +3,7 @@
 A simple [Telegram](https://telegram.org/) ↔ IRC gateway.
 
 * [Changelog](https://fruitiex.org/blog/tag/teleirc/)
-* Official IRC channel: [#teleirc @ irc.freenode.net](http://webchat.freenode.net?channels=%23teleirc)
+* Official IRC channel: [#teleirc @ irc.freenode.net](https://kiwiirc.com/client/irc.freenode.net:+6697/#teleirc)
 * Official Telegram group: Run `teleirc --join-tg` for URL (to prevent spambots)
 
 [![Build Status](https://travis-ci.org/FruitieX/teleirc.svg?branch=develop)](https://travis-ci.org/FruitieX/teleirc)
