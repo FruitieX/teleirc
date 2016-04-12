@@ -28,9 +28,11 @@ exports.parseMsg = function(chanName, text) {
 
     var match = config.hlRegexp.exec(text);
     if (match || config.ircRelayAll) {
-        if (match) {
-            text = match[1].trim();
+        if (match && config.hlOnlyShowMatch) {
+            text = match[1];
         }
+
+        text = text.trim();
 
         return {
             channel: channel,
@@ -40,7 +42,7 @@ exports.parseMsg = function(chanName, text) {
 };
 
 exports.parseTopic = function(chanName, topic, user) {
-    var channel = ircUtil.lookupChannel(chanName, config.channels);
+    var channel = exports.lookupChannel(chanName, config.channels);
     if (!channel) {
         return;
     }

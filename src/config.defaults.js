@@ -116,3 +116,8 @@ config.ircRelayAll = false;
 // lines starting with '! '
 var regex = '^ *(?:' + config.ircNick + '[:,]?|!) +(.*\\S.*)$';
 config.hlRegexp = new RegExp(regex, 'i');
+
+// if there was a match, should we only show the parenthesized substring match?
+// with the default regexp this would hide the bot nickname in messages when
+// highlighted
+config.hlOnlyShowMatch = false;
