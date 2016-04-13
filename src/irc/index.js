@@ -49,13 +49,15 @@ var init = function(msgCallback) {
     nodeIrc.on('topic', function(chanName, topic, user) {
         var message = ircUtil.parseTopic(chanName, topic, user);
 
-        msgCallback({
-            protocol: 'irc',
-            type: 'topic',
-            channel: message.channel,
-            user: null,
-            text: message.text
-        });
+        if (message) {
+            msgCallback({
+                protocol: 'irc',
+                type: 'topic',
+                channel: message.channel,
+                user: null,
+                text: message.text
+            });
+        }
     });
 
     return {
