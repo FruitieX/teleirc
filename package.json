@@ -12,11 +12,7 @@
     "join-tg": "node src/join-tg.js"
   },
   "version": "0.4.5",
-  "licenses": [
-    {
-      "type": "MIT"
-    }
-  ],
+  "license": "MIT",
   "repository": [
     {
       "type": "git",
