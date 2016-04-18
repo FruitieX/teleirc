@@ -31,11 +31,8 @@ var init = function(msgCallback) {
 
             tgUtil.parseMsg(msg, myUser, tg, function(message) {
                 if (message) {
-                    msgCallback({
-                        protocol: 'tg',
-                        channel: message.channel,
-                        text: message.text
-                    });
+                    message.protocol = 'tg';
+                    msgCallback(message);
                 }
             });
         });

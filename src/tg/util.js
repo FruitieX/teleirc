@@ -158,17 +158,12 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
         return callback();
     }
 
-    // TODO: fix /names command
-    /*
     if (msg.text && !msg.text.indexOf('/names')) {
-        var names = sendTo.ircNames(channel);
-        names.sort();
-        names = 'Users on ' + (channel.chanAlias || channel.ircChan) + ':\n\n' +
-            names.join(', ');
-
-        return tg.sendMessage(channel.tgChatId, names);
+        return callback({
+            channel: channel,
+            cmd: 'getNames'
+        });
     }
-    */
 
     // skip posts containing media if it's configured off
     if ((msg.audio || msg.document || msg.photo || msg.sticker || msg.video ||

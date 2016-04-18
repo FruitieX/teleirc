@@ -26,7 +26,20 @@ if (argv.version) {
                 tg.send(message);
                 break;
             case 'tg':
-                irc.send(message);
+                if (message.cmd === 'getNames') {
+                    var names = irc.getNames(message.channel);
+                    names.sort();
+
+                    var channel = message.channel;
+                    names = 'Users on ' + (channel.chanAlias || channel.ircChan) + ':\n\n' +
+                        names.join(', ');
+
+                    message.text = names;
+
+                    return tg.send(message);
+                } else {
+                    irc.send(message);
+                }
                 break;
             default:
                 logger.warn('unknown protocol: ' + message.protocol);

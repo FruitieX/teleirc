@@ -65,7 +65,7 @@ var init = function(msgCallback) {
             logger.verbose('<< relaying to IRC:', message.text);
             nodeIrc.say(message.channel.ircChan, message.text);
         },
-        names: function(channel) {
+        getNames: function(channel) {
             return ircUtil.getNames(nodeIrc.chans[channel.ircChan]);
         }
     };
