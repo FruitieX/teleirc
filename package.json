@@ -22,10 +22,10 @@
   "bugs": "https://github.com/FruitieX/teleirc/issues",
   "homepage": "https://github.com/FruitieX/teleirc",
   "dependencies": {
-    "git-rev-sync": "^1.5.0",
+    "git-rev-sync": "^1.5.1",
     "irc": "^0.5.0",
-    "irc-colors": "^1.2.0",
-    "lodash": "^4.5.0",
+    "irc-colors": "^1.2.1",
+    "lodash": "^4.11.1",
     "mkdirp": "^0.5.1",
     "node-static": "^0.7.7",
     "node-telegram-bot-api": "^0.21.1",
@@ -34,8 +34,8 @@
   },
   "devDependencies": {
     "jscs": "^2.2.1",
-    "mocha": "^2.3.3",
-    "mocha-jscs": "^4.0.0",
-    "mocha-jshint": "^2.2.3"
+    "mocha": "^2.4.5",
+    "mocha-jscs": "^4.2.0",
+    "mocha-jshint": "^2.3.1"
   }
 }
