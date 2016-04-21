@@ -16,6 +16,9 @@ config.tgToken = 'YOUR-BOT-TOKEN';
 // send IRC topic changes to Telegram
 config.sendTopic = true;
 
+// send IRC joins, parts and quits to Telegram
+config.sendNonMsg = false;
+
 // enable HTTP server which hosts sent media files, links to files are
 // forwarded to IRC
 config.showMedia = false;
