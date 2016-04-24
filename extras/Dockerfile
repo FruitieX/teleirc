@@ -2,9 +2,9 @@ FROM node:argon
 
 USER root
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y libicu-dev
+RUN apt-get update && apt-get install -y libicu-dev && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN npm install -g teleirc
+RUN npm install -g teleirc && npm cache clear
 
 RUN useradd -ms /bin/bash teleirc
 USER teleirc

@@ -13,9 +13,7 @@ In the following commands you will need to replace some values:
 
     git clone https://github.com/FruitieX/teleirc
     cd teleirc
-    sudo docker build -t <YOUR_DOCKER_USERNAME>/teleirc .
-
-_Don't forget the dot at the end!_
+    sudo docker build -t <YOUR_DOCKER_USERNAME>/teleirc extras
 
 **Step 2: Create a data-only container for teleirc**
 
