@@ -44,6 +44,15 @@ config.httpLocation = 'http://mydomain.com' + ':' + config.httpPort;
 // Colorizes nicks
 config.nickcolor = true;
 
+// nick color palette
+var palette = [
+    'white', 'silver', 'navy',
+    'green', 'red', 'brown',
+    'purple', 'olive', 'yellow',
+    'lime', 'teal', 'cyan',
+    'pink', 'blue'
+];
+
 // If soloUse is true, send all messages without username preview, intented
 // to use telegram as a limited IRC client.
 config.soloUse = false;

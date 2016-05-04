@@ -1,8 +1,21 @@
 var c = require('irc-colors');
+var config = require('../config');
 
-var getNameHash = function(name) {
+var palette = [
+    'navy', 'green', 'red',
+    'brown','purple', 'olive',
+    'yellow','lime', 'teal',
+    'cyan', 'pink', 'blue'
+];
+
+module.exports = function(name) {
+
     var hash = 0;
-    if (name.length === 0) { return hash; }
+    if (config.palette && config.palette.length !== 0) {
+        palette = config.palette;
+    }
+
+    if (name.length === 0) { return name; }
 
     for (var i = 0; i < name.length; ++i) {
         chr = name.charCodeAt(i);
@@ -12,39 +25,8 @@ var getNameHash = function(name) {
     }
 
     // returns negatives sometimes...
-    return Math.abs(hash % 14);
-};
+    hash = Math.abs(hash % palette.length);
 
-module.exports = function(name) {
-    switch (getNameHash(name)) {
-        case 0:
-            return c.white(name);
-        case 1:
-            return c.silver(name);
-        case 2:
-            return c.navy(name);
-        case 3:
-            return c.green(name);
-        case 4:
-            return c.red(name);
-        case 5:
-            return c.brown(name);
-        case 6:
-            return c.purple(name);
-        case 7:
-            return c.olive(name);
-        case 8:
-            return c.yellow(name);
-        case 9:
-            return c.lime(name);
-        case 10:
-            return c.teal(name);
-        case 11:
-            return c.cyan(name);
-        case 12:
-            return c.blue(name);
-        case 13:
-            return c.pink(name);
-    }
+    if (!c[palette[hash]]) { return name; }
+    return c[palette[hash]](name);
 };
-
