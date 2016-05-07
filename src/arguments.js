@@ -23,6 +23,7 @@ module.exports = {
 
         .alias('h', 'help')
         .help()
+        .strict()
 
         .argv
 };
