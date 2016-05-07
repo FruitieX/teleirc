@@ -7,3 +7,6 @@ notifications:
             # Avoid forks spamming the channel.
             # travis encrypt "ircs://irc.freenode.net:6697/#teleirc" -r FruitieX/teleirc
             - secure: "A/l0j/MMIrXTP5jPCN1x7fJCykjSgH0bL+bUQZOVL9nEr4OuIi5lgZtOMv2XZC8iG7uaPmyvQCLEsnXzC6CgqnPXuF4h+cClBiGnAeMqWelTJdMHfR0ebHM8Brx/h9EEOR86LDDtT5i7CQA4/YExIoURy7UnvEfVHq6tYGUFEiU="
+        template:
+            - "%{repository_slug}#%{build_number} %{branch} - %{commit} (%{commit_subject}) - : %{author}): %{message}"
+            - "Change view : %{compare_url} / Build details : %{build_url}"
