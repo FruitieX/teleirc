@@ -1,19 +1,9 @@
 var c = require('irc-colors');
 var config = require('../config');
 
-var palette = [
-    'navy', 'green', 'red',
-    'brown','purple', 'olive',
-    'yellow','lime', 'teal',
-    'cyan', 'pink', 'blue'
-];
-
 module.exports = function(name) {
 
     var hash = 0;
-    if (config.palette && config.palette.length !== 0) {
-        palette = config.palette;
-    }
 
     if (name.length === 0) { return name; }
 
@@ -25,8 +15,8 @@ module.exports = function(name) {
     }
 
     // returns negatives sometimes...
-    hash = Math.abs(hash % palette.length);
+    hash = Math.abs(hash % config.palette.length);
 
-    if (!c[palette[hash]]) { return name; }
-    return c[palette[hash]](name);
+    if (!c[config.palette[hash]]) { return name; }
+    return c[config.palette[hash]](name);
 };

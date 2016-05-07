@@ -47,8 +47,8 @@ config.allowCommands = false;
 // Colorizes nicks
 config.nickcolor = true;
 
-// nick color palette
-var palette = [
+// Nick color palette
+config.palette = [
     'white', 'silver', 'navy',
     'green', 'red', 'brown',
     'purple', 'olive', 'yellow',
