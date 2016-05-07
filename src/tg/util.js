@@ -11,9 +11,6 @@ var logger = require('winston');
 var chatIdsPath = path.join(os.homedir(), '.teleirc');
 
 exports.readChatId = function(channel) {
-    logger.verbose('NOTE!');
-    logger.verbose('=====');
-
     var chatId;
     var chatIdPath = path.join(chatIdsPath, channel.tgGroup + '.chatid');
 
@@ -21,10 +18,12 @@ exports.readChatId = function(channel) {
         chatId = JSON.parse(fs.readFileSync(chatIdPath));
         logger.info('successfully read chat ID for group ' + channel.tgGroup);
     } catch (e) {
-        logger.error('error while reading chat ID:', e);
+        logger.error('while reading chat ID for group ' + channel.tgGroup);
     }
 
     if (!chatId) {
+        logger.warn('NOTE!');
+        logger.warn('=====');
         logger.warn('Please add your Telegram bot to a Telegram group and have');
         logger.warn('someone send a message to that group.');
         logger.warn('teleirc will then automatically store your group chat_id.');

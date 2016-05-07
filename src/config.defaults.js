@@ -127,7 +127,7 @@ config.ircOptions = {
 
 // if you wish to relay every irc message to telegram, set this to true.
 // if false, then only lines matching config.hlRegexp will be relayed
-config.ircRelayAll = false;
+config.ircRelayAll = true;
 
 // the default hilight regexp will match lines containing the bot nick, or
 // lines starting with '! '

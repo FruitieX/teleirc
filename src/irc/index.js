@@ -20,9 +20,9 @@ var init = function(msgCallback) {
 
     nodeIrc.on('message', function(user, chanName, text) {
         var message = ircUtil.parseMsg(chanName, text);
-        logger.debug('got irc msg:', message);
 
         if (message) {
+            logger.debug('got irc msg:', message);
             msgCallback({
                 protocol: 'irc',
                 channel: message.channel,

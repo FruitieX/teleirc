@@ -1,4 +1,5 @@
 var config = require('../config');
+var logger = require('winston');
 
 exports.lookupChannel = function(chanName, channels) {
     return channels.filter(function(channel) {
@@ -23,6 +24,7 @@ exports.getChannels = function(arr) {
 exports.parseMsg = function(chanName, text) {
     var channel = exports.lookupChannel(chanName, config.channels);
     if (!channel) {
+        logger.error('channel ' + chanName + ' not found in config!');
         return;
     }
 
