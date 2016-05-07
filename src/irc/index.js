@@ -109,6 +109,9 @@ var init = function(msgCallback) {
 
     return {
         send: function(message) {
+            // strip empty lines
+            message.text = message.text.replace(/^\s*\n/gm, '');
+
             // replace newlines with ellipsis character
             message.text = message.text.replace(/\n/g, ' … ');
 
