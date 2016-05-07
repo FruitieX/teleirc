@@ -8,49 +8,38 @@ var mkdirp = require('mkdirp');
 var crypto = require('crypto');
 var logger = require('winston');
 
-var chatIdsPath = path.join(os.homedir(), '.teleirc', 'chat_ids');
+var chatIdsPath = path.join(os.homedir(), '.teleirc');
 
-exports.readChatIds = function(arr) {
+exports.readChatId = function(channel) {
     logger.verbose('NOTE!');
     logger.verbose('=====');
 
-    var idMissing = false;
+    var chatId;
+    var chatIdPath = path.join(chatIdsPath, channel.tgGroup + '.chatid');
+
     try {
-        var json = JSON.parse(fs.readFileSync(chatIdsPath));
-        for (var i = 0; i < arr.length; i++) {
-            var key = arr[i].tgGroup;
-            if (key in json) {
-                arr[i].tgChatId = json[key];
-                logger.info('id found for:', key, ':', json[key]);
-            } else {
-                logger.warn('id not found:', key);
-                idMissing = true;
-            }
-        }
+        chatId = JSON.parse(fs.readFileSync(chatIdPath));
+        logger.info('successfully read chat ID for group ' + channel.tgGroup);
     } catch (e) {
-        logger.warn(chatIdsPath + ' file not found!');
-        idMissing = true;
+        logger.error('error while reading chat ID:', e);
     }
 
-    if (idMissing) {
+    if (!chatId) {
         logger.warn('Please add your Telegram bot to a Telegram group and have');
         logger.warn('someone send a message to that group.');
         logger.warn('teleirc will then automatically store your group chat_id.');
     }
+
+    return chatId;
 };
 
-exports.writeChatIds = function(config) {
-    var json = {};
-    for (var i = 0; i < config.channels.length; i++) {
-        if (config.channels[i].tgChatId) {
-            json[config.channels[i].tgGroup] = config.channels[i].tgChatId;
-        }
-    }
-    json = JSON.stringify(json);
-    logger.debug('writing to chat_ids file...');
+exports.writeChatId = function(channel) {
+    var chatId = JSON.stringify(channel.tgChatId);
+    var chatIdPath = path.join(chatIdsPath, channel.tgGroup + '.chatid');
+
     try {
-        fs.writeFileSync(chatIdsPath, json);
-        logger.info('successfully stored chat ID in ' + chatIdsPath);
+        fs.writeFileSync(chatIdPath, chatId);
+        logger.info('successfully stored chat ID in ' + chatIdPath);
     } catch (e) {
         logger.error('error while storing chat ID:', e);
     }
@@ -142,13 +131,13 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
     if (msg.migrate_to_chat_id) {
         logger.info('chat migrated to supergroup.');
         channel.tgChatId = msg.migrate_to_chat_id;
-        exports.writeChatIds(config);
+        exports.writeChatId(channel);
         logger.info('stored new chatId');
         return callback();
     } else if (!channel.tgChatId) {
         logger.info('storing chat ID: ' + msg.chat.id);
         channel.tgChatId = msg.chat.id;
-        exports.writeChatIds(config);
+        exports.writeChatId(channel);
     }
 
     var age = Math.floor(Date.now() / 1000) - msg.date;

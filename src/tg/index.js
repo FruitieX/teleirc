@@ -14,9 +14,6 @@ var init = function(msgCallback) {
 
     var tg = new Telegram(config.tgToken, {polling: true});
 
-    // read stored group chat ID numbers
-    tgUtil.readChatIds(config.channels);
-
     // get our own Telegram user
     tg.getMe().then(function(me) {
         myUser = me;
@@ -40,6 +37,12 @@ var init = function(msgCallback) {
 
     return {
         send: function(message) {
+            // if no chatId has been read for the chat yet, try reading it from disk
+            if (!message.channel.tgChatId) {
+                message.channel.tgChatId = tgUtil.readChatId(message.channel);
+            }
+
+            // if still no chatId, return with error message
             if (!message.channel.tgChatId) {
                 var err = 'No chat_id set! Add me to a Telegram group ' +
                           'and say hi so I can find your group\'s chat_id!';
