@@ -112,8 +112,12 @@ var init = function(msgCallback) {
             // strip empty lines
             message.text = message.text.replace(/^\s*\n/gm, '');
 
-            // replace newlines with ellipsis character
-            message.text = message.text.replace(/\n/g, ' … ');
+            // replace newlines
+            message.text = message.text.replace(/\n/g, config.replaceNewlines);
+
+            // TODO: replace here any remaining newlines with username
+            // (this can happen if user configured replaceNewlines to itself
+            // contain newlines)
 
             logger.verbose('<< relaying to IRC:', message.text);
             nodeIrc.say(message.channel.ircChan, message.text);

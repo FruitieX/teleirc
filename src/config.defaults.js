@@ -68,6 +68,12 @@ config.nameFormat = '%username%';
 // fallback format string for %username% if sender lacks username
 config.usernameFallbackFormat = '%firstName% %lastName%';
 
+// Replace newline characters in Telegram messages with this string before
+// relaying them to IRC, prevents flood from long messages.
+//
+// Tip: you can set this to \n if you want them as separate messages on IRC
+config.replaceNewlines = ' … ';
+
 config.ircNick = 'tgBot';
 config.ircServer = 'irc.cs.hut.fi';
 
