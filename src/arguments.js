@@ -19,6 +19,8 @@ module.exports = {
 
         .describe('version', 'Show teleirc version and quit')
 
+        .describe('upgrade-config', 'Replace deprecated options and add new options to config')
+
         .alias('h', 'help')
         .help()
 

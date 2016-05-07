@@ -13,76 +13,49 @@ var warnDeprecated = function(oldOpt, newOpt) {
                  'migrating to the new "' + newOpt + '" option instead.');
 };
 
+var deprecatedChannelOptions = {
+    'irc_channel_id': 'ircChan',
+    'irc_channel_pwd': 'chanPwd',
+    'irc_channel': 'chanAlias',
+    'tg_chat': 'tgGroup'
+};
+
+var deprecatedOptions = {
+    'tg_bot_token': 'tgToken',
+    'irc_nick': 'ircNick',
+    'irc_server': 'ircServer',
+    'irc_options': 'ircOptions',
+    'irc_relay_all': 'ircRelayAll',
+    'irc_hilight_re': 'hlRegexp',
+    'send_topic': 'sendTopic',
+    'mediaRandomLenght': 'mediaRandomLength'
+};
+
 // support old config options for a few versions, but warn about their usage
 var parseDeprecatedOptions = function(config) {
 
-    // check the contents of the channels array for old options
+    // search for old channel config options, loop through every channel
     _.forEach(config.channels, function(channel, i) {
-        _.forEach(channel, function(value, key) {
-            if (key === 'irc_channel') {
-                config.channels[i].chanAlias = value;
-                warnDeprecated(key, 'chanAlias');
-                return;
-            }
-            if (key === 'irc_channel_id') {
-                config.channels[i].ircChan = value;
-                warnDeprecated(key, 'ircChan');
-                return;
-            }
-            if (key === 'irc_channel_pwd') {
-                config.channels[i].chanPwd = value;
-                warnDeprecated(key, 'chanPwd');
-                return;
-            }
-            if (key === 'tg_chat') {
-                config.channels[i].tgGroup = value;
-                warnDeprecated(key, 'tgGroup');
-                return;
+        // loop over every key, value pair in the channel config
+        _.forEach(channel, function(value, option) {
+            var newOption = deprecatedChannelOptions[option];
+
+            if (newOption) {
+                channel[newOption] = value;
+                delete(channel[option]);
+                warnDeprecated(option, newOption);
             }
         });
     });
 
-    // search for old config options
+    // search for old config options by looping over every key, value pair
     _.forEach(config, function(value, option) {
-        if (option === 'tg_bot_token') {
-            config.tgToken = value;
-            warnDeprecated(option, 'tgToken');
-            return;
-        }
-        if (option === 'irc_nick') {
-            config.ircNick = value;
-            warnDeprecated(option, 'ircNick');
-            return;
-        }
-        if (option === 'irc_server') {
-            config.ircServer = value;
-            warnDeprecated(option, 'ircServer');
-            return;
-        }
-        if (option === 'irc_options') {
-            config.ircOptions = value;
-            warnDeprecated(option, 'ircOptions');
-            return;
-        }
-        if (option === 'irc_relay_all') {
-            config.ircRelayAll = value;
-            warnDeprecated(option, 'ircRelayAll');
-            return;
-        }
-        if (option === 'irc_hilight_re') {
-            config.hlRegexp = value;
-            warnDeprecated(option, 'hlRegexp');
-            return;
-        }
-        if (option === 'send_topic') {
-            config.sendTopic = value;
-            warnDeprecated(option, 'sendTopic');
-            return;
-        }
-        if (option === 'mediaRandomLenght') {
-            config.mediaRandomLength = value;
-            warnDeprecated(option, 'mediaRandomLength');
-            return;
+        var newOption = deprecatedOptions[option];
+
+        if (newOption) {
+            config[newOption] = value;
+            delete(config[option]);
+            warnDeprecated(option, newOption);
         }
     });
 
@@ -115,8 +88,45 @@ try {
     process.exit(1);
 }
 
-config = parseDeprecatedOptions(config);
-config = _.defaults(config, defaultConfig);
+if (argv['upgrade-config']) {
+    logger.info('replacing deprecated config options...');
+
+    var configFile = fs.readFileSync(configPath).toString();
+
+    _.forEach(deprecatedChannelOptions, function(newOpt, depOpt) {
+        configFile = configFile.replace(new RegExp(depOpt, 'g'), newOpt);
+    });
+    _.forEach(deprecatedOptions, function(newOpt, depOpt) {
+        configFile = configFile.replace(new RegExp(depOpt, 'g'), newOpt);
+    });
+
+    config = parseDeprecatedOptions(config);
+    logger.info('appending new config options...');
+
+    // find out which options are missing
+    var newOpts = _.difference(_.keys(defaultConfig), _.keys(config));
+
+    // append each option to the end of the config file
+    // NOTE: only works if config file uses the default syntax
+    var commentAdded = false;
+    _.forEach(newOpts, function(option) {
+        if (!commentAdded) {
+            configFile += '\n// automatically added by config upgrade:\n';
+            commentAdded = true;
+        }
+
+        configFile += 'config.' + option + ' = ' + JSON.stringify(defaultConfig[option]) + ';\n';
+    });
+
+    fs.writeFileSync(configPath + '.new', configFile);
+
+    logger.info('wrote new config to: ' + configPath + '.new, please review it before using');
+
+    process.exit(0);
+} else {
+    config = parseDeprecatedOptions(config);
+    config = _.defaults(config, defaultConfig);
+}
 
 if (argv.v) {
     // TODO: right now this is our only verbose option
