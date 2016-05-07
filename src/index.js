@@ -55,6 +55,18 @@ if (argv.version) {
                     }
 
                     return tg.send(message);
+                } else if (message.cmd === 'sendCommand') {
+                    if (!config.allowCommands) {
+                        message.text = 'Commands are disabled.';
+                        return tg.send(message);
+                    }
+
+                    if (!message.text) {
+                        message.text = 'Usage example: /command !foobar';
+                        return tg.send(message);
+                    } else {
+                        irc.send(message);
+                    }
                 } else {
                     irc.send(message);
                 }

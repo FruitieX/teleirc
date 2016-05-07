@@ -156,6 +156,16 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
             channel: channel,
             cmd: 'getTopic'
         });
+    } else if (msg.text && !msg.text.indexOf('/command')) {
+        var command = msg.text.split(' ');
+        command.shift();
+        command = command.join(' ');
+
+        return callback({
+            channel: channel,
+            cmd: 'sendCommand',
+            text: command
+        });
     }
 
     // skip posts containing media if it's configured off

@@ -37,6 +37,9 @@ config.httpPort = 9090;
 // HTTP server location, URLs are generated from this
 config.httpLocation = 'http://mydomain.com' + ':' + config.httpPort;
 
+// Whether to allow sending messages to IRC without nick prefix
+config.allowCommands = false;
+
 //////////////////
 //  IRC config  //
 //////////////////

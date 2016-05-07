@@ -1,2 +1,3 @@
+command - Send IRC msg without nick prefix
 names - List users on IRC
 topic - Get IRC channel topic
