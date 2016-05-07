@@ -159,7 +159,6 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
         return callback();
     }
 
-    var text;
     var prefix = '';
     if (!config.soloUse) {
         prefix = '<' + exports.getName(msg.from, config) + '> ';
@@ -280,7 +279,7 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
     } else if (msg.text) {
         callback({
             channel: channel,
-            text: prefix + text
+            text: prefix + msg.text
         });
     } else {
         logger.warn('WARNING: unhandled message:', msg);
