@@ -109,6 +109,9 @@ var init = function(msgCallback) {
 
     return {
         send: function(message) {
+            // replace newlines with ellipsis character
+            message.text = message.text.replace(/\n/g, ' … ');
+
             logger.verbose('<< relaying to IRC:', message.text);
             nodeIrc.say(message.channel.ircChan, message.text);
         },

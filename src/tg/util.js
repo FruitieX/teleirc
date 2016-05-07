@@ -73,7 +73,7 @@ exports.getIRCName = function(msg, config) {
     var name;
     if (!results) {
         // Fall back to telegram name (i.e. for the topic change message)
-        name = exports.getName(msg.from, config);
+        name = exports.getName(msg.from || msg.forward_from, config);
     } else {
         name = results[1];
     }
@@ -164,18 +164,34 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
     if (!config.soloUse) {
         prefix = '<' + exports.getName(msg.from, config) + '> ';
     }
+
     if (msg.reply_to_message && msg.text) {
         var replyName;
+
+        // is the replied to message originating from the bot?
         if (msg.reply_to_message.from.username == myUser.username) {
             replyName = exports.getIRCName(msg.reply_to_message, config);
         } else {
             replyName = exports.getName(msg.reply_to_message.from, config);
         }
 
-        text = msg.text.replace(/\n/g , prefix);
         callback({
             channel: channel,
-            text: prefix + '@' + replyName + ', ' + text
+            text: prefix + '@' + replyName + ', ' + msg.text
+        });
+    } else if (msg.forward_from && msg.text) {
+        var fwdName;
+
+        // is the forwarded message originating from the bot?
+        if (msg.forward_from.username == myUser.username) {
+            fwdName = exports.getIRCName(msg, config);
+        } else {
+            fwdName = exports.getName(msg.forward_from, config);
+        }
+
+        callback({
+            channel: channel,
+            text: prefix + 'Fwd from ' + fwdName + ': ' + msg.text
         });
     } else if (msg.audio) {
         exports.serveFile(msg.audio.file_id, config, tg, function(url) {
@@ -262,8 +278,6 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
                 ' was removed by: ' + exports.getName(msg.from, config)
         });
     } else if (msg.text) {
-        text = msg.text.replace(/\n/g , '\n' + prefix);
-
         callback({
             channel: channel,
             text: prefix + text
