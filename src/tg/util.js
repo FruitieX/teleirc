@@ -3,12 +3,12 @@ var nickcolor = require('./nickcolor');
 var nodeStatic = require('node-static');
 var fs = require('fs');
 var path = require('path');
-var os = require('os');
+var osHomedir = require('os-homedir');
 var mkdirp = require('mkdirp');
 var crypto = require('crypto');
 var logger = require('winston');
 
-var chatIdsPath = path.join(os.homedir(), '.teleirc');
+var chatIdsPath = path.join(osHomedir(), '.teleirc');
 
 exports.readChatId = function(channel) {
     var chatId;
@@ -90,7 +90,7 @@ exports.randomValueBase64 = function(len) {
 };
 
 exports.serveFile = function(fileId, config, tg, callback) {
-    var filesPath = path.join(os.homedir(), '.teleirc', 'files');
+    var filesPath = path.join(osHomedir(), '.teleirc', 'files');
 
     var randomString = exports.randomValueBase64(config.mediaRandomLength);
     mkdirp(path.join(filesPath, randomString));
@@ -101,7 +101,7 @@ exports.serveFile = function(fileId, config, tg, callback) {
 };
 
 exports.initHttpServer = function() {
-    var filesPath = path.join(os.homedir(), '.teleirc', 'files');
+    var filesPath = path.join(osHomedir(), '.teleirc', 'files');
     mkdirp(filesPath);
 
     var fileServer = new nodeStatic.Server(filesPath);

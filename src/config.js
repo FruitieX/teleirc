@@ -4,7 +4,7 @@ var mkdirp = require('mkdirp');
 var defaultConfig = require('./config.defaults');
 var argv = require('./arguments').argv;
 var path = require('path');
-var os = require('os');
+var osHomedir = require('os-homedir');
 var logger = require('winston');
 
 var warnDeprecated = function(oldOpt, newOpt) {
@@ -63,9 +63,9 @@ var parseDeprecatedOptions = function(config) {
 };
 
 var config;
-var configPath = argv.c || path.join(os.homedir(), '.teleirc', 'config.js');
+var configPath = argv.c || path.join(osHomedir(), '.teleirc', 'config.js');
 if (argv.g) {
-    mkdirp(path.join(os.homedir(), '/.teleirc'));
+    mkdirp(path.join(osHomedir(), '/.teleirc'));
 
     // read default config using readFile to include comments
     var config = fs.readFileSync(path.join(__dirname, 'config.defaults.js'));
