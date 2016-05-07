@@ -67,17 +67,21 @@ exports.parseTopic = function(chanName, topic, user) {
 };
 
 // returns list of names from given channel
-// NOTE: parameter must be the channel object from nodeIrc internal
-// channel list
-exports.getNames = function(channel) {
-    if (!channel) {
+exports.getNames = function(nodeIrcChannel) {
+    if (!nodeIrcChannel) {
         return;
     }
 
-    var names = Object.keys(channel.users);
+    // nodeIrcChannel.users is a node-irc internal object containing
+    // {nickname: prefix} key-value pairs
+    var names = Object.keys(nodeIrcChannel.users);
 
     names.forEach(function(name, i) {
-        names[i] = channel.users[name] + names[i];
+        var prefix = nodeIrcChannel.users[name];
+
+        if (prefix) {
+            names[i] = '(' + prefix + ')' + names[i];
+        }
     });
 
     return names;

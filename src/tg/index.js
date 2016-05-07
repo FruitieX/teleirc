@@ -4,7 +4,6 @@ var tgUtil = require('./util');
 var logger = require('winston');
 
 var myUser = {};
-var seenNames = [];
 
 var init = function(msgCallback) {
     // start HTTP server for media files if configured to do so
@@ -20,11 +19,6 @@ var init = function(msgCallback) {
 
         tg.on('message', function(msg) {
             logger.debug('got tg msg:', msg);
-
-            // track usernames for creating mentions
-            if (seenNames.indexOf(msg.from.username) == -1) {
-                seenNames.push(msg.from.username);
-            }
 
             tgUtil.parseMsg(msg, myUser, tg, function(message) {
                 if (message) {
@@ -56,11 +50,6 @@ var init = function(msgCallback) {
                 logger.error(err);
                 return;
             }
-
-            seenNames.forEach(function(name) {
-                var rx = new RegExp('\\b' + name + '\\b', 'i');
-                message.text = message.text.replace(rx, '@' + name);
-            });
 
             if (message.user) {
                 message.text = '<' + message.user + '> ' + message.text;
