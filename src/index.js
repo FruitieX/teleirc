@@ -26,14 +26,33 @@ if (argv.version) {
                 tg.send(message);
                 break;
             case 'tg':
+                var channel = message.channel;
+
                 if (message.cmd === 'getNames') {
-                    var names = irc.getNames(message.channel);
+                    var names = irc.getNames(channel);
+
+                    if (!names) {
+                        logger.error('No nicklist received!');
+                    }
+
                     names.sort();
                     names = names.join(', ');
 
-                    var channel = message.channel;
                     message.text = 'Users on ' + (channel.chanAlias || channel.ircChan) +
                         ':\n\n' + names;
+
+                    return tg.send(message);
+                } else if (message.cmd === 'getTopic') {
+                    var topic = irc.getTopic(channel);
+
+                    if (topic) {
+                        message.text = 'Topic for channel ' +
+                            (channel.chanAlias || channel.ircChan) +
+                            ': "' + topic.text + '" set by ' + topic.topicBy;
+                    } else {
+                        message.text = 'No topic for channel ' +
+                            (channel.chanAlias || channel.ircChan);
+                    }
 
                     return tg.send(message);
                 } else {

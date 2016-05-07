@@ -56,9 +56,9 @@ exports.parseTopic = function(chanName, topic, user) {
         return;
     }
 
-    var text = '* Topic for channel ' + (channel.chanAlias || channel.ircChan) +
-           ':\n' + topic +
-           '\n* set by ' + user.split('!')[0];
+    var text = 'Topic for channel ' + (channel.chanAlias || channel.ircChan) +
+           ': "' + topic +
+           '" set by ' + user.split('!')[0];
 
     return {
         channel: channel,
@@ -85,4 +85,16 @@ exports.getNames = function(nodeIrcChannel) {
     });
 
     return names;
+};
+
+// returns topic for given channel
+exports.getTopic = function(nodeIrcChannel) {
+    if (!nodeIrcChannel || !nodeIrcChannel.topic) {
+        return;
+    }
+
+    return {
+        text: nodeIrcChannel.topic,
+        topicBy: nodeIrcChannel.topicBy
+    };
 };

@@ -1,1 +1,2 @@
 names - List users on IRC
+topic - Get IRC channel topic

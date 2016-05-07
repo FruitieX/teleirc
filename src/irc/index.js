@@ -124,6 +124,9 @@ var init = function(msgCallback) {
         },
         getNames: function(channel) {
             return ircUtil.getNames(nodeIrc.chans[channel.ircChan]);
+        },
+        getTopic: function(channel) {
+            return ircUtil.getTopic(nodeIrc.chans[channel.ircChan]);
         }
     };
 };

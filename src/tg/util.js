@@ -151,6 +151,11 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
             channel: channel,
             cmd: 'getNames'
         });
+    } else if (msg.text && !msg.text.indexOf('/topic')) {
+        return callback({
+            channel: channel,
+            cmd: 'getTopic'
+        });
     }
 
     // skip posts containing media if it's configured off
