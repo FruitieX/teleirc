@@ -117,7 +117,6 @@ config.ircOptions = {
     realName: 'Telegram IRC Bot',
     port: 6667,
     localAddress: null,
-    debug: false,
     showErrors: false,
     autoRejoin: false,
     autoConnect: true,

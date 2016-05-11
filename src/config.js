@@ -128,9 +128,21 @@ if (argv['upgrade-config']) {
     config = _.defaults(config, defaultConfig);
 }
 
+// log level is set to one of these depending on how many verbose flags were provided
+var verboseLevels = ['verbose', 'debug', 'silly'];
+// node-irc debug mode is enabled only on these log levels
+var nodeIrcDebugLevels = ['debug', 'silly'];
+
 if (argv.v) {
-    // TODO: right now this is our only verbose option
+    // select a logLevel based on number of verbose flags
+    config.logLevel = verboseLevels[Math.min(argv.v, verboseLevels.length) - 1];
+    logger.info('forcing log level to "' + config.logLevel + '"');
+}
+
+if (_.includes(nodeIrcDebugLevels, config.logLevel)) {
     config.ircOptions.debug = true;
+} else {
+    config.ircOptions.debug = false;
 }
 
 module.exports = config;
