@@ -146,6 +146,17 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
         return callback();
     }
 
+    // skip posts containing media if it's configured off
+    if ((msg.audio || msg.document || msg.photo || msg.sticker || msg.video ||
+                msg.voice || msg.contact || msg.location) && !config.showMedia) {
+        return callback();
+    }
+
+    var prefix = '';
+    if (!config.soloUse) {
+        prefix = '<' + exports.getName(msg.from, config) + '> ';
+    }
+
     if (msg.text && !msg.text.indexOf('/names')) {
         return callback({
             channel: channel,
@@ -164,19 +175,9 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
         return callback({
             channel: channel,
             cmd: 'sendCommand',
-            text: command
+            text: command,
+            origText: prefix + msg.text
         });
-    }
-
-    // skip posts containing media if it's configured off
-    if ((msg.audio || msg.document || msg.photo || msg.sticker || msg.video ||
-                msg.voice || msg.contact || msg.location) && !config.showMedia) {
-        return callback();
-    }
-
-    var prefix = '';
-    if (!config.soloUse) {
-        prefix = '<' + exports.getName(msg.from, config) + '> ';
     }
 
     if (msg.reply_to_message && msg.text) {

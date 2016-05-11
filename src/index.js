@@ -65,7 +65,14 @@ if (argv.version) {
                         message.text = 'Usage example: /command !foobar';
                         return tg.send(message);
                     } else {
-                        irc.send(message);
+                        var command = message.text;
+
+                        // prepend with line containing original message
+                        message.text = message.origText + '\n' + message.text;
+                        irc.send(message, true);
+
+                        message.text = 'Command "' + command + '" executed.';
+                        return tg.send(message);
                     }
                 } else {
                     irc.send(message);
