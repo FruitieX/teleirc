@@ -113,6 +113,58 @@ exports.initHttpServer = function() {
     }).listen(config.httpPort);
 };
 
+// reconstructs the original raw markdown message
+var reconstructMarkdown = function(msg) {
+    if (!msg.entities) {
+        return;
+    }
+
+    var incrementOffsets = function(from, by) {
+        msg.entities.forEach(function(entity) {
+            if (entity.offset > from) {
+                entity.offset += by;
+            }
+        });
+    };
+
+    // example markdown:
+    // pre `txt` end
+    var pre; // contains 'pre '
+    var txt; // contains 'txt'
+    var end; // contains ' end'
+
+    msg.entities.forEach(function(entity) {
+        switch (entity.type) {
+            case 'text_link': // [text](url)
+                pre = msg.text.substr(0, entity.offset);
+                txt = msg.text.substr(entity.offset, entity.length);
+                end = msg.text.substr(entity.offset + entity.length);
+
+                msg.text = pre + '[' + txt + ']' + '(' + entity.url + ')' + end;
+                incrementOffsets(entity.offset, 4 + entity.url);
+                break;
+            case 'code': // ` code
+                pre = msg.text.substr(0, entity.offset);
+                txt = msg.text.substr(entity.offset, entity.length);
+                end = msg.text.substr(entity.offset + entity.length);
+
+                msg.text = pre + '`' + txt + '`' + end;
+                incrementOffsets(entity.offset, 2);
+                break;
+            case 'pre': // ``` code blocks
+                pre = msg.text.substr(0, entity.offset);
+                txt = msg.text.substr(entity.offset, entity.length);
+                end = msg.text.substr(entity.offset + entity.length);
+
+                msg.text = pre + '```' + txt + '```' + end;
+                incrementOffsets(entity.offset, 6);
+                break;
+            default:
+                logger.warn('unsupported entity type:', entity.type, msg);
+        }
+    });
+};
+
 exports.parseMsg = function(msg, myUser, tg, callback) {
     // TODO: Telegram code should not have to deal with IRC channels at all
 
@@ -178,6 +230,10 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
             text: command,
             origText: prefix + msg.text
         });
+    }
+
+    if (msg.text) {
+        reconstructMarkdown(msg);
     }
 
     if (msg.reply_to_message && msg.text) {
