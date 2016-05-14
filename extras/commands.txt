@@ -1,3 +1,4 @@
 command - Send IRC msg without nick prefix
+me - Send action message
 names - List users on IRC
 topic - Get IRC channel topic
