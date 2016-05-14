@@ -232,6 +232,9 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
             text: command,
             origText: prefix + msg.text
         });
+    } else if (msg.text && !msg.text.indexOf('/')) { // drop other commands
+        logger.verbose('ignoring unknown command:', msg.text);
+        return;
     }
 
     if (msg.text) {
