@@ -47,7 +47,9 @@ exports.writeChatId = function(channel) {
 exports.getName = function(user, config) {
     var name = config.nameFormat;
 
-    if (user.username) {
+    if (user.title) { // channels
+        name = name.replace('%username%', user.title, 'g');
+    } else if (user.username) {
         name = name.replace('%username%', user.username, 'g');
     } else {
         // if user lacks username, use fallback format string instead
@@ -250,14 +252,15 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
             channel: channel,
             text: prefix + '@' + replyName + ', ' + msg.text
         });
-    } else if (msg.forward_from && msg.text) {
+    } else if ((msg.forward_from || msg.forward_from_chat) && msg.text) {
+        var from = msg.forward_from || msg.forward_from_chat;
         var fwdName;
 
         // is the forwarded message originating from the bot?
-        if (msg.forward_from.username == myUser.username) {
+        if (from.username == myUser.username) {
             fwdName = exports.getIRCName(msg, config);
         } else {
-            fwdName = exports.getName(msg.forward_from, config);
+            fwdName = exports.getName(from, config);
         }
 
         callback({
