@@ -20,7 +20,8 @@ logger.addColors({
 
 logger.remove(logger.transports.Console);
 logger.add(logger.transports.Console, {
-    colorize: true
+    colorize: true,
+    prettyPrint: true
 });
 
 module.exports = logger;
