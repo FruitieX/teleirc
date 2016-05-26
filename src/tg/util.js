@@ -161,6 +161,8 @@ var reconstructMarkdown = function(msg) {
                 msg.text = pre + '```' + txt + '```' + end;
                 incrementOffsets(entity.offset, 6);
                 break;
+            case 'hashtag': // #hashtags can be passed on as is
+                break;
             default:
                 logger.warn('unsupported entity type:', entity.type, msg);
         }
