@@ -3,7 +3,7 @@ var logger = require('winston');
 
 exports.lookupChannel = function(chanName, channels) {
     return channels.filter(function(channel) {
-        return channel.ircChan === chanName;
+        return channel.ircChan.toLowerCase() === chanName.toLowerCase();
     })[0];
 };
 
