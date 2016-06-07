@@ -3,6 +3,7 @@ node_js:
     - "node"
 notifications:
     irc:
+        on_success: change
         channels:
             # Avoid forks spamming the channel.
             # travis encrypt "ircs://irc.freenode.net:6697/#teleirc" -r FruitieX/teleirc
