@@ -3,7 +3,7 @@ var argv = require('./arguments').argv;
 var git = require('git-rev-sync');
 var pjson = require('../package.json');
 
-if (argv.version) {
+var getVersionStr = function() {
     process.chdir(__dirname);
     var shorthash = git.short();
 
@@ -14,7 +14,11 @@ if (argv.version) {
 
     version += 'npm-' + pjson.version;
 
-    console.log(version);
+    return version;
+};
+
+if (argv.version) {
+    console.log(getVersionStr());
 } else {
     var config = require('./config');
 
@@ -53,6 +57,11 @@ if (argv.version) {
                         message.text = 'No topic for channel ' +
                             (channel.chanAlias || channel.ircChan);
                     }
+
+                    return tg.send(message);
+                } else if (message.cmd === 'getVersion') {
+                    message.text = 'Version: ' +
+                        getVersionStr();
 
                     return tg.send(message);
                 } else if (message.cmd === 'sendCommand') {

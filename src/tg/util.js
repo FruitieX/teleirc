@@ -223,6 +223,11 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
             channel: channel,
             cmd: 'getTopic'
         });
+    } else if (msg.text && !msg.text.indexOf('/version')) {
+        return callback({
+            channel: channel,
+            cmd: 'getVersion'
+        });
     } else if (msg.text && !msg.text.indexOf('/command')) {
         var command = msg.text.split(' ');
         command.shift();
