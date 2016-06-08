@@ -21,7 +21,14 @@ var init = function(msgCallback) {
             logger.debug('got tg msg:', msg);
 
             tgUtil.parseMsg(msg, myUser, tg, function(message) {
+                var tgGroupReadOnly = message.channel.tgGroupReadOnly;
+                var isBotHighlighted = false;
+
                 if (message) {
+                    isBotHighlighted = msg.text.startsWith('@' + myUser.username);
+                }
+
+                if ((message && !tgGroupReadOnly) || (message && isBotHighlighted)) {
                     message.protocol = 'tg';
                     msgCallback(message);
                 }

@@ -80,6 +80,8 @@ config.replaceNewlines = ' … ';
 config.ircNick = 'tgBot';
 config.ircServer = 'irc.cs.hut.fi';
 
+config.telegramNick = 'tgBot';
+
 // array of commands to send to IRC server as soon as we're connected,
 // example: config.ircPerformCmds = [
 //     'PRIVMSG Q@CServe.quakenet.org :AUTH <username> <password>'
@@ -99,6 +101,14 @@ config.channels = [
         ircChan: '#channel2',
         chanPwd: 'passwd',
         tgGroup: 'Tg_Group_2'
+    },
+
+    // example of a readOnly IRC channel and Telegram Group:
+    {
+        ircChan: '#channel3',
+        ircChanReadOnly: true,
+        tgGroup: 'Tg_Group_3',
+        tgGroupReadOnly: true
     },
 
     // example of an IRC channel with an alias:

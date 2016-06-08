@@ -20,8 +20,15 @@ var init = function(msgCallback) {
 
     nodeIrc.on('message', function(user, chanName, text) {
         var message = ircUtil.parseMsg(chanName, text);
+        var channel = ircUtil.lookupChannel(chanName, config.channels);
+        var ircChanReadOnly = channel.ircChanReadOnly;
+        var isBotHighlighted = false;
 
         if (message) {
+            isBotHighlighted = message.text.startsWith(config.ircNick);
+        }
+
+        if ((message && !ircChanReadOnly) || (message && isBotHighlighted)) {
             logger.debug('got irc msg:', message);
             msgCallback({
                 protocol: 'irc',
