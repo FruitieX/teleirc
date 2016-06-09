@@ -25,7 +25,6 @@ var deprecatedOptions = {
     'irc_nick': 'ircNick',
     'irc_server': 'ircServer',
     'irc_options': 'ircOptions',
-    'irc_relay_all': 'ircRelayAll',
     'irc_hilight_re': 'hlRegexp',
     'send_topic': 'sendTopic',
     'mediaRandomLenght': 'mediaRandomLength'

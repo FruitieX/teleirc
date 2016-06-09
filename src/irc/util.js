@@ -28,19 +28,12 @@ exports.parseMsg = function(chanName, text) {
         return;
     }
 
-    var match = config.hlRegexp.exec(text);
-    if (match || config.ircRelayAll) {
-        if (match && config.hlOnlyShowMatch) {
-            text = match[1];
-        }
+    text = text.trim();
 
-        text = text.trim();
-
-        return {
-            channel: channel,
-            text: text
-        };
-    }
+    return {
+        channel: channel,
+        text: text
+    };
 };
 
 exports.parseTopic = function(chanName, topic, user) {

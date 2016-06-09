@@ -20,13 +20,17 @@ var init = function(msgCallback) {
 
     nodeIrc.on('message', function(user, chanName, text) {
         var message = ircUtil.parseMsg(chanName, text);
-        var channel = ircUtil.lookupChannel(chanName, config.channels);
-        var ircChanReadOnly = channel.ircChanReadOnly;
-        var isOverrideReadOnly = channel.ircChanOverrideReadOnly;
-        var isBotHighlighted = false;
 
         if (message) {
-            isBotHighlighted = message.text.startsWith(config.ircNick);
+            var channel = ircUtil.lookupChannel(chanName, config.channels);
+            var ircChanReadOnly = channel.ircChanReadOnly;
+            var isOverrideReadOnly = channel.ircChanOverrideReadOnly;
+            var isBotHighlighted = config.hlRegexp.exec(message.text);
+            var match = isBotHighlighted;
+
+            if (match && config.hlOnlyShowMatch) {
+                message.text = match[1];
+            }
 
             if (ircChanReadOnly) {
                 if (!(isOverrideReadOnly && isBotHighlighted)) {

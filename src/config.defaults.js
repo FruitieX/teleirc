@@ -80,8 +80,6 @@ config.replaceNewlines = ' … ';
 config.ircNick = 'tgBot';
 config.ircServer = 'irc.cs.hut.fi';
 
-config.telegramNick = 'tgBot';
-
 // array of commands to send to IRC server as soon as we're connected,
 // example: config.ircPerformCmds = [
 //     'PRIVMSG Q@CServe.quakenet.org :AUTH <username> <password>'
@@ -106,11 +104,11 @@ config.channels = [
     // example of a readOnly IRC channel and Telegram Group:
     {
         ircChan: '#channel3',
-        ircChanReadOnly: true,          /* Optional */
-        ircChanOverrideReadOnly: false, /* Optional - override readonly by highlighting the bot */
+        ircChanReadOnly: true,          // if true, irc can not send to telegram
+        ircChanOverrideReadOnly: false, // if true, override readonly by highlighting the bot
         tgGroup: 'Tg_Group_3',
-        tgGroupReadOnly: true,          /* Optional */
-        tgGroupOverrideReadOnly: false, /* Optional - same as ircChanOverrideReadOnly */
+        tgGroupReadOnly: true,          // if true, telegram can not send to irc
+        tgGroupOverrideReadOnly: true,  // if true, override readonly by highlighting the bot
     },
 
     // example of an IRC channel with an alias:
@@ -144,10 +142,6 @@ config.ircOptions = {
     messageSplit: 512,
     encoding: ''
 };
-
-// if you wish to relay every irc message to telegram, set this to true.
-// if false, then only lines matching config.hlRegexp will be relayed
-config.ircRelayAll = true;
 
 // the default hilight regexp will match lines containing the bot nick, or
 // lines starting with '! '
