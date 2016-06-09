@@ -106,9 +106,11 @@ config.channels = [
     // example of a readOnly IRC channel and Telegram Group:
     {
         ircChan: '#channel3',
-        ircChanReadOnly: true,
+        ircChanReadOnly: true,          /* Optional */
+        ircChanOverrideReadOnly: false, /* Optional - override readonly by highlighting the bot */
         tgGroup: 'Tg_Group_3',
-        tgGroupReadOnly: true
+        tgGroupReadOnly: true,          /* Optional */
+        tgGroupOverrideReadOnly: false, /* Optional - same as ircChanOverrideReadOnly */
     },
 
     // example of an IRC channel with an alias:

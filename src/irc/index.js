@@ -22,13 +22,18 @@ var init = function(msgCallback) {
         var message = ircUtil.parseMsg(chanName, text);
         var channel = ircUtil.lookupChannel(chanName, config.channels);
         var ircChanReadOnly = channel.ircChanReadOnly;
+        var isOverrideReadOnly = channel.ircChanOverrideReadOnly;
         var isBotHighlighted = false;
 
         if (message) {
             isBotHighlighted = message.text.startsWith(config.ircNick);
-        }
 
-        if ((message && !ircChanReadOnly) || (message && isBotHighlighted)) {
+            if (ircChanReadOnly) {
+                if (!(isOverrideReadOnly && isBotHighlighted)) {
+                    return;
+                }
+            }
+
             logger.debug('got irc msg:', message);
             msgCallback({
                 protocol: 'irc',
