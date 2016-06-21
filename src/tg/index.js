@@ -21,11 +21,11 @@ var init = function(msgCallback) {
             logger.debug('got tg msg:', msg);
 
             tgUtil.parseMsg(msg, myUser, tg, function(message) {
-                var tgGroupReadOnly = message.channel.tgGroupReadOnly;
-                var isOverrideReadonly = message.channel.tgGroupOverrideReadOnly;
-                var isBotHighlighted = false;
-
                 if (message) {
+                    var tgGroupReadOnly = message.channel.tgGroupReadOnly;
+                    var isOverrideReadonly = message.channel.tgGroupOverrideReadOnly;
+                    var isBotHighlighted = false;
+
                     isBotHighlighted = msg.text.startsWith('@' + myUser.username);
 
                     if (tgGroupReadOnly) {
