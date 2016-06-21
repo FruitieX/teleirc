@@ -26,7 +26,7 @@ var init = function(msgCallback) {
                     var isOverrideReadonly = message.channel.tgGroupOverrideReadOnly;
                     var isBotHighlighted = false;
 
-                    isBotHighlighted = msg.text.startsWith('@' + myUser.username);
+                    isBotHighlighted = msg.text && msg.text.startsWith('@' + myUser.username);
 
                     if (tgGroupReadOnly) {
                         if (!(isOverrideReadonly && isBotHighlighted)) {
