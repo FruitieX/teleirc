@@ -5,7 +5,13 @@ var pjson = require('../package.json');
 
 var getVersionStr = function() {
     process.chdir(__dirname);
-    var shorthash = git.short();
+
+    var shorthash;
+    try {
+        shorthash = git.short();
+    } catch (e) {
+        shorthash = null;
+    }
 
     var version = 'teleirc ';
     if (shorthash) {
