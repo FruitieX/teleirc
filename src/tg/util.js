@@ -344,7 +344,7 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
         exports.serveFile(msg.voice.file_id, config, tg, function(url) {
             callback({
                 channel: channel,
-                text: prefix + '(Voice, ' + msg.voice.duration + 's)' + url
+                text: prefix + '(Voice, ' + msg.voice.duration + 's) ' + url
             });
         });
     } else if (msg.contact) {
