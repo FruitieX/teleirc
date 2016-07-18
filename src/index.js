@@ -3,6 +3,8 @@ var argv = require('./arguments').argv;
 var git = require('git-rev-sync');
 var pjson = require('../package.json');
 
+require('string.prototype.startswith');
+
 var getVersionStr = function() {
     process.chdir(__dirname);
 

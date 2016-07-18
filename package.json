@@ -30,6 +30,7 @@
     "node-static": "^0.7.7",
     "node-telegram-bot-api": "^0.21.1",
     "os-homedir": "^1.0.1",
+    "string.prototype.startswith": "^0.2.0",
     "winston": "^2.2.0",
     "yargs": "^4.7.0"
   },
