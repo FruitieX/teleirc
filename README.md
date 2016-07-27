@@ -49,6 +49,16 @@ Optional:
   [`commands.txt`](/extras/commands.txt) to show all supported commands to
   Telegram clients.
 
+Troubleshooting
+---------------
+
+1. Check your system clock. By default if a Telegram message's timestamp is
+   older than one minute compared to your system clock, the message is skipped.
+   You can configure this behaviour via `config.maxMsgAge`.
+2. Make sure your Telegram group's name and IRC channel has been entered
+   correctly in your config (case sensitive!)
+3. Run with verbose flags to see more output: `teleirc -vvv`
+
 Contributing
 ------------
 
