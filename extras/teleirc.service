@@ -4,6 +4,8 @@ After=network-online.target oidentd.socket
 
 [Service]
 # NPM installations: find out correct path by running `which teleirc`
+# Ex. /usr/local/bin/teleirc
+# ExecStart=/usr/bin/env node /usr/local/bin/teleirc
 ExecStart=/usr/bin/env node /path/to/bin/teleirc
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
