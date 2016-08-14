@@ -3,7 +3,8 @@ Description=teleirc
 After=network-online.target oidentd.socket
 
 [Service]
-ExecStart=/usr/bin/env node /path/to/teleirc.js
+# NPM installations: find out correct path by running `which teleirc`
+ExecStart=/usr/bin/env node /path/to/bin/teleirc
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
 User=USERNAME_YOU_CONFIGURED_TELEIRC_ON
