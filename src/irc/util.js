@@ -36,6 +36,18 @@ exports.parseMsg = function(chanName, text) {
     };
 };
 
+exports.topicFormat = function(channel, topic, user) {
+    if (!topic) {
+        return 'No topic for channel ' +
+            (channel.chanAlias || channel.ircChan);
+    }
+
+    return 'Topic for channel ' + (channel.chanAlias || channel.ircChan) +
+           ':\n | ' + topic.split(' | ').join('\n | ') +
+           '\n * set by ' + user.split('!')[0];
+
+};
+
 exports.parseTopic = function(chanName, topic, user) {
     var channel = exports.lookupChannel(chanName, config.channels);
     if (!channel) {
@@ -49,13 +61,9 @@ exports.parseTopic = function(chanName, topic, user) {
         return;
     }
 
-    var text = 'Topic for channel ' + (channel.chanAlias || channel.ircChan) +
-           ': "' + topic +
-           '" set by ' + user.split('!')[0];
-
     return {
         channel: channel,
-        text: text
+        text: exports.topicFormat(channel, topic, user)
     };
 };
 
