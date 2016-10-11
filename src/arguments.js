@@ -5,7 +5,7 @@ module.exports = {
         .usage('Usage: $0 [options]')
 
         .alias('c', 'config')
-        .describe('c', 'Use config from given path')
+        .describe('c', 'Use config from given path. Always use full path e.g. /path/to/config.js')
 
         .alias('g', 'genconfig')
         .describe('g', 'Generate a new default config')
