@@ -48,6 +48,36 @@ var init = function(msgCallback) {
         }
     });
 
+    nodeIrc.on('notice', function(user, chanName, text) {
+        var notice = ircUtil.parseMsg(chanName, text);
+
+        if (notice) {
+            var channel = ircUtil.lookupChannel(chanName, config.channels);
+            var ircChanReadOnly = channel.ircChanReadOnly;
+            var isOverrideReadOnly = channel.ircChanOverrideReadOnly;
+            var isBotHighlighted = config.hlRegexp.exec(notice.text);
+            var match = isBotHighlighted;
+
+            if (match && config.hlOnlyShowMatch) {
+                notice.text = match[1];
+            }
+
+            if (ircChanReadOnly) {
+                if (!(isOverrideReadOnly && isBotHighlighted)) {
+                    return;
+                }
+            }
+
+            logger.debug('got irc msg:', notice);
+            msgCallback({
+                protocol: 'irc',
+                channel: notice.channel,
+                user: user,
+                text: notice.text
+            });
+        }
+    });
+
     nodeIrc.on('action', function(user, chanName, text) {
         var message = ircUtil.parseMsg(chanName, text);
 
