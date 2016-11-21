@@ -1,10 +1,86 @@
-var NodeIrc = require('irc');
+var IRC = require('irc-framework');
 var config = require('../config');
 var ircUtil = require('./util');
 var logger = require('winston');
 
+export default class IrcModule {
+  constructor(moduleConfig, rooms, broadcastToGroup) {
+    this.moduleConfig = moduleConfig;
+    this.rooms = rooms;
+    this.broadcastToGroup = broadcastToGroup;
+
+    const bot = new IRC.Client();
+    this.bot = bot;
+    bot.connect(moduleConfig.config);
+
+    bot.on('message', (e) => {
+      this.handleMessage(e);
+    });
+
+    bot.on('registered', () => {
+      console.log('registered');
+      this.channels = rooms.map((name) => {
+        console.log('joining', name);
+        const channel = bot.channel(name);
+
+        channel.join();
+        return channel;
+      });
+    });
+  }
+
+  // Sends message to IRC
+  sendMsg(e) {
+    if (!this.rooms.includes(e.room)) {
+      return console.error(`Got message from unknown channel ${e.room}`);
+    }
+
+    const channel = this.channels.find((channel) => channel.name === e.room);
+    if (!channel) {
+      return console.error(`Channel ${e.room}`);
+    }
+
+    // strip empty lines
+    e.message = message.replace(/^\s*\n/gm, '');
+
+    // replace newlines
+    e.message = message.replace(/\n/g, this.config.replaceNewlines);
+
+    channel.say(`<${e.nick}> ${e.message}`);
+  }
+
+  // Handle message from IRC
+  handleMessage(e) {
+    if (!this.rooms.includes(e.target)) {
+      return console.error(`Got message from unknown channel ${e.target}`);
+    }
+
+    e.room = e.target;
+    this.broadcastToGroup(e);
+  }
+}
+
+/*
 var init = function(msgCallback) {
-    config.ircOptions.channels = ircUtil.getChannels(config.channels);
+    //config.ircOptions.channels = ircUtil.getChannels(config.channels);
+
+    bot.on('message', function(event) {
+        if (event.message.indexOf('hello') === 0) {
+              event.reply('Hi!');
+        }
+
+        if (event.message.match(/^!join /)) {
+            var to_join = event.message.split(' ');
+            event.reply('Joining ' + to_join + '..');
+            bot.join(to_join);
+        }
+    });
+
+
+    // Or a quicker to match messages...
+    bot.matchMessage(/^hi/, function(event) {
+        event.reply('hello there!');
+    });
 
     var nodeIrc = new NodeIrc.Client(config.ircServer, config.ircNick, config.ircOptions);
     nodeIrc.on('error', function(error) {
@@ -180,3 +256,4 @@ var init = function(msgCallback) {
 };
 
 module.exports = init;
+*/

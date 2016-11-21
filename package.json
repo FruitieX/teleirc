@@ -6,8 +6,10 @@
     "teleirc": "bin/teleirc"
   },
   "scripts": {
-    "prestart": "npm install",
-    "start": "node bin/teleirc",
+    "postinstall": "npm run build",
+    "build": "babel src --out-dir dist --source-maps",
+    "start": "node dist/index",
+    "watch": "nodemon --exec babel-node src/index.js",
     "test": "NODE_ENV=test ./node_modules/mocha/bin/mocha",
     "join-tg": "node src/join-tg.js"
   },
@@ -22,9 +24,13 @@
   "bugs": "https://github.com/FruitieX/teleirc/issues",
   "homepage": "https://github.com/FruitieX/teleirc",
   "dependencies": {
+    "babel-cli": "^6.11.4",
+    "babel-core": "^6.11.4",
+    "babel-preset-es2015-node": "^6.1.1",
     "git-rev-sync": "^1.6.0",
     "irc": "^0.5.0",
     "irc-colors": "^1.2.1",
+    "irc-framework": "^2.5.0",
     "lodash": "^4.12.0",
     "mkdirp": "^0.5.1",
     "node-static": "^0.7.7",
