@@ -2,16 +2,18 @@ var IRC = require('irc-framework');
 var config = require('../config');
 var ircUtil = require('./util');
 var logger = require('winston');
+import _ from 'lodash';
 
-export default class IrcModule {
+export default class Irc {
   constructor(moduleConfig, rooms, broadcastToGroup) {
     this.moduleConfig = moduleConfig;
     this.rooms = rooms;
     this.broadcastToGroup = broadcastToGroup;
+    this.channels = [];
 
     const bot = new IRC.Client();
     this.bot = bot;
-    bot.connect(moduleConfig.config);
+    bot.connect(moduleConfig);
 
     bot.on('message', (e) => {
       this.handleMessage(e);
@@ -30,23 +32,22 @@ export default class IrcModule {
   }
 
   // Sends message to IRC
-  sendMsg(e) {
-    if (!this.rooms.includes(e.room)) {
-      return console.error(`Ignoring message from unknown sender ${e.room}`);
+  sendMsg(msg, target) {
+    const channel = this.channels.find((channel) => channel.name === target);
+    if (!channel) {
+      return console.error(`Active IRC channel matching source room ${msg.room} not found`);
     }
 
-    const channel = this.channels.find((channel) => channel.name === e.room);
-    if (!channel) {
-      return console.error(`Channel ${e.room}`);
-    }
+    // Make copy of message
+    msg = _.cloneDeep(msg);
 
     // strip empty lines
-    e.message = message.replace(/^\s*\n/gm, '');
+    msg.text = msg.text.replace(/^\s*\n/gm, '');
 
     // replace newlines
-    e.message = message.replace(/\n/g, this.config.replaceNewlines);
+    msg.text = msg.text.replace(/\n/g, this.moduleConfig.replaceNewlines);
 
-    channel.say(`<${e.nick}> ${e.message}`);
+    channel.say(`<${msg.nick}> ${msg.text}`);
   }
 
   // Handle message from IRC
@@ -66,7 +67,7 @@ export default class IrcModule {
     console.log('translated into msg', msg);
 
     if (!this.rooms.includes(msg.room)) {
-      return console.error(`Ignoring message to unknown target/channel ${msg.room}`);
+      return console.error(`Ignoring message from unknown target/channel ${msg.room}`);
     }
 
     this.broadcastToGroup(msg);

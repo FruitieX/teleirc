@@ -1,8 +1,43 @@
-var Telegram = require('node-telegram-bot-api');
+var tgApi = require('node-telegram-bot-api');
 var config = require('../config');
 var tgUtil = require('./util');
 var logger = require('winston');
 
+import _ from 'lodash';
+
+export default class Telegram {
+  constructor(moduleConfig, rooms, broadcastToGroup) {
+    this.rooms = rooms;
+    this.broadcastToGroup = broadcastToGroup;
+
+    const tg = new tgApi(moduleConfig.token, _.omit(moduleConfig, 'token'));
+    tg.on('message', ::this.handleMessage);
+  }
+
+  // Sends message to Telegram
+  sendMsg(e) {
+    if (!this.rooms.includes(e.room)) {
+      return console.error(`Ignoring message from unknown sender ${e.room}`);
+    }
+  }
+
+  // Handle message from Telegram
+  handleMessage(e) {
+    const msg = {
+      nick: e.from.username || `${e.from.first_name} ${e.from.last_name}`,
+      room: e.chat.title,
+      text: e.text,
+      date: e.date
+    };
+
+    if (!this.rooms.includes(msg.room)) {
+      return console.error(`Ignoring message to unknown target/channel ${msg.room}`);
+    }
+
+    this.broadcastToGroup(msg);
+  }
+}
+/*
 var myUser = {};
 
 var init = function(msgCallback) {
@@ -74,3 +109,4 @@ var init = function(msgCallback) {
 };
 
 module.exports = init;
+*/

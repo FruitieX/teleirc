@@ -34,7 +34,7 @@
     "lodash": "^4.12.0",
     "mkdirp": "^0.5.1",
     "node-static": "^0.7.7",
-    "node-telegram-bot-api": "^0.21.1",
+    "node-telegram-bot-api": "^0.25.0",
     "os-homedir": "^1.0.1",
     "string.prototype.startswith": "^0.2.0",
     "winston": "^2.2.0",

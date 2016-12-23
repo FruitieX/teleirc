@@ -4,10 +4,12 @@ var git = require('git-rev-sync');
 var pjson = require('../package.json');
 import _ from 'lodash';
 
-import IrcModule from './irc';
+import irc from './irc';
+import telegram from './telegram';
 
 const loadedModules = {
-  irc: IrcModule
+  irc,
+  telegram
 };
 
 require('string.prototype.startswith');
@@ -114,7 +116,8 @@ if (argv.version) {
    * msg is an object containing: {
    *   nick: Sender,
    *   text: Text contents,
-   *   room: Source room
+   *   room: Source room,
+   *   (date): Timestamp
    * }
    */
   const broadcast = (msg) => {
@@ -143,7 +146,7 @@ if (argv.version) {
         return console.error(`Unknown module alias '${moduleAlias}', not forwarding message`);
       }
 
-      modules[moduleAlias].sendMsg(msg);
+      modules[moduleAlias].sendMsg(msg, room.substr(moduleAlias.length + 1));
     });
   };
 
@@ -167,11 +170,8 @@ if (argv.version) {
       });
     });
 
-    const instance = new module(moduleConfig, rooms, (msg) => {
+    const instance = new module(moduleConfig.config, rooms, (msg) => {
       msg.module = moduleConfig.alias;
-
-      // Prepend room name with module alias.
-      // This will be used later so we don't broadcast message back
       msg.room = `${moduleConfig.alias}:${msg.room}`;
 
       broadcast(msg);
