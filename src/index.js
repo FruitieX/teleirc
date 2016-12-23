@@ -41,77 +41,8 @@ if (argv.version) {
 
   logger.level = config.logLevel;
 
-  /*
-  var msgCallback = function(message) {
-    switch (message.protocol) {
-      case 'irc':
-        //tg.send(message);
-        break;
-      case 'tg':
-        var channel = message.channel;
-
-        if (message.cmd === 'getNames') {
-          var names = irc.getNames(channel);
-
-          if (!names) {
-            logger.error('No nicklist received!');
-          }
-
-          names.sort();
-          names = names.join(', ');
-
-          message.text = 'Users on ' + (channel.chanAlias || channel.ircChan) +
-            ':\n\n' + names;
-
-          //return tg.send(message);
-        } else if (message.cmd === 'getTopic') {
-          var topic = irc.getTopic(channel);
-
-          if (topic) {
-            message.text = 'Topic for channel ' +
-              (channel.chanAlias || channel.ircChan) +
-              ': "' + topic.text + '" set by ' + topic.topicBy;
-          } else {
-            message.text = 'No topic for channel ' +
-              (channel.chanAlias || channel.ircChan);
-          }
-
-          //return tg.send(message);
-        } else if (message.cmd === 'getVersion') {
-          message.text = 'Version: ' +
-            getVersionStr();
-
-          //return tg.send(message);
-        } else if (message.cmd === 'sendCommand') {
-          if (!config.allowCommands) {
-            message.text = 'Commands are disabled.';
-            //return tg.send(message);
-          }
-
-          if (!message.text) {
-            message.text = 'Usage example: /command !foobar';
-            //return tg.send(message);
-          } else {
-            var command = message.text;
-
-            // prepend with line containing original message
-            message.text = message.origText + '\n' + message.text;
-            irc.send(message, true);
-
-            message.text = 'Command "' + command + '" executed.';
-            //return tg.send(message);
-          }
-        } else {
-          irc.send(message);
-        }
-        break;
-      default:
-        logger.warn('unknown protocol: ' + message.protocol);
-    }
-  };
-  */
-
-  /* Broadcast message to all groups where source room is present
+  /**
+   * Broadcast message to all groups where source room is present
    *
    * msg is an object containing: {
    *   nick: Sender,
@@ -150,6 +81,9 @@ if (argv.version) {
     });
   };
 
+  /**
+   * Initialize modules
+   */
   let modules = {};
   config.modules.forEach((moduleConfig) => {
     const module = loadedModules[moduleConfig.module];
