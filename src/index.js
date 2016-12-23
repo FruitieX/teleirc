@@ -2,6 +2,7 @@ var logger = require('./log');
 var argv = require('./arguments').argv;
 var git = require('git-rev-sync');
 var pjson = require('../package.json');
+import _ from 'lodash';
 
 import IrcModule from './irc';
 
@@ -38,6 +39,7 @@ if (argv.version) {
 
   logger.level = config.logLevel;
 
+  /*
   var msgCallback = function(message) {
     switch (message.protocol) {
       case 'irc':
@@ -105,8 +107,48 @@ if (argv.version) {
         logger.warn('unknown protocol: ' + message.protocol);
     }
   };
+  */
 
-  const modules = config.modules.map((moduleConfig) => {
+  /* Broadcast message to all groups where source room is present
+   *
+   * msg is an object containing: {
+   *   nick: Sender,
+   *   text: Text contents,
+   *   room: Source room
+   * }
+   */
+  const broadcast = (msg) => {
+    console.log('Got message', msg);
+
+    // Find all target groups which contain the source room
+    const targetGroups = config.groups.filter((group) => {
+      return group.rooms.includes(msg.room);
+    });
+
+    // Concatenate all target rooms
+    let targetRooms = _.flattenDeep(targetGroups.map((group) => group.rooms));
+
+    // Remove duplicates
+    targetRooms = _.uniq(targetRooms);
+
+    // Remove the source room (don't forward message back to it!)
+    targetRooms = _.without(targetRooms, msg.room);
+
+    // Broadcast message to target rooms
+    console.log('sending', msg, 'to', targetRooms);
+    targetRooms.forEach((room) => {
+      const moduleAlias = room.substr(0, room.indexOf(':'));
+
+      if (!modules[moduleAlias]) {
+        return console.error(`Unknown module alias '${moduleAlias}', not forwarding message`);
+      }
+
+      modules[moduleAlias].sendMsg(msg);
+    });
+  };
+
+  let modules = {};
+  config.modules.forEach((moduleConfig) => {
     const module = loadedModules[moduleConfig.module];
 
     if (!module) {
@@ -115,27 +157,26 @@ if (argv.version) {
     }
 
     // Find rooms that module should join
-    // (Needed for eg. IRC which has to join channels)
+    // (Needed for eg. IRC which has to join channels on connect)
     let rooms = [];
     config.groups.forEach((group) => {
       group.rooms.forEach((room) => {
-        if (room.startsWith(`${moduleConfig.name}:`)) {
-          rooms.push(room.substr(moduleConfig.name.length + 1));
+        if (room.startsWith(`${moduleConfig.alias}:`)) {
+          rooms.push(room.substr(moduleConfig.alias.length + 1));
         }
       });
     });
 
-    const initialized = new module(moduleConfig, rooms, (e) => {
-      e.module = moduleConfig.name;
-      e.room = `${moduleConfig.name}:${e.room}`;
+    const instance = new module(moduleConfig, rooms, (msg) => {
+      msg.module = moduleConfig.alias;
 
-      /*
-       * e must contain:
-       * nick, message, room
-      */
+      // Prepend room name with module alias.
+      // This will be used later so we don't broadcast message back
+      msg.room = `${moduleConfig.alias}:${msg.room}`;
 
-      console.log('Got message', e);
-      msgCallback(e);
+      broadcast(msg);
     });
+
+    modules[moduleConfig.alias] = instance;
   });
 }

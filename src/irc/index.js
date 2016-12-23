@@ -32,7 +32,7 @@ export default class IrcModule {
   // Sends message to IRC
   sendMsg(e) {
     if (!this.rooms.includes(e.room)) {
-      return console.error(`Got message from unknown channel ${e.room}`);
+      return console.error(`Ignoring message from unknown sender ${e.room}`);
     }
 
     const channel = this.channels.find((channel) => channel.name === e.room);
@@ -51,12 +51,25 @@ export default class IrcModule {
 
   // Handle message from IRC
   handleMessage(e) {
-    if (!this.rooms.includes(e.target)) {
-      return console.error(`Got message from unknown channel ${e.target}`);
+    // only accept privmsgs TODO: what about notices?
+    if (!['privmsg'].includes(e.type)) {
+      return console.log('ignoring message of type', e.type);
     }
 
-    e.room = e.target;
-    this.broadcastToGroup(e);
+    const msg = {
+      nick: e.nick,
+      room: e.target,
+      text: e.message
+
+    };
+    console.log('got e', e);
+    console.log('translated into msg', msg);
+
+    if (!this.rooms.includes(msg.room)) {
+      return console.error(`Ignoring message to unknown target/channel ${msg.room}`);
+    }
+
+    this.broadcastToGroup(msg);
   }
 }
 
