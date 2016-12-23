@@ -35,7 +35,9 @@ export default class Irc {
   sendMsg(msg, target) {
     const channel = this.channels.find((channel) => channel.name === target);
     if (!channel) {
-      return console.error(`Active IRC channel matching source room ${msg.room} not found`);
+      console.error(`I haven't joined the IRC channel ${target} yet!`);
+      console.error(`Check your config and network connection to the IRC server.`);
+      return;
     }
 
     // Make copy of message

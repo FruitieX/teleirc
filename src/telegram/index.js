@@ -10,15 +10,24 @@ export default class Telegram {
     this.rooms = rooms;
     this.broadcastToGroup = broadcastToGroup;
 
-    const tg = new tgApi(moduleConfig.token, _.omit(moduleConfig, 'token'));
-    tg.on('message', ::this.handleMessage);
+    // Maps room name -> chat ID
+    this.chatIds = {};
+
+    this.client = new tgApi(moduleConfig.token, _.omit(moduleConfig, 'token'));
+    this.client.on('message', ::this.handleMessage);
   }
 
   // Sends message to Telegram
-  sendMsg(e) {
-    if (!this.rooms.includes(e.room)) {
-      return console.error(`Ignoring message from unknown sender ${e.room}`);
+  sendMsg(msg, target) {
+    if (!this.chatIds[target]) {
+      console.error(`I haven't learned the chat ID of '${target}' yet!`);
+      console.error(`Invite me to '${target}' and greet me in the room so I can learn the chat ID!`);
+      return;
     }
+
+    const text = (msg.nick ? `<${msg.nick}> ` : '') + msg.text;
+
+    this.client.sendMessage(this.chatIds[target], text);
   }
 
   // Handle message from Telegram
@@ -33,6 +42,8 @@ export default class Telegram {
     if (!this.rooms.includes(msg.room)) {
       return console.error(`Ignoring message to unknown target/channel ${msg.room}`);
     }
+
+    this.chatIds[e.chat.title] = e.chat.id;
 
     this.broadcastToGroup(msg);
   }

@@ -138,7 +138,7 @@ if (argv.version) {
     targetRooms = _.without(targetRooms, msg.room);
 
     // Broadcast message to target rooms
-    console.log('sending', msg, 'to', targetRooms);
+    console.log('forwarding to', targetRooms);
     targetRooms.forEach((room) => {
       const moduleAlias = room.substr(0, room.indexOf(':'));
 
