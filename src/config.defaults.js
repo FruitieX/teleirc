@@ -71,54 +71,44 @@ config.nameFormat = '%username%';
 // fallback format string for %username% if sender lacks username
 config.usernameFallbackFormat = '%firstName% %lastName%';
 
-// Replace newline characters in Telegram messages with this string before
-// relaying them to IRC, prevents flood from long messages.
-//
-// Tip: you can set this to \n if you want them as separate messages on IRC
-config.replaceNewlines = ' … ';
-
-config.ircNick = 'tgBot';
-config.ircServer = 'irc.cs.hut.fi';
-
 // array of commands to send to IRC server as soon as we're connected,
 // example: config.ircPerformCmds = [
 //     'PRIVMSG Q@CServe.quakenet.org :AUTH <username> <password>'
 // ]
 config.ircPerformCmds = [];
 
-config.channels = [
-    // example of a barebones IRC channel:
-    // '#channel1' will be bridged to a Telegram group called 'Tg_Group_1'
-    {
-        ircChan: '#channel1',
-        tgGroup: 'Tg_Group_1'
-    },
+// Here you configure which modules (e.g. IRC, Telegram) you wish to use,
+// as well as options they may need in order to connect
+config.modules = [{
+  alias: 'freenode',
+  module: 'irc',
+  config: {
+    host: 'irc.myserver.org',
+    port: 6667,
+    nick: 'tgBot',
 
-    // example of a password-protected IRC channel:
-    {
-        ircChan: '#channel2',
-        chanPwd: 'passwd',
-        tgGroup: 'Tg_Group_2'
-    },
+    // Replace newlines with this string before relaying to IRC
+    // If you *do* want newlines, just set this to '\n' (flood warning)
+    replaceNewlines: ' … '
+  }
+}, {
+  alias: 'telegram',
+  module: 'telegram',
+  config: {
+    token: 'YOUR-BOT-API-TOKEN',
+    polling: true
+  }
+}];
 
-    // example of a readOnly IRC channel and Telegram Group:
-    {
-        ircChan: '#channel3',
-        ircChanReadOnly: true,          // if true, irc can not send to telegram
-        ircChanOverrideReadOnly: false, // if true, override readonly by highlighting the bot
-        tgGroup: 'Tg_Group_3',
-        tgGroupReadOnly: true,          // if true, telegram can not send to irc
-        tgGroupOverrideReadOnly: true,  // if true, override readonly by highlighting the bot
-    },
-
-    // example of an IRC channel with an alias:
-    // channel name will be displayed as '!channel3' instead of '!XXXXXchannel3'
-    {
-        ircChan: '!XXXXXchannel3',
-        chanAlias: '!channel3',
-        tgGroup: 'Tg_Group_3'
-    }
-];
+// Here you configure groups. Each room in a group will receive messages from
+// all other rooms in the group.
+config.groups = [{
+  name: 'Test Group',
+  rooms: [
+    'freenode:#fruittest',
+    'telegram:Fruits bot testing'
+  ]
+}];
 
 // see https://node-irc.readthedocs.org/en/latest/API.html#client for
 // documentation
