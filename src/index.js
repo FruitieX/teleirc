@@ -95,14 +95,19 @@ if (argv.version) {
 
     // Find rooms that module should join
     // (Needed for eg. IRC which has to join channels on connect)
-    let rooms = [];
-    config.groups.forEach((group) => {
-      group.rooms.forEach((room) => {
-        if (room.startsWith(`${moduleConfig.alias}:`)) {
-          rooms.push(room.substr(moduleConfig.alias.length + 1));
-        }
-      });
-    });
+    let rooms = _.flattenDeep(
+      config.groups.map((group) => (
+        group.rooms.filter((room) => room.startsWith(`${moduleConfig.alias}:`))
+      ))
+    );
+
+    // Remove duplicates
+    rooms = _.uniq(rooms);
+
+    // Remove module alias prefix
+    rooms = rooms.map((room) => (
+      room.substr(moduleConfig.alias.length + 1)
+    ));
 
     const instance = new module(moduleConfig.config, rooms, (msg) => {
       msg.module = moduleConfig.alias;
