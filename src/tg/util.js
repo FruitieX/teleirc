@@ -7,6 +7,12 @@ var osHomedir = require('os-homedir');
 var mkdirp = require('mkdirp');
 var crypto = require('crypto');
 var logger = require('winston');
+var imgur = require('imgur');
+var os = require('os');
+
+if (config.uploadToImgur) {
+  imgur.setClientId(config.imgurClientId);
+}
 
 var chatIdsPath = path.join(osHomedir(), '.teleirc');
 
@@ -101,6 +107,19 @@ exports.serveFile = function(fileId, config, tg, callback) {
         callback(config.httpLocation + '/' + randomString + '/' + path.basename(filePath));
     });
 };
+
+exports.uploadToImgur = function(fileId, config, tg, callback) {
+  var filesPath = os.tmpdir()
+  var randomString = exports.randomValueBase64(config.mediaRandomLength);
+  mkdirp(path.join(filesPath, randomString));
+  tg.downloadFile(fileId, path.join(filesPath, randomString))
+  .then(function(filePath) {
+    imgur.uploadFile(filePath)
+    .then(function(json) {
+      callback(json.data.link);
+    })
+  })
+}
 
 exports.initHttpServer = function() {
     var filesPath = path.join(osHomedir(), '.teleirc', 'files');
@@ -205,7 +224,11 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
     // skip posts containing media if it's configured off
     if ((msg.audio || msg.document || msg.photo || msg.sticker || msg.video ||
                 msg.voice || msg.contact || msg.location) && !config.showMedia) {
-        return callback();
+        // except if the media object is an photo and imgur uploading is
+        // enabled
+        if (!(msg.photo && config.uploadToImgur)) {
+          return callback();
+        }
     }
 
     var prefix = '';
@@ -305,25 +328,42 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
     } else if (msg.photo) {
         // pick the highest quality photo
         var photo = msg.photo[msg.photo.length - 1];
-
-        exports.serveFile(photo.file_id, config, tg, function(url) {
+        if (config.uploadToImgur) {
+          exports.uploadToImgur(photo.file_id, config, tg, function(url) {
             callback({
                 channel: channel,
                 text: prefix + '(Photo, ' + photo.width + 'x' + photo.height + ') ' +
                     url + (msg.caption ? ' ' + msg.caption : '')
             });
-        });
+          });
+        } else {
+          exports.serveFile(photo.file_id, config, tg, function(url) {
+              callback({
+                  channel: channel,
+                  text: prefix + '(Photo, ' + photo.width + 'x' + photo.height + ') ' +
+                      url + (msg.caption ? ' ' + msg.caption : '')
+              })
+          });
+        }
     } else if (msg.new_chat_photo) {
         // pick the highest quality photo
         var chatPhoto = msg.new_chat_photo[msg.new_chat_photo.length - 1];
-
-        exports.serveFile(chatPhoto.file_id, config, tg, function(url) {
-            callback({
-                channel: channel,
-                text: prefix + '(New chat photo, ' +
-                        chatPhoto.width + 'x' + chatPhoto.height + ') ' + url
-            });
-        });
+        if (config.uploadToImgur) {
+          exports.uploadToImgur(chatPhoto.file_id, config, tg, function(url) {
+              callback({
+                  channel: channel,
+                  text: prefix + '(New chat photo, ' +
+                          chatPhoto.width + 'x' + chatPhoto.height + ') ' + url
+              })});
+        } else {
+          exports.serveFile(chatPhoto.file_id, config, tg, function(url) {
+              callback({
+                  channel: channel,
+                  text: prefix + '(New chat photo, ' +
+                          chatPhoto.width + 'x' + chatPhoto.height + ') ' + url
+              });
+          });
+        }
     } else if (msg.sticker) {
         exports.serveFile(msg.sticker.file_id, config, tg, function(url) {
             callback({
