@@ -48,6 +48,9 @@ Optional:
   `/setcommands` BotFather command. You may copy-paste the contents of
   [`commands.txt`](/extras/commands.txt) to show all supported commands to
   Telegram clients.
+- Instead of enabling the HTTP server for serving sent media files, photo files
+  sent to the groups can be uploaded to [Imgur](http://imgur.com/). See the
+  [README for Imgur](extras/Imgur_README.md) for more information.
 
 Troubleshooting
 ---------------
