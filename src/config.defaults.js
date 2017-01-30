@@ -37,6 +37,13 @@ config.httpPort = 9090;
 // HTTP server location, URLs are generated from this
 config.httpLocation = 'http://mydomain.com' + ':' + config.httpPort;
 
+// Upload sent photos to Imgur, links to Imgur uploads are
+// forwared to IRC
+config.uploadToImgur = false;
+
+// Imgur client id required for uploading photos to Imgur
+config.imgurClientId = 'YOUR-CLIENT-ID';
+
 // Whether to allow sending messages to IRC without nick prefix
 config.allowCommands = false;
 
