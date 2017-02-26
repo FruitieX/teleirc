@@ -140,7 +140,7 @@ var init = function(msgCallback) {
                 type: 'part',
                 channel: channel,
                 user: null,
-                text: user + ' was kicked by ' + by + ' (' + reason + ')';
+                text: user + ' was kicked by ' + by + ' (' + reason + ')',
             });
         }
     });
