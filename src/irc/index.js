@@ -171,10 +171,11 @@ var init = function(msgCallback) {
             nodeIrc.say(message.channel.ircChan, message.text);
         },
         getNames: function(channel) {
-            return ircUtil.getNames(nodeIrc.chans[channel.ircChan]);
+            return ircUtil.getNames(nodeIrc.chans[channel.ircChan.toLowerCase()]);
         },
         getTopic: function(channel) {
-            return ircUtil.getTopic(nodeIrc.chans[channel.ircChan]);
+            var topic = ircUtil.getTopic(nodeIrc.chans[channel.ircChan.toLowerCase()]);
+            return ircUtil.topicFormat(channel, topic.text, topic.topicBy);
         }
     };
 };
