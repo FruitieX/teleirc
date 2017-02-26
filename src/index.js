@@ -55,16 +55,7 @@ if (argv.version) {
 
                     return tg.send(message);
                 } else if (message.cmd === 'getTopic') {
-                    var topic = irc.getTopic(channel);
-
-                    if (topic) {
-                        message.text = 'Topic for channel ' +
-                            (channel.chanAlias || channel.ircChan) +
-                            ': "' + topic.text + '" set by ' + topic.topicBy;
-                    } else {
-                        message.text = 'No topic for channel ' +
-                            (channel.chanAlias || channel.ircChan);
-                    }
+                    message.text = irc.getTopic(channel);
 
                     return tg.send(message);
                 } else if (message.cmd === 'getVersion') {
