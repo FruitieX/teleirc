@@ -132,6 +132,19 @@ var init = function(msgCallback) {
         }
     });
 
+    nodeIrc.on('kick', function(chanName, user, by, reason) {
+        if (config.sendNonMsg) {
+            var channel = ircUtil.lookupChannel(chanName, config.channels);
+            msgCallback({
+                protocol: 'irc',
+                type: 'part',
+                channel: channel,
+                user: null,
+                text: user + ' was kicked by ' + by + ' (' + reason + ')';
+            });
+        }
+    });
+
     nodeIrc.on('quit', function(user, text, channels, message) {
         if (config.sendNonMsg) {
             for (var i = 0; i < channels.length; i++) {
