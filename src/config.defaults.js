@@ -13,11 +13,10 @@ config.logLevel = 'info';
 // paste the bot API token you got from BotFather here:
 config.tgToken = 'YOUR-BOT-TOKEN';
 
-// send IRC topic changes to Telegram
-config.sendTopic = true;
-
-// send IRC joins, parts and quits to Telegram
-config.sendNonMsg = false;
+// only relay IRC events present in array
+// possible values include:
+// message, notice, action, topic, join, part, kick, quit
+config.relayIRCEvents = ['message', 'notice', 'action', 'topic', 'kick'];
 
 // enable HTTP server which hosts sent media files, links to files are
 // forwarded to IRC

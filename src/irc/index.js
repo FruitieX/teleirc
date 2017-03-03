@@ -2,6 +2,30 @@ var NodeIrc = require('irc');
 var config = require('../config');
 var ircUtil = require('./util');
 var logger = require('winston');
+var _ = require('lodash');
+
+var shouldRelayEvent = function(event) {
+    if (_.isArray(config.relayIRCEvents)) {
+        // Using the new array format
+        if (config.relayIRCEvents.includes(event)) {
+            return true;
+        }
+
+        return false;
+    } else {
+        // Using the old boolean format and warn
+
+        logger.warn('config.sendTopic and config.sendNonMsg were merged into ' +
+            'config.relayIRCEvents. You are either using one of them, or passing a boolean ' +
+            '(true/false) to config.relayIRCEvents. Please migrate to config.relayIRCEvents, ' +
+            'and pass an array of the desired IRC events to relay. See the default config for an ' +
+            'example: ' +
+            'https://github.com/FruitieX/teleirc/blob/develop/src/config.defaults.js '
+        );
+
+        return true;
+    }
+};
 
 var init = function(msgCallback) {
     config.ircOptions.channels = ircUtil.getChannels(config.channels);
@@ -19,6 +43,10 @@ var init = function(msgCallback) {
     });
 
     nodeIrc.on('message', function(user, chanName, text) {
+        if (!config.relayIRCEvents.includes('message')) {
+            return;
+        }
+
         var message = ircUtil.parseMsg(chanName, text);
 
         if (message) {

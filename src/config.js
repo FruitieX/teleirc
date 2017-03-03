@@ -27,7 +27,9 @@ var deprecatedOptions = {
     'irc_options': 'ircOptions',
     'irc_hilight_re': 'hlRegexp',
     'send_topic': 'sendTopic',
-    'mediaRandomLenght': 'mediaRandomLength'
+    'mediaRandomLenght': 'mediaRandomLength',
+    'sendTopic': 'relayIRCEvents',
+    'sendNonMsg': 'relayIRCEvents'
 };
 
 // support old config options for a few versions, but warn about their usage
@@ -52,6 +54,14 @@ var parseDeprecatedOptions = function(config) {
         var newOption = deprecatedOptions[option];
 
         if (newOption) {
+            if (option === 'sendTopic' || option === 'sendNonMsg') {
+                logger.warn('config.sendTopic and config.sendNonMsg are no longer used! Please ' +
+                    'remove them from config and replace them with the new config.relayIRCEvents ' +
+                    'option! See the default config for an example: ' +
+                    'https://github.com/FruitieX/teleirc/blob/develop/src/config.defaults.js'
+                );
+
+            }
             config[newOption] = value;
             delete(config[option]);
             warnDeprecated(option, newOption);
