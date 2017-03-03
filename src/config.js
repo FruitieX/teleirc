@@ -64,7 +64,7 @@ var parseDeprecatedOptions = function(config) {
 var config;
 var configPath = argv.c || path.join(osHomedir(), '.teleirc', 'config.js');
 if (argv.g) {
-    mkdirp(path.join(osHomedir(), '/.teleirc'));
+    mkdirp(path.join(osHomedir(), '.teleirc'));
 
     // read default config using readFile to include comments
     var config = fs.readFileSync(path.join(__dirname, 'config.defaults.js'));
