@@ -43,7 +43,7 @@ var init = function(msgCallback) {
     });
 
     nodeIrc.on('message', function(user, chanName, text) {
-        if (!config.relayIRCEvents.includes('message')) {
+        if (!shouldRelayEvent('message')) {
             return;
         }
 
@@ -77,6 +77,10 @@ var init = function(msgCallback) {
     });
 
     nodeIrc.on('notice', function(user, chanName, text) {
+        if (!shouldRelayEvent('notice')) {
+            return;
+        }
+
         var notice = ircUtil.parseMsg(chanName, text);
 
         if (notice) {
@@ -107,6 +111,10 @@ var init = function(msgCallback) {
     });
 
     nodeIrc.on('action', function(user, chanName, text) {
+        if (!shouldRelayEvent('action')) {
+            return;
+        }
+
         var message = ircUtil.parseMsg(chanName, text);
 
         if (message) {
@@ -121,6 +129,10 @@ var init = function(msgCallback) {
     });
 
     nodeIrc.on('topic', function(chanName, topic, user) {
+        if (!shouldRelayEvent('topic')) {
+            return;
+        }
+
         var message = ircUtil.parseTopic(chanName, topic, user);
 
         if (message) {
@@ -135,63 +147,70 @@ var init = function(msgCallback) {
     });
 
     nodeIrc.on('join', function(chanName, user, text) {
-        if (config.sendNonMsg) {
-            var channel = ircUtil.lookupChannel(chanName, config.channels);
-            msgCallback({
-                protocol: 'irc',
-                type: 'join',
-                channel: channel,
-                user: null,
-                text: user + ' has joined'
-            });
+        if (!shouldRelayEvent('join')) {
+            return;
         }
+
+        var channel = ircUtil.lookupChannel(chanName, config.channels);
+        msgCallback({
+            protocol: 'irc',
+            type: 'join',
+            channel: channel,
+            user: null,
+            text: user + ' has joined'
+        });
     });
 
     nodeIrc.on('part', function(chanName, user, text) {
-        if (config.sendNonMsg) {
-            var channel = ircUtil.lookupChannel(chanName, config.channels);
-            msgCallback({
-                protocol: 'irc',
-                type: 'part',
-                channel: channel,
-                user: null,
-                text: user + ' has left'
-            });
+        if (!shouldRelayEvent('part')) {
+            return;
         }
+
+        var channel = ircUtil.lookupChannel(chanName, config.channels);
+        msgCallback({
+            protocol: 'irc',
+            type: 'part',
+            channel: channel,
+            user: null,
+            text: user + ' has left'
+        });
     });
 
     nodeIrc.on('kick', function(chanName, user, by, reason) {
-        if (config.sendNonMsg) {
-            var channel = ircUtil.lookupChannel(chanName, config.channels);
-            msgCallback({
-                protocol: 'irc',
-                type: 'part',
-                channel: channel,
-                user: null,
-                text: user + ' was kicked by ' + by + ' (' + reason + ')',
-            });
+        if (!shouldRelayEvent('kick')) {
+            return;
         }
+
+        var channel = ircUtil.lookupChannel(chanName, config.channels);
+        msgCallback({
+            protocol: 'irc',
+            type: 'part',
+            channel: channel,
+            user: null,
+            text: user + ' was kicked by ' + by + ' (' + reason + ')',
+        });
     });
 
     nodeIrc.on('quit', function(user, text, channels, message) {
-        if (config.sendNonMsg) {
-            for (var i = 0; i < channels.length; i++) {
-                var reason = '';
-                if (text) {
-                    reason = ' (' + text + ')';
-                }
-
-                var channel = ircUtil.lookupChannel(channels[i], config.channels);
-                msgCallback({
-                    protocol: 'irc',
-                    type: 'quit',
-                    channel: channel,
-                    user: null,
-                    text: user + ' has quit' + reason
-                });
-            }
+        if (!shouldRelayEvent('quit')) {
+            return;
         }
 
+        for (var i = 0; i < channels.length; i++) {
+            var reason = '';
+            if (text) {
+                reason = ' (' + text + ')';
+            }
+
+            var channel = ircUtil.lookupChannel(channels[i], config.channels);
+            msgCallback({
+                protocol: 'irc',
+                type: 'quit',
+                channel: channel,
+                user: null,
+                text: user + ' has quit' + reason
+            });
+        }
     });
 
     return {

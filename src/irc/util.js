@@ -56,7 +56,7 @@ exports.parseTopic = function(chanName, topic, user) {
 
     // ignore first topic event when joining channel
     // (doesn't handle rejoins yet)
-    if (!config.sendTopic || !channel.firstTopicRcvd) {
+    if (!channel.firstTopicRcvd) {
         channel.firstTopicRcvd = true;
         return;
     }
