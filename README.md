@@ -27,6 +27,7 @@ Make sure you've installed Node.js.
 1. Install the teleirc npm module with `npm install -g teleirc` (might need
    sudo)
 2. Generate a default config using `teleirc --genconfig`
+   NOTE: if this step fails, try `mkdir ~/.teleirc` and run the command again (FIXME).
 3. Set up your bot with [BotFather](https://telegram.me/botfather)
 4. Use the `/setprivacy` command with `BotFather` to allow your bot to see all
    messages in your group (NOTE on usage: bot name is preceded by @ sign and
