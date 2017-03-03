@@ -7,7 +7,7 @@ var _ = require('lodash');
 var shouldRelayEvent = function(event) {
     if (_.isArray(config.relayIRCEvents)) {
         // Using the new array format
-        if (config.relayIRCEvents.includes(event)) {
+        if (config.relayIRCEvents.indexOf(event) !== -1) {
             return true;
         }
 
