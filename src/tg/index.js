@@ -67,8 +67,17 @@ var init = function(msgCallback) {
                 message.text = '<' + message.user + '> ' + message.text;
             }
 
+            var sendMessage = function(message) {
+                tg.sendMessage(message.channel.tgChatId, message.text)/*.timeout(30000)*/.then(res => {
+                    logger.verbose('   [  success  ] :', message.text);
+                }).catch(error => {
+                    logger.verbose('   [ resending ] :', message.text);
+                    sendMessage(message);
+                });
+            };
+
             logger.verbose('>> relaying to TG:', message.text);
-            tg.sendMessage(message.channel.tgChatId, message.text);
+            sendMessage(message);
         }
     };
 };
