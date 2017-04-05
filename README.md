@@ -19,6 +19,15 @@ A simple [Telegram](https://telegram.org/) ↔ IRC gateway.
   bot is hilighted via a configurable regexp
 * Supports Telegram media files, URL to file sent to IRC
 
+Requirements
+------------
+
+On Ubuntu:
+```
+sudo apt-get install libicu-dev
+```
+
+
 Quick start
 -----------
 
