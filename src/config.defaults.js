@@ -158,3 +158,6 @@ config.hlRegexp = new RegExp(regex, 'i');
 // with the default regexp this would hide the bot nickname in messages when
 // highlighted
 config.hlOnlyShowMatch = false;
+
+// put action messages (posted with /me in IRC) between '*'
+config.emphasizeAction = true;
