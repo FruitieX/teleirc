@@ -118,12 +118,17 @@ var init = function(msgCallback) {
         var message = ircUtil.parseMsg(chanName, text);
 
         if (message) {
+            var messageText = user + ': ' + message.text;
+            if (config.emphasizeAction) {
+                messageText = '*' + messageText + '*';
+            }
+
             msgCallback({
                 protocol: 'irc',
                 type: 'action',
                 channel: message.channel,
                 user: null,
-                text: '*' + user + ': ' + message.text + '*'
+                text: messageText
             });
         }
     });
