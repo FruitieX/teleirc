@@ -22,6 +22,13 @@ config.relayIRCEvents = ['message', 'notice', 'action', 'topic', 'kick'];
 // forwarded to IRC
 config.showMedia = false;
 
+// Convert these media files to other types using the "convert" command.
+// To be able to convert from WebP, install imagemagick and the dwebp tool
+// (e.g. sudo apt install imagemagick webp)
+config.mediaConversions = {
+    //'webp': 'png'
+};
+
 // Add some randomness to url when relaying media
 // Use 0 to disable
 config.mediaRandomLength = 8;
