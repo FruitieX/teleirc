@@ -9,6 +9,7 @@ var crypto = require('crypto');
 var logger = require('winston');
 var imgur = require('imgur');
 var os = require('os');
+var child_process = require('child_process');
 
 if (config.uploadToImgur) {
     imgur.setClientId(config.imgurClientId);
@@ -97,12 +98,55 @@ exports.randomValueBase64 = function(len) {
         .replace(/\//g, '0');
 };
 
+exports.convertMedia = function(filePath, config) {
+    if (config.mediaConversions) {
+        // get the filename suffix
+        var match = /^(.+\.)(.+?)$/.exec(filePath);
+        if (match) {
+            var basename = match[1];
+            var suffix = match[2];
+
+            // should it be converted?
+            var newSuffix = config.mediaConversions[suffix.toLowerCase()];
+            if (newSuffix) {
+                logger.verbose('Converting', filePath, 'to', newSuffix);
+
+                return new Promise(function(resolve, reject) {
+                    var newFilePath = basename + newSuffix;
+                    var child = child_process.spawn('convert', [filePath, newFilePath]);
+                    child.on('error', function(err) {
+                        logger.error('Failed to run "convert":', err.message);
+                        // fall back to the original filename
+                        resolve(filePath);
+                    });
+                    child.on('exit', function(code) {
+                        if (code !== 0) {
+                            logger.error('"convert" exited with code', code);
+                            // fall back to the original filename
+                            resolve(filePath);
+                        } else {
+                            // on success, return the new filename
+                            resolve(newFilePath);
+                        }
+                    });
+                });
+            } else {
+                logger.debug('No media conversion defined for', suffix);
+            }
+        }
+    }
+    return filePath;
+};
+
 exports.serveFile = function(fileId, config, tg, callback) {
     var filesPath = path.join(osHomedir(), '.teleirc', 'files');
 
     var randomString = exports.randomValueBase64(config.mediaRandomLength);
     mkdirp(path.join(filesPath, randomString));
     tg.downloadFile(fileId, path.join(filesPath, randomString))
+    .then(function(filePath) {
+        return exports.convertMedia(filePath, config);
+    })
     .then(function(filePath) {
         callback(config.httpLocation + '/' + randomString + '/' + path.basename(filePath));
     });
