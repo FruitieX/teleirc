@@ -15,7 +15,8 @@ if (config.uploadToImgur) {
     imgur.setClientId(config.imgurClientId);
 }
 
-var chatIdsPath = path.join(osHomedir(), '.teleirc');
+var argv = require('../arguments').argv;
+var chatIdsPath = path.dirname(argv.c || path.join(osHomedir(), '.teleirc', 'config.js'));
 
 exports.readChatId = function(channel) {
     var chatId;
@@ -139,7 +140,7 @@ exports.convertMedia = function(filePath, config) {
 };
 
 exports.serveFile = function(fileId, config, tg, callback) {
-    var filesPath = path.join(osHomedir(), '.teleirc', 'files');
+    var filesPath = path.join(chatIdsPath, 'files');
 
     var randomString = exports.randomValueBase64(config.mediaRandomLength);
     mkdirp(path.join(filesPath, randomString));
@@ -166,7 +167,7 @@ exports.uploadToImgur = function(fileId, config, tg, callback) {
 };
 
 exports.initHttpServer = function() {
-    var filesPath = path.join(osHomedir(), '.teleirc', 'files');
+    var filesPath = path.join(chatIdsPath, 'files');
     mkdirp(filesPath);
 
     var fileServer = new nodeStatic.Server(filesPath);
