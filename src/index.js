@@ -41,23 +41,9 @@ if (argv.version) {
                 var channel = message.channel;
 
                 if (message.cmd === 'getNames') {
-                    var names = irc.getNames(channel);
-
-                    if (!names) {
-                        logger.error('No nicklist received!');
-                    }
-
-                    names.sort();
-                    names = names.join(', ');
-
-                    message.text = 'Users on ' + (channel.chanAlias || channel.ircChan) +
-                        ':\n\n' + names;
-
-                    return tg.send(message);
+                    return irc.getNames(channel);
                 } else if (message.cmd === 'getTopic') {
-                    message.text = irc.getTopic(channel);
-
-                    return tg.send(message);
+                    return irc.getTopic(channel);
                 } else if (message.cmd === 'getVersion') {
                     message.text = 'Version: ' +
                         getVersionStr();
