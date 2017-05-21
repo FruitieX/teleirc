@@ -336,9 +336,19 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
             replyName = exports.getName(msg.reply_to_message.from, config);
         }
 
+        // Show snippet of message being replied to
+        var snippet = '';
+        if (config.replySnippetLength) {
+            truncatedMessage = msg.reply_to_message.text.substr(0, config.replySnippetLength);
+            if (truncatedMessage.length < msg.reply_to_message.text.length) {
+                truncatedMessage = truncatedMessage + ' …';
+            }
+            snippet = ' [' + truncatedMessage + ']';
+        }
+
         callback({
             channel: channel,
-            text: prefix + '@' + replyName + ', ' + msg.text
+            text: prefix + '@' + replyName + snippet + ', ' + msg.text
         });
     } else if ((msg.forward_from || msg.forward_from_chat) && msg.text) {
         var from = msg.forward_from || msg.forward_from_chat;
