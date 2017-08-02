@@ -18,6 +18,10 @@ config.tgToken = 'YOUR-BOT-TOKEN';
 // message, notice, action, topic, join, part, kick, quit
 config.relayIRCEvents = ['message', 'notice', 'action', 'topic', 'kick'];
 
+// The maximum length of quoted message when a message is replied to in Telegram
+// Set to 0 to disable showing replies
+config.replySnippetLength = 80;
+
 // enable HTTP server which hosts sent media files, links to files are
 // forwarded to IRC
 config.showMedia = false;
