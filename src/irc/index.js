@@ -45,7 +45,7 @@ var init = function(msgCallback) {
     nodeIrc.on('registered', function() {
         // IRC perform on connect
         config.ircPerformCmds.forEach(function(cmd) {
-            nodeIrc.raw.apply(null, cmd.split(' '));
+            nodeIrc.raw.apply(nodeIrc, cmd.split(' '));
         });
         config.ircOptions.channels.forEach(function(channel) {
             nodeIrc.join(channel);
