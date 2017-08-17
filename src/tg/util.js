@@ -342,8 +342,7 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
         if (config.replySnippetLength) {
             if (!msg.reply_to_message.text) {
                 truncatedMessage = '<reply to image>';
-            }
-            else {
+            } else {
                 truncatedMessage = msg.reply_to_message.text
                                    .substr(0, config.replySnippetLength)
                                    .trim();
