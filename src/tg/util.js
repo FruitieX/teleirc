@@ -340,11 +340,15 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
         // Show snippet of message being replied to
         var snippet = '';
         if (config.replySnippetLength) {
-            truncatedMessage = msg.reply_to_message.text
-                               .substr(0, config.replySnippetLength)
-                               .trim();
-            if (truncatedMessage.length < msg.reply_to_message.text.length) {
-                truncatedMessage = truncatedMessage + ' …';
+            if (!msg.reply_to_message.text) {
+                truncatedMessage = '<reply to image>';
+            } else {
+                truncatedMessage = msg.reply_to_message.text
+                                   .substr(0, config.replySnippetLength)
+                                   .trim();
+                if (truncatedMessage.length < msg.reply_to_message.text.length) {
+                    truncatedMessage = truncatedMessage + ' …';
+                }
             }
             snippet = ' [' + truncatedMessage + ']';
         }
