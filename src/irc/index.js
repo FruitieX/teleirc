@@ -259,18 +259,25 @@ var init = function(msgCallback) {
     });
 
     return {
-        send: function(message, raw) {
-            if (!raw) {
-                // strip empty lines
-                message.text = message.text.replace(/^\s*\n/gm, '');
+        send: function(message, multi) {
 
-                // replace newlines
-                message.text = message.text.replace(/\n/g, config.replaceNewlines);
-
-                // TODO: replace here any remaining newlines with username
-                // (this can happen if user configured replaceNewlines to itself
-                // contain newlines)
+            if (multi) {
+                logger.verbose('<< relaying to IRC w/ multiple lines:', message.text);
+                message.text.split('\n').forEach(function(msg) {
+                    nodeIrc.say(message.channel.ircChan, msg);
+                });
+                return;
             }
+
+            // strip empty lines
+            message.text = message.text.replace(/^\s*\n/gm, '');
+
+            // replace newlines
+            message.text = message.text.replace(/\n/g, config.replaceNewlines);
+
+            // TODO: replace here any remaining newlines with username
+            // (this can happen if user configured replaceNewlines to itself
+            // contain newlines)
 
             logger.verbose('<< relaying to IRC:', message.text);
             nodeIrc.say(message.channel.ircChan, message.text);
