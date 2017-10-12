@@ -35,9 +35,9 @@ var init = function(msgCallback) {
         nick: config.ircNick,
         port: config.ircOptions.port,
         tls: config.ircOptions.secure,
-    }
+    };
     if (config.ircOptions.password) {
-        connOptions.password = config.ircOptions.password
+        connOptions.password = config.ircOptions.password;
     }
     var nodeIrc = new NodeIrc.Client();
     nodeIrc.connect(connOptions);
