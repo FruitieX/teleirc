@@ -30,13 +30,17 @@ var shouldRelayEvent = function(event) {
 var init = function(msgCallback) {
     config.ircOptions.channels = ircUtil.getChannels(config.channels);
 
-    var nodeIrc = new NodeIrc.Client();
-    nodeIrc.connect({
+    var connOptions = {
         host: config.ircServer,
         nick: config.ircNick,
         port: config.ircOptions.port,
-        tls: config.ircOptions.secure
-    });
+        tls: config.ircOptions.secure,
+    }
+    if (config.ircOptions.password) {
+        connOptions.password = config.ircOptions.password
+    }
+    var nodeIrc = new NodeIrc.Client();
+    nodeIrc.connect(connOptions);
 
     nodeIrc.on('error', function(error) {
         logger.error('unhandled IRC error:', error);
