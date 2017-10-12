@@ -35,7 +35,10 @@ var init = function(msgCallback) {
         host: config.ircServer,
         nick: config.ircNick,
         port: config.ircOptions.port,
-        tls: config.ircOptions.secure
+        tls: config.ircOptions.secure,
+        password: config.ircOptions.password,
+        username: config.ircOptions.userName,
+        gecos: config.ircOptions.realName,
     });
 
     nodeIrc.on('error', function(error) {
