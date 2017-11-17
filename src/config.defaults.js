@@ -173,3 +173,15 @@ config.hlOnlyShowMatch = false;
 
 // put action messages (posted with /me in IRC) between '*'
 config.emphasizeAction = true;
+
+// a list of users to ignore
+// and not relay to telegram
+config.ircIgnoreList = [
+// 'user_or_bot_here'
+];
+
+// list of regular expressions to test a message
+// text with, any that match will mean the message won't relay
+config.ircRegexFilters = [
+// /regexhere/,
+];

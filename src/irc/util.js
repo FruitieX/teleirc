@@ -99,3 +99,19 @@ exports.getTopic = function(nodeIrcChannel) {
         topicBy: nodeIrcChannel.topicBy
     };
 };
+
+exports.checkIgnore = function(user, text) {
+    if (config.ircIgnoreList) {
+        if (config.ircIgnoreList.indexOf(user) > -1) {
+            return true;
+        }
+    }
+
+    if (config.ircRegexFilters) {
+        return config.ircRegexFilters.reduce(function(acc, regex) {
+            return acc || regex.test(text);
+        }, false);
+    }
+
+    return false;
+};
