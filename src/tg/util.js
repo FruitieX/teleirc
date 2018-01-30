@@ -169,6 +169,9 @@ exports.uploadToImgur = function(fileId, config, tg, callback) {
 exports.initHttpServer = function() {
     var filesPath = path.join(chatIdsPath, 'files');
     mkdirp(filesPath);
+    if (config.externalWebServer) {
+        return;
+    }
 
     var fileServer = new nodeStatic.Server(filesPath);
 
