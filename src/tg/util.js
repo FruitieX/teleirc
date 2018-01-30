@@ -483,3 +483,9 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
         callback();
     }
 };
+
+exports.stripIrcCodes = function(text) {
+    return text.replace(
+        /\x03[0-9][0-9]?(?:,[0-9][0-9]?)?|[\x02\x03\x0f\x16\x1d\x1f]/g, ''
+    );
+};

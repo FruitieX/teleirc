@@ -71,7 +71,10 @@ var init = function(msgCallback) {
             }
 
             logger.verbose('>> relaying to TG:', message.text);
-            tg.sendMessage(message.channel.tgChatId, message.text);
+            tg.sendMessage(
+                message.channel.tgChatId,
+                tgUtil.stripIrcCodes(message.text)
+            );
         }
     };
 };
