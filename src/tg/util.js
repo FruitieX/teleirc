@@ -19,19 +19,43 @@ if (config.uploadToImgur) {
 
 var argv = require('../arguments').argv;
 var chatIdsPath = path.dirname(argv.c || path.join(osHomedir(), '.teleirc', 'config.js'));
+var chatIdsFile = path.join(chatIdsPath, 'chatids.json');
+var ChatIds;
+try {
+    ChatIds = JSON.parse(fs.readFileSync(chatIdsFile));
+} catch (e) {
+    ChatIds = null;
+}
+
+function migrateChatIdStorage() {
+    ChatIds = {};
+    logger.warn('Missing chatids.json; attempting to migrate existing chatids.');
+    fs.readdirSync(chatIdsPath).forEach(function(fname) {
+        if (fname.slice(-7) != '.chatid') {
+            return;
+        }
+        channelName = fname.slice(0, -7);
+        try {
+            chatid = JSON.parse(fs.readFileSync(path.join(chatIdsPath, fname)));
+            ChatIds[channelName] = chatid;
+            logger.warn('Successfully migrated ' + fname + '; you must remove it yourself.');
+        } catch (e) {
+            logger.error(
+                'Could not read ' + fname +
+                '. You must migrate it manually yourself.'
+            );
+        }
+    });
+    fs.writeFileSync(chatIdsFile, JSON.stringify(ChatIds));
+    logger.info('successfully migrated chat IDs in ' + chatIdsFile);
+}
 
 exports.readChatId = function(channel) {
-    var chatId;
-    var chatIdPath = path.join(chatIdsPath, channel.tgGroup + '.chatid');
-
-    try {
-        chatId = JSON.parse(fs.readFileSync(chatIdPath));
-        logger.info('successfully read chat ID for group ' + channel.tgGroup);
-    } catch (e) {
-        logger.error('while reading chat ID for group ' + channel.tgGroup);
+    if (!ChatIds) {
+        migrateChatIdStorage();
     }
 
-    if (!chatId) {
+    if (!ChatIds[channel.tgGroup]) {
         logger.warn('NOTE!');
         logger.warn('=====');
         logger.warn('Please add your Telegram bot to a Telegram group and have');
@@ -39,16 +63,15 @@ exports.readChatId = function(channel) {
         logger.warn('teleirc will then automatically store your group chat_id.');
     }
 
-    return chatId;
+    return ChatIds[channel.tgGroup];
 };
 
 exports.writeChatId = function(channel) {
-    var chatId = JSON.stringify(channel.tgChatId);
-    var chatIdPath = path.join(chatIdsPath, channel.tgGroup + '.chatid');
+    ChatIds[channel.tgGroup] = JSON.stringify(channel.tgChatId);
 
     try {
-        fs.writeFileSync(chatIdPath, chatId);
-        logger.info('successfully stored chat ID in ' + chatIdPath);
+        fs.writeFileSync(chatIdsFile, JSON.stringify(ChatIds));
+        logger.info('successfully stored chat ID in ' + chatIdsFile);
     } catch (e) {
         logger.error('error while storing chat ID:', e);
     }
@@ -532,4 +555,10 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
         logger.warn('WARNING: unhandled message:', msg);
         callback();
     }
+};
+
+exports.stripIrcCodes = function(text) {
+    return text.replace(
+        /\x03[0-9][0-9]?(?:,[0-9][0-9]?)?|[\x02\x03\x0f\x16\x1d\x1f]/g, ''
+    );
 };
