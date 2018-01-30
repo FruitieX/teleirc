@@ -172,46 +172,38 @@ exports.serveFile = function(fileId, mimetype, config, tg, callback) {
     var filePath = path.join(filesPath, randomString + '.' + mime.getExtension(mimetype));
     tg.getFileLink(fileId)
     .then(function(link) {
-        https.get(link, function(res) {
+        https.get(link)
+        .on('response', function(res) {
             if (res.statusCode != 200) {
                 logger.error(
                     'Could not save file: ( ' + 'Status code: ' + res.statusCode + ' )'
                 );
                 return callback('Could not save file.');
-            } 
+            }
 
             res.pipe(fs.createWriteStream(filePath))
             .on('error', function(e) {
                 logger.error(
-                    'Could not save file: ( ' + 'Status code: ' + res.statusCode + ' )'
+                    'Could not save file: ( ' + e.toString() + ' )'
                 );
                 return callback('Could not save file.');
             }).on('finish', function() {
                 exports.convertMedia(filePath, config)
                 .then(function(filePath) {
                     callback(
-                        config.httpLocation + '/' + 
-                        path.basename(filePath)
+                        config.httpLocation + '/' + path.basename(filePath)
                     );
                 });
             });
+        })
+        .on('error', function(e) {
+            logger.error(
+                'Could not save file: ( ' + e.toString() + ' )'
+            );
+            return callback('Could not save file.');
         });
     });
-}
-
-//exports.serveFile = function(fileId, config, tg, callback) {
-//    var filesPath = path.join(chatIdsPath, 'files');
-//
-//    var randomString = exports.randomValueBase64(config.mediaRandomLength);
-//    mkdirp(path.join(filesPath, randomString));
-//    tg.downloadFile(fileId, path.join(filesPath, randomString))
-//    .then(function(filePath) {
-//        return exports.convertMedia(filePath, config);
-//    })
-//    .then(function(filePath) {
-//        callback(config.httpLocation + '/' + randomString + '/' + path.basename(filePath));
-//    });
-//};
+};
 
 exports.uploadToImgur = function(fileId, config, tg, callback) {
     var filesPath = os.tmpdir();
@@ -443,7 +435,7 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
             });
         });
     } else if (msg.document) {
-        exports.serveFile(msg.document.file_id, msg.document.mime_type ,config, tg, function(url) {
+        exports.serveFile(msg.document.file_id, msg.document.mime_type, config, tg, function(url) {
             callback({
                 channel: channel,
                 text: prefix + '(Document) ' + url
