@@ -65,6 +65,10 @@ exports.readChatId = function(channel) {
 };
 
 exports.writeChatId = function(channel) {
+    if (!ChatIds) {
+        migrateChatIdStorage();
+    }
+
     ChatIds[channel.tgGroup] = JSON.stringify(channel.tgChatId);
 
     try {
