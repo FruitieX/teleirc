@@ -26,6 +26,9 @@ config.replySnippetLength = 80;
 // forwarded to IRC
 config.showMedia = false;
 
+// disable the internal webserver and use your own instead.
+config.externalWebServer = false;
+
 // Convert these media files to other types using the "convert" command.
 // To be able to convert from WebP, install imagemagick and the dwebp tool
 // (e.g. sudo apt install imagemagick webp)
