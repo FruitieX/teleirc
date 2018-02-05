@@ -318,7 +318,11 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
         exports.writeChatId(channel);
     }
 
-    var age = Math.floor(Date.now() / 1000) - msg.date;
+    var date = msg.date;
+    if (msg.edit_date) {
+        date = msg.edit_date;
+    }
+    var age = Math.floor(Date.now() / 1000) - date;
     if (config.maxMsgAge && age > config.maxMsgAge) {
         logger.warn('skipping ' + age + ' seconds old message! ' +
             'NOTE: change this behaviour with config.maxMsgAge, also check your system clock');
@@ -384,6 +388,10 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
 
     if (msg.text) {
         reconstructMarkdown(msg);
+    }
+
+    if (msg.edit_date && msg.text) {
+        msg.text = '[Edit] ' + msg.text;
     }
 
     if (msg.reply_to_message && msg.text) {

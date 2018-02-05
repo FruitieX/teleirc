@@ -22,6 +22,9 @@ config.relayIRCEvents = ['message', 'notice', 'action', 'topic', 'kick'];
 // Set to 0 to disable showing replies
 config.replySnippetLength = 80;
 
+// Relay edited Telgram messages to  IRC
+config.relayEdited = false;
+
 // enable HTTP server which hosts sent media files, links to files are
 // forwarded to IRC
 config.showMedia = false;
