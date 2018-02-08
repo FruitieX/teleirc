@@ -292,6 +292,11 @@ var reconstructMarkdown = function(msg) {
     });
 };
 
+var isMedia = function(msg) {
+    return Boolean(msg.audio || msg.document || msg.photo || msg.sticker ||
+        msg.video || msg.voice || msg.contact || msg.location);
+};
+
 exports.parseMsg = function(msg, myUser, tg, callback) {
     // TODO: Telegram code should not have to deal with IRC channels at all
 
@@ -330,8 +335,7 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
     }
 
     // skip posts containing media if it's configured off
-    if ((msg.audio || msg.document || msg.photo || msg.sticker || msg.video ||
-                msg.voice || msg.contact || msg.location) && !config.showMedia) {
+    if (isMedia(msg) && !config.showMedia) {
         // except if the media object is an photo and imgur uploading is
         // enabled
         if (!(msg.photo && config.uploadToImgur)) {
@@ -396,26 +400,35 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
 
     if (msg.reply_to_message && msg.text) {
         var replyName;
+        var replyMsg = msg.reply_to_message;
 
         // is the replied to message originating from the bot?
-        if (msg.reply_to_message.from.username == myUser.username) {
-            replyName = exports.getIRCName(msg.reply_to_message, config);
+        if (replyMsg.from.username == myUser.username) {
+            replyName = exports.getIRCName(replyMsg, config);
         } else {
-            replyName = exports.getName(msg.reply_to_message.from, config);
+            replyName = exports.getName(replyMsg.from, config);
         }
 
         // Show snippet of message being replied to
         var snippet = '';
         if (config.replySnippetLength) {
-            if (!msg.reply_to_message.text) {
-                truncatedMessage = '<reply to image>';
-            } else {
+            if (isMedia(replyMsg)) {
+                truncatedMessage = '<reply to media>';
+            } else if (replyMsg.new_chat_participant) {
+                truncatedMessage = exports.getName(replyMsg.new_chat_participant,
+                    config) + ' was added by: ' + exports.getName(msg.from, config);
+            } else if (replyMsg.left_chat_participant) {
+                truncatedMessage = exports.getName(replyMsg.left_chat_participant,
+                    config) + ' was removed by: ' + exports.getName(msg.from, config);
+            } else if (replyMsg.text) {
                 truncatedMessage = msg.reply_to_message.text
                                    .substr(0, config.replySnippetLength)
                                    .trim();
                 if (truncatedMessage.length < msg.reply_to_message.text.length) {
                     truncatedMessage = truncatedMessage + ' …';
                 }
+            } else {
+                truncatedMessage = '<reply to unk>';
             }
             snippet = ' [' + truncatedMessage + ']';
         }
