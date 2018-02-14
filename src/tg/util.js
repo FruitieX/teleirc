@@ -107,7 +107,7 @@ exports.getName = function(user, config) {
 };
 
 exports.getIRCName = function(msg, config) {
-    var ircNickMatchRE = /^<(.*)>/;
+    var ircNickMatchRE = /^<(.*)> (.*)/;
     var results = ircNickMatchRE.exec(msg.text);
     var name;
     if (!results) {
@@ -115,6 +115,7 @@ exports.getIRCName = function(msg, config) {
         name = exports.getName(msg.from || msg.forward_from, config);
     } else {
         name = results[1];
+        msg.text = results[2];
     }
 
     return name;
@@ -421,10 +422,10 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
                 truncatedMessage = exports.getName(replyMsg.left_chat_participant,
                     config) + ' was removed by: ' + exports.getName(msg.from, config);
             } else if (replyMsg.text) {
-                truncatedMessage = msg.reply_to_message.text
+                truncatedMessage = replyMsg.text
                                    .substr(0, config.replySnippetLength)
                                    .trim();
-                if (truncatedMessage.length < msg.reply_to_message.text.length) {
+                if (truncatedMessage.length < replyMsg.text.length) {
                     truncatedMessage = truncatedMessage + ' …';
                 }
             } else {
