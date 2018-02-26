@@ -7,20 +7,6 @@ exports.lookupChannel = function(chanName, channels) {
     })[0];
 };
 
-// generates channel list for ircOptions
-exports.getChannels = function(arr) {
-    var result = [];
-
-    for (var i = 0; i < arr.length; i++) {
-        var chanName = arr[i].chanPwd ?
-                       arr[i].ircChan + ' ' + arr[i].chanPwd :
-                       arr[i].ircChan;
-        result.push(chanName);
-    }
-
-    return result;
-};
-
 exports.parseMsg = function(chanName, text) {
     var channel = exports.lookupChannel(chanName, config.channels);
     if (!channel) {
@@ -54,10 +40,10 @@ exports.parseTopic = function(chanName, topic, user) {
         return;
     }
 
-    // ignore first topic event when joining channel
-    // (doesn't handle rejoins yet)
-    if (!channel.firstTopicRcvd) {
-        channel.firstTopicRcvd = true;
+    // ignore first topic event when joining channel and unchanged topics
+    // (should handle rejoins)
+    if (!channel.previousTopic || channel.previousTopic === topic) {
+        channel.previousTopic = topic;
         return;
     }
 
