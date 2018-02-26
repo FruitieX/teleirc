@@ -1,0 +1,24 @@
+{
+  "rules": {
+    "brace-style": [ 2, "1tbs" ],
+    "no-trailing-spaces": [ 2 ],
+    "semi": [ 2, "always" ],
+    "wrap-iife": 2,
+    "max-len": [
+      2,
+      100
+    ],
+    "linebreak-style": [
+      2,
+      "unix"
+    ],
+    "indent": [
+      2,
+      4,
+      {
+        "SwitchCase": 1
+      }
+    ],
+    "camelcase": 0
+  }
+}

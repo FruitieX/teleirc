@@ -6,12 +6,12 @@
     "teleirc": "bin/teleirc"
   },
   "scripts": {
-    "prestart": "npm install",
     "start": "node bin/teleirc",
+    "genconfig": "node bin/teleirc --genconfig",
     "test": "NODE_ENV=test ./node_modules/mocha/bin/mocha",
     "join-tg": "node src/join-tg.js"
   },
-  "version": "0.4.6",
+  "version": "0.4.7",
   "license": "MIT",
   "repository": [
     {
@@ -24,20 +24,21 @@
   "dependencies": {
     "git-rev-sync": "^1.6.0",
     "imgur": "^0.2.0",
-    "irc": "^0.5.0",
     "irc-colors": "^1.2.1",
+    "irc-framework": "^2.8.1",
     "lodash": "^4.12.0",
+    "mime": "^2.2.0",
     "mkdirp": "^0.5.1",
     "node-static": "^0.7.7",
-    "node-telegram-bot-api": "^0.27.0",
     "os-homedir": "^1.0.1",
     "string.prototype.startswith": "^0.2.0",
+    "tgfancy": "^0.12.0",
     "winston": "^2.2.0",
-    "yargs": "^4.7.0"
+    "yargs": "^10.0.3"
   },
   "devDependencies": {
     "jscs": "^3.0.3",
-    "mocha": "^2.4.5",
+    "mocha": "^4.0.1",
     "mocha-jscs": "^5.0.0",
     "mocha-jshint": "^2.3.1"
   }

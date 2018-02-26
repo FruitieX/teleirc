@@ -56,7 +56,7 @@ exports.parseTopic = function(chanName, topic, user) {
 
     // ignore first topic event when joining channel
     // (doesn't handle rejoins yet)
-    if (!config.sendTopic || !channel.firstTopicRcvd) {
+    if (!channel.firstTopicRcvd) {
         channel.firstTopicRcvd = true;
         return;
     }
@@ -98,4 +98,20 @@ exports.getTopic = function(nodeIrcChannel) {
         text: nodeIrcChannel.topic,
         topicBy: nodeIrcChannel.topicBy
     };
+};
+
+exports.checkIgnore = function(user, text) {
+    if (config.ircIgnoreList) {
+        if (config.ircIgnoreList.indexOf(user) > -1) {
+            return true;
+        }
+    }
+
+    if (config.ircRegexFilters) {
+        return config.ircRegexFilters.reduce(function(acc, regex) {
+            return acc || regex.test(text);
+        }, false);
+    }
+
+    return false;
 };
