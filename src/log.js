@@ -21,7 +21,8 @@ logger.addColors({
 logger.remove(logger.transports.Console);
 logger.add(logger.transports.Console, {
     colorize: true,
-    prettyPrint: true
+    prettyPrint: true,
+    timestamp: function() { return (new Date()).toTimeString().split(' ')[0]; }
 });
 
 module.exports = logger;
