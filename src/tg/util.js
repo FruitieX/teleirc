@@ -12,6 +12,7 @@ var os = require('os');
 var child_process = require('child_process');
 var mime = require('mime');
 var https = require('https');
+var webp = require('webp-converter');
 
 if (config.uploadToImgur) {
     imgur.setClientId(config.imgurClientId);
@@ -216,11 +217,25 @@ exports.uploadToImgur = function(fileId, config, tg, callback) {
     mkdirp(path.join(filesPath, randomString));
     tg.downloadFile(fileId, path.join(filesPath, randomString))
     .then(function(filePath) {
+        
+        /* Imgur doesn't allow webp, so convert them to png. */
+        if (path.extname(filePath) === '.webp') {
+            var convertedFilePath = filePath + '.png';
+            webp.dwebp(filePath, convertedFilePath, '-o', function(status) {
+                if (status.startsWith('100')) { // success
+                    imgur.uploadFile(convertedFilePath)
+                    .then(function(json) {
+                        callback(json.data.link);
+                    });
+                }
+            });
+        } else {
             imgur.uploadFile(filePath)
             .then(function(json) {
                 callback(json.data.link);
             });
-        });
+        }
+    });
 };
 
 exports.initHttpServer = function() {
@@ -337,9 +352,9 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
 
     // skip posts containing media if it's configured off
     if (isMedia(msg) && !config.showMedia) {
-        // except if the media object is an photo and imgur uploading is
+        // except if the media object is a photo or a sticker and imgur uploading is
         // enabled
-        if (!(msg.photo && config.uploadToImgur)) {
+        if (!((msg.photo || msg.sticker) && config.uploadToImgur)) {
             return callback();
         }
     }
@@ -517,13 +532,23 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
             );
         }
     } else if (msg.sticker) {
-        exports.serveFile(msg.sticker.file_id, 'image/webp', config, tg, function(url) {
-            callback({
-                channel: channel,
-                text: prefix + '(Sticker, ' +
-                        msg.sticker.width + 'x' + msg.sticker.height + ') ' + url
+        if (config.uploadToImgur) {
+            exports.uploadToImgur(msg.sticker.file_id, config, tg, function(url) {
+                callback({
+                    channel: channel,
+                    text: prefix + '(Sticker, ' +
+                            msg.sticker.width + 'x' + msg.sticker.height + ') ' + url
+                });
             });
-        });
+        } else {
+            exports.serveFile(msg.sticker.file_id, 'image/webp', config, tg, function(url) {
+                callback({
+                    channel: channel,
+                    text: prefix + '(Sticker, ' +
+                            msg.sticker.width + 'x' + msg.sticker.height + ') ' + url
+                });
+            });
+        }
     } else if (msg.video) {
         exports.serveFile(msg.video.file_id, msg.video.mime_type, config, tg, function(url) {
             callback({

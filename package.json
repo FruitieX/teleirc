@@ -33,6 +33,7 @@
     "os-homedir": "^1.0.1",
     "string.prototype.startswith": "^0.2.0",
     "tgfancy": "^0.12.0",
+    "webp-converter": "2.1.6",
     "winston": "^2.2.0",
     "yargs": "^10.0.3"
   },
