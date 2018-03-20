@@ -1,5 +1,6 @@
 var config = require('../config');
 var nickcolor = require('./nickcolor');
+var imgurUtils = require('./imgur-utils');
 var nodeStatic = require('node-static');
 var fs = require('fs');
 var path = require('path');
@@ -7,16 +8,10 @@ var osHomedir = require('os-homedir');
 var mkdirp = require('mkdirp');
 var crypto = require('crypto');
 var logger = require('winston');
-var imgur = require('imgur');
 var os = require('os');
 var child_process = require('child_process');
 var mime = require('mime');
 var https = require('https');
-var webp = require('webp-converter');
-
-if (config.uploadToImgur) {
-    imgur.setClientId(config.imgurClientId);
-}
 
 var argv = require('../arguments').argv;
 var chatIdsPath = path.dirname(argv.c || path.join(osHomedir(), '.teleirc', 'config.js'));
@@ -208,44 +203,6 @@ exports.serveFile = function(fileId, mimetype, config, tg, callback) {
             );
             return callback('Could not save file.');
         });
-    });
-};
-
-exports.uploadToImgur = function(fileId, config, tg, callback) {
-    var filesPath = os.tmpdir();
-    var randomString = exports.randomValueBase64(config.mediaRandomLength);
-    mkdirp(path.join(filesPath, randomString));
-    tg.downloadFile(fileId, path.join(filesPath, randomString))
-    .then(function(filePath) {
-        
-        /* Imgur doesn't allow webp, so convert them to png. */
-        if (path.extname(filePath) === '.webp') {
-            var convertedFilePath = filePath + '.png';
-            webp.dwebp(filePath, convertedFilePath, '-o', function(status) {
-                if (status.startsWith('100')) { // success
-                    imgur.uploadFile(convertedFilePath)
-                    .then(function(json) {
-                        callback(json.data.link);
-                    })
-                    .catch(function(error) {
-                        logger.error(error.message)
-                    });
-                } else { // error
-                    logger.error('webp to png conversion failed');
-                }
-            });
-        } else {
-            imgur.uploadFile(filePath)
-            .then(function(json) {
-                callback(json.data.link);
-            })
-            .catch(function(error) {
-                logger.error(error.message)
-            });
-        }
-    })
-    .catch(function(error) {
-        logger.error(error.message)
     });
 };
 
@@ -497,7 +454,7 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
         // pick the highest quality photo
         var photo = msg.photo[msg.photo.length - 1];
         if (config.uploadToImgur) {
-            exports.uploadToImgur(photo.file_id, config, tg, function(url) {
+            imgurUtils.uploadToImgur(photo.file_id, config, tg, function(url) {
                 callback({
                     channel: channel,
                     text: prefix + '(Photo, ' + photo.width + 'x' + photo.height + ') ' +
@@ -522,7 +479,7 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
         // pick the highest quality photo
         var chatPhoto = msg.new_chat_photo[msg.new_chat_photo.length - 1];
         if (config.uploadToImgur) {
-            exports.uploadToImgur(chatPhoto.file_id, config, tg, function(url) {
+            imgurUtils.uploadToImgur(chatPhoto.file_id, config, tg, function(url) {
                 callback({
                     channel: channel,
                     text: prefix + '(New chat photo, ' +
@@ -544,7 +501,7 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
         }
     } else if (msg.sticker) {
         if (config.uploadToImgur) {
-            exports.uploadToImgur(msg.sticker.file_id, config, tg, function(url) {
+            imgurUtils.uploadToImgur(msg.sticker.file_id, config, tg, function(url) {
                 callback({
                     channel: channel,
                     text: prefix + '(Sticker, ' +
