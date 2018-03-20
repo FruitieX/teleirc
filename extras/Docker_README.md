@@ -7,7 +7,7 @@ In the following commands you will need to replace some values:
 - for `<ABSOLUTE_PATH_ON_THE_HOST>` choose a path to a folder on the host where
   the config files of teleirc will be accessible (for example I use
   `/data/teleirc`). _Make sure the folder exists beforehand!_ This folder will
-  be mapped to `/home/teleirc/.teleirc` in the container.
+  be mapped to `/home/node/.teleirc` in the container.
 
 **Step 1: Build the docker image**
 
@@ -25,7 +25,7 @@ Moreover we link the volume inside the container to a local path on the host to
 be able to manage the config file of teleirc directly from the host.
 
     sudo docker run --name=teleirc-data -v
-    <ABSOLUTE_PATH_ON_THE_HOST>:/home/teleirc/.teleirc
+    <ABSOLUTE_PATH_ON_THE_HOST>:/home/node/.teleirc
     <YOUR_DOCKER_USERNAME>/teleirc echo 'data teleirc'
 
 **Step 3: Initialize the sample config file**
@@ -34,7 +34,7 @@ be able to manage the config file of teleirc directly from the host.
     <YOUR_DOCKER_USERNAME>/teleirc teleirc --genconfig
 
 This only calls the command `teleirc --genconfig` which creates the file
-`/home/teleirc/.teleirc/config.js` inside the container. This file is
+`/home/node/.teleirc/config.js` inside the container. This file is
 accessible from the host at  `<ABSOLUTE_PATH_ON_THE_HOST>/config.js`.
 
 **Step 4: Create your bot on Telegram**
