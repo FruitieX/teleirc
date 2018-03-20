@@ -30,7 +30,7 @@ sudo apt-get install libicu-dev
 Quick start
 -----------
 
-Make sure you've installed Node.js.
+Make sure you've installed the [latest LTS version of Node.js](https://nodejs.org/en/).
 
 1. Install the teleirc npm module with `npm install -g teleirc` (might need
    sudo)
