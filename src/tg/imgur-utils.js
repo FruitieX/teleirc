@@ -1,50 +1,68 @@
-var config = require('../config');
-var util = require('./util');
-var imgur = require('imgur');
-var webp = require('webp-converter');
-var logger = require('winston');
-var path = require('path');
-var os = require('os');
-var mkdirp = require('mkdirp');
+const config = require('../config');
+const util = require('./util');
+
+const path = require('path');
+const os = require('os');
+
+const imgur = require('imgur');
+const webp = require('webp-converter');
+const logger = require('winston');
+const mkdirp = require('mkdirp');
 
 if (config.uploadToImgur) {
     imgur.setClientId(config.imgurClientId);
 }
 
 exports.uploadToImgur = function(fileId, config, tg, callback) {
-    var filesPath = os.tmpdir();
-    var randomString = util.randomValueBase64(config.mediaRandomLength);
-    mkdirp(path.join(filesPath, randomString));
-    tg.downloadFile(fileId, path.join(filesPath, randomString))
+    let filesPath = os.tmpdir();
+    let randomString = util.randomValueBase64(config.mediaRandomLength);
+    let downloadDir = path.join(filesPath, randomString);
+    
+    createDir(downloadDir)
+    .then(function() {
+        return tg.downloadFile(fileId, downloadDir);
+    })
     .then(function(filePath) {
         
         /* Imgur doesn't allow webp, so convert them to png. */
         if (path.extname(filePath) === '.webp') {
-            var convertedFilePath = filePath + '.png';
-            webp.dwebp(filePath, convertedFilePath, '-o', function(status) {
-                if (status.startsWith('100')) { // success
-                    imgur.uploadFile(convertedFilePath)
-                    .then(function(json) {
-                        callback(json.data.link);
-                    })
-                    .catch(function(error) {
-                        logger.error(error.message)
-                    });
-                } else { // error
-                    logger.error('webp to png conversion failed');
-                }
-            });
+            let convertedFilePath = filePath + '.png';
+            return convertWebpToPng(filePath, convertedFilePath);
         } else {
-            imgur.uploadFile(filePath)
-            .then(function(json) {
-                callback(json.data.link);
-            })
-            .catch(function(error) {
-                logger.error(error.message)
-            });
+            return Promise.resolve(filePath);
         }
     })
+    .then(function(filePath) {
+        return imgur.uploadFile(filePath)
+    })
+    .then(function(json) {
+        callback(json.data.link);
+    })
     .catch(function(error) {
-        logger.error(error.message)
+        logger.error(error);
     });
 };
+
+function createDir(dir) {
+    return new Promise(function(resolve, reject) {
+        mkdirp(dir, function(err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve();
+            }
+        });
+    });
+}
+
+function convertWebpToPng(sourceFile, targetFile) {
+    return new Promise(function(resolve, reject) {
+        webp.dwebp(sourceFile, targetFile, '-o', function(status) {
+            if (status.startsWith('100')) {
+                resolve(targetFile);
+            } else {
+                reject(new Error('webp to png conversion failed'));
+            }
+        });
+    });
+}
