@@ -22,6 +22,7 @@
   "bugs": "https://github.com/FruitieX/teleirc/issues",
   "homepage": "https://github.com/FruitieX/teleirc",
   "dependencies": {
+    "fs-extra": "5.0.0",
     "git-rev-sync": "^1.6.0",
     "imgur": "^0.2.0",
     "irc-colors": "^1.2.1",

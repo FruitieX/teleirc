@@ -4,56 +4,52 @@ const util = require('./util');
 const path = require('path');
 const os = require('os');
 
+const fs = require('fs-extra');
 const imgur = require('imgur');
 const webp = require('webp-converter');
 const logger = require('winston');
-const mkdirp = require('mkdirp');
 
 if (config.uploadToImgur) {
     imgur.setClientId(config.imgurClientId);
 }
 
 exports.uploadToImgur = function(fileId, config, tg, callback) {
-    let filesPath = os.tmpdir();
-    let randomString = util.randomValueBase64(config.mediaRandomLength);
-    let downloadDir = path.join(filesPath, randomString);
     
-    createDir(downloadDir)
-    .then(function() {
-        return tg.downloadFile(fileId, downloadDir);
-    })
-    .then(function(filePath) {
+    fs.mkdtemp(path.join(os.tmpdir(), 'teleirc-'))
+    .then(function(downloadDirPath) {
         
-        /* Imgur doesn't allow webp, so convert them to png. */
-        if (path.extname(filePath) === '.webp') {
-            let convertedFilePath = filePath + '.png';
-            return convertWebpToPng(filePath, convertedFilePath);
-        } else {
-            return Promise.resolve(filePath);
-        }
-    })
-    .then(function(filePath) {
-        return imgur.uploadFile(filePath)
-    })
-    .then(function(json) {
-        callback(json.data.link);
+        tg.downloadFile(fileId, downloadDirPath)
+        .then(function(filePath) {
+            
+            /* Imgur doesn't allow webp, so convert them to png. */
+            if (path.extname(filePath) === '.webp') {
+                let convertedFilePath = filePath + '.png';
+                return convertWebpToPng(filePath, convertedFilePath);
+            } else {
+                return Promise.resolve(filePath);
+            }
+        })
+        .then(function(filePath) {
+            return imgur.uploadFile(filePath);
+        })
+        .then(function(json) {
+
+            fs.remove(downloadDirPath)
+            .then(function() {
+                callback(json.data.link);
+            })
+            .catch(function(error) {
+                logger.error(error);
+            });
+        })
+        .catch(function(error) {
+            logger.error(error);
+        });
     })
     .catch(function(error) {
         logger.error(error);
     });
 };
-
-function createDir(dir) {
-    return new Promise(function(resolve, reject) {
-        mkdirp(dir, function(err) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve();
-            }
-        });
-    });
-}
 
 function convertWebpToPng(sourceFile, targetFile) {
     return new Promise(function(resolve, reject) {
