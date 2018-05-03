@@ -8,6 +8,10 @@ const fs = require('fs-extra');
 const imgur = require('imgur');
 const webp = require('webp-converter');
 const logger = require('winston');
+const LRU = require('modern-lru');
+const md5 = require('md5');
+
+const linkCache = new LRU(1000);
 
 if (config.uploadToImgur) {
     imgur.setClientId(config.imgurClientId);
@@ -21,22 +25,40 @@ exports.uploadToImgur = function(fileId, config, tg, callback) {
         tg.downloadFile(fileId, downloadDirPath)
         .then(function(filePath) {
             
-            /* Imgur doesn't allow webp, so convert them to png. */
-            if (path.extname(filePath) === '.webp') {
-                let convertedFilePath = filePath + '.png';
-                return convertWebpToPng(filePath, convertedFilePath);
-            } else {
-                return Promise.resolve(filePath);
-            }
+            return fs.readFile(filePath)
+            .then(function(fileContentBuffer) {
+                const md5Hash = md5(fileContentBuffer);
+                const imgurLink = linkCache.get(md5Hash);
+                if (imgurLink === undefined) {
+                
+                    /* Imgur doesn't allow webp, so convert them to png. */
+                    let conversionPromise;
+                    if (path.extname(filePath) === '.webp') {
+                        const convertedFilePath = filePath + '.png';
+                        conversionPromise = convertWebpToPng(filePath, convertedFilePath);
+                    } else {
+                        conversionPromise = Promise.resolve(filePath);
+                    }
+
+                    return conversionPromise
+                    .then(function(newFilePath) {
+                        return imgur.uploadFile(newFilePath);
+                    })
+                    .then(function(json) {
+                        const link = json.data.link;
+                        linkCache.set(md5Hash, link);
+                        return link;
+                    });
+                } else {
+                    return Promise.resolve(imgurLink);
+                }
+            });
         })
-        .then(function(filePath) {
-            return imgur.uploadFile(filePath);
-        })
-        .then(function(json) {
+        .then(function(link) {
 
             fs.remove(downloadDirPath)
             .then(function() {
-                callback(json.data.link);
+                callback(link);
             })
             .catch(function(error) {
                 logger.error(error);
