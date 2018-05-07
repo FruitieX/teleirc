@@ -1,5 +1,6 @@
 const config = require('../config');
 const util = require('./util');
+const argv = require('../arguments').argv;
 
 const path = require('path');
 const os = require('os');
@@ -11,7 +12,18 @@ const logger = require('winston');
 const LRU = require('modern-lru');
 const md5 = require('md5');
 
-const linkCache = new LRU(1000);
+const configDir = path.dirname(argv.c || path.join(os.homedir(), '.teleirc', 'config.js'));
+const linkCacheFilePath = path.join(configDir, 'imgurLinkCache.json');
+
+let linkCacheData = [];
+try {
+    if (fs.pathExistsSync(linkCacheFilePath)) {
+        linkCacheData = fs.readJsonSync(linkCacheFilePath);
+    }
+} catch (error) {
+    logger.error(error);
+}
+const linkCache = new LRU(1000, linkCacheData);
 
 if (config.uploadToImgur) {
     imgur.setClientId(config.imgurClientId);
@@ -47,6 +59,10 @@ exports.uploadToImgur = function(fileId, config, tg, callback) {
                     .then(function(json) {
                         const link = json.data.link;
                         linkCache.set(md5Hash, link);
+                        fs.writeJson(linkCacheFilePath, [...linkCache])
+                        .catch(function(error) {
+                            logger.error(error);
+                        });
                         return link;
                     });
                 } else {
