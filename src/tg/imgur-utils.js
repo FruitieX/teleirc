@@ -23,7 +23,7 @@ try {
 } catch (error) {
     logger.error(error);
 }
-const linkCache = new LRU(1000, linkCacheData);
+const linkCache = new LRU(config.imgurLinkCacheSize, linkCacheData);
 
 if (config.uploadToImgur) {
     imgur.setClientId(config.imgurClientId);

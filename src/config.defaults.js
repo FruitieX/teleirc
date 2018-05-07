@@ -60,6 +60,10 @@ config.uploadToImgur = false;
 // Imgur client id required for uploading photos to Imgur
 config.imgurClientId = 'YOUR-CLIENT-ID';
 
+// How many Imgur links are stored in an LRU (least recently used) cache for
+// reuse if the same image/sticker is sent again.
+config.imgurLinkCacheSize = 1000;
+
 // Whether to allow sending messages to IRC without nick prefix
 config.allowCommands = false;
 
