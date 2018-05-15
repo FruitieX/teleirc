@@ -30,63 +30,48 @@ if (config.uploadToImgur) {
 }
 
 exports.uploadToImgur = function(fileId, config, tg, callback) {
-    
-    fs.mkdtemp(path.join(os.tmpdir(), 'teleirc-'))
-    .then(function(downloadDirPath) {
+
+    /* Kind of a hack to get an async function to complete with a callback. */
+    async function impl() {
         
-        tg.downloadFile(fileId, downloadDirPath)
-        .then(function(filePath) {
-            
-            return fs.readFile(filePath)
-            .then(function(fileContentBuffer) {
-                const md5Hash = md5(fileContentBuffer);
-                const imgurLink = linkCache.get(md5Hash);
-                if (imgurLink === undefined) {
+        try {
+            const downloadDirPath = await fs.mkdtemp(path.join(os.tmpdir(), 'teleirc-'));
                 
-                    /* Imgur doesn't allow webp, so convert them to png. */
-                    let conversionPromise;
-                    if (path.extname(filePath) === '.webp') {
-                        const convertedFilePath = filePath + '.png';
-                        conversionPromise = convertWebpToPng(filePath, convertedFilePath);
-                    } else {
-                        conversionPromise = Promise.resolve(filePath);
-                    }
+            const filePath = await tg.downloadFile(fileId, downloadDirPath);
+                
+            const fileContentBuffer = await fs.readFile(filePath)
+            const md5Hash = md5(fileContentBuffer);
 
-                    return conversionPromise
-                    .then(function(newFilePath) {
-                        return imgur.uploadFile(newFilePath);
-                    })
-                    .then(function(json) {
-                        const link = json.data.link;
-                        linkCache.set(md5Hash, link);
-                        fs.writeJson(linkCacheFilePath, [...linkCache])
-                        .catch(function(error) {
-                            logger.error(error);
-                        });
-                        return link;
-                    });
-                } else {
-                    return Promise.resolve(imgurLink);
+            if (!linkCache.has(md5Hash)) {
+            
+                /* Imgur doesn't allow webp, so convert them to png. */
+                let uploadableFilePath = filePath;
+                if (path.extname(filePath) === '.webp') {
+                    const convertedFilePath = filePath + '.png';
+                    uploadableFilePath = await convertWebpToPng(filePath, convertedFilePath);
                 }
-            });
-        })
-        .then(function(link) {
 
-            fs.remove(downloadDirPath)
-            .then(function() {
-                callback(link);
-            })
-            .catch(function(error) {
-                logger.error(error);
-            });
-        })
-        .catch(function(error) {
+                const imgurData = await imgur.uploadFile(uploadableFilePath);
+                
+                linkCache.set(md5Hash, imgurData.data.link);
+
+                /* Not waiting for this write, because it doesn't matter when it
+                * finishes. */
+                fs.writeJson(linkCacheFilePath, [...linkCache]);
+            }
+            const imgurLink = linkCache.get(md5Hash);
+
+            /* Cleanup. Not waiting for this. */
+            fs.remove(downloadDirPath);
+
+            return imgurLink;
+
+        } catch (error) {
             logger.error(error);
-        });
-    })
-    .catch(function(error) {
-        logger.error(error);
-    });
+        }
+
+    }
+    impl().then((imgurLink) => callback(imgurLink));
 };
 
 function convertWebpToPng(sourceFile, targetFile) {
