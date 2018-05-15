@@ -33,17 +33,17 @@ exports.uploadToImgur = function(fileId, config, tg, callback) {
 
     /* Kind of a hack to get an async function to complete with a callback. */
     async function impl() {
-        
+
         try {
             const downloadDirPath = await fs.mkdtemp(path.join(os.tmpdir(), 'teleirc-'));
-                
+
             const filePath = await tg.downloadFile(fileId, downloadDirPath);
-                
-            const fileContentBuffer = await fs.readFile(filePath)
+
+            const fileContentBuffer = await fs.readFile(filePath);
             const md5Hash = md5(fileContentBuffer);
 
             if (!linkCache.has(md5Hash)) {
-            
+
                 /* Imgur doesn't allow webp, so convert them to png. */
                 let uploadableFilePath = filePath;
                 if (path.extname(filePath) === '.webp') {
@@ -52,7 +52,7 @@ exports.uploadToImgur = function(fileId, config, tg, callback) {
                 }
 
                 const imgurData = await imgur.uploadFile(uploadableFilePath);
-                
+
                 linkCache.set(md5Hash, imgurData.data.link);
 
                 /* Not waiting for this write, because it doesn't matter when it
