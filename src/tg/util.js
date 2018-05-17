@@ -1,5 +1,6 @@
 var config = require('../config');
 var nickcolor = require('./nickcolor');
+var imgurUtils = require('./imgur-utils');
 var nodeStatic = require('node-static');
 var fs = require('fs');
 var path = require('path');
@@ -7,15 +8,10 @@ var osHomedir = require('os-homedir');
 var mkdirp = require('mkdirp');
 var crypto = require('crypto');
 var logger = require('winston');
-var imgur = require('imgur');
 var os = require('os');
 var child_process = require('child_process');
 var mime = require('mime');
 var https = require('https');
-
-if (config.uploadToImgur) {
-    imgur.setClientId(config.imgurClientId);
-}
 
 var argv = require('../arguments').argv;
 var chatIdsPath = path.dirname(argv.c || path.join(osHomedir(), '.teleirc', 'config.js'));
@@ -210,19 +206,6 @@ exports.serveFile = function(fileId, mimetype, config, tg, callback) {
     });
 };
 
-exports.uploadToImgur = function(fileId, config, tg, callback) {
-    var filesPath = os.tmpdir();
-    var randomString = exports.randomValueBase64(config.mediaRandomLength);
-    mkdirp(path.join(filesPath, randomString));
-    tg.downloadFile(fileId, path.join(filesPath, randomString))
-    .then(function(filePath) {
-            imgur.uploadFile(filePath)
-            .then(function(json) {
-                callback(json.data.link);
-            });
-        });
-};
-
 exports.initHttpServer = function() {
     var filesPath = path.join(chatIdsPath, 'files');
     mkdirp(filesPath);
@@ -337,9 +320,9 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
 
     // skip posts containing media if it's configured off
     if (isMedia(msg) && !config.showMedia) {
-        // except if the media object is an photo and imgur uploading is
+        // except if the media object is a photo or a sticker and imgur uploading is
         // enabled
-        if (!(msg.photo && config.uploadToImgur)) {
+        if (!((msg.photo || msg.sticker) && config.uploadToImgur)) {
             return callback();
         }
     }
@@ -471,7 +454,7 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
         // pick the highest quality photo
         var photo = msg.photo[msg.photo.length - 1];
         if (config.uploadToImgur) {
-            exports.uploadToImgur(photo.file_id, config, tg, function(url) {
+            imgurUtils.uploadToImgur(photo.file_id, config, tg, function(url) {
                 callback({
                     channel: channel,
                     text: prefix + '(Photo, ' + photo.width + 'x' + photo.height + ') ' +
@@ -496,7 +479,7 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
         // pick the highest quality photo
         var chatPhoto = msg.new_chat_photo[msg.new_chat_photo.length - 1];
         if (config.uploadToImgur) {
-            exports.uploadToImgur(chatPhoto.file_id, config, tg, function(url) {
+            imgurUtils.uploadToImgur(chatPhoto.file_id, config, tg, function(url) {
                 callback({
                     channel: channel,
                     text: prefix + '(New chat photo, ' +
@@ -517,13 +500,23 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
             );
         }
     } else if (msg.sticker) {
-        exports.serveFile(msg.sticker.file_id, 'image/webp', config, tg, function(url) {
-            callback({
-                channel: channel,
-                text: prefix + '(Sticker, ' +
-                        msg.sticker.width + 'x' + msg.sticker.height + ') ' + url
+        if (config.uploadToImgur) {
+            imgurUtils.uploadToImgur(msg.sticker.file_id, config, tg, function(url) {
+                callback({
+                    channel: channel,
+                    text: prefix + '(Sticker, ' +
+                            msg.sticker.width + 'x' + msg.sticker.height + ') ' + url
+                });
             });
-        });
+        } else {
+            exports.serveFile(msg.sticker.file_id, 'image/webp', config, tg, function(url) {
+                callback({
+                    channel: channel,
+                    text: prefix + '(Sticker, ' +
+                            msg.sticker.width + 'x' + msg.sticker.height + ') ' + url
+                });
+            });
+        }
     } else if (msg.video) {
         exports.serveFile(msg.video.file_id, msg.video.mime_type, config, tg, function(url) {
             callback({
