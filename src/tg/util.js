@@ -102,6 +102,19 @@ exports.getName = function(user, config) {
     return name;
 };
 
+exports.getIRCNameOnly = function(msg, config) {
+    var ircNickMatchRE = /^<(.*)>/;
+    var results = ircNickMatchRE.exec(msg.text);
+    var name;
+    if (!results) {
+        name = '';
+    } else {
+        name = results[1];
+    }
+
+    return name;
+};
+
 exports.getIRCName = function(msg, config) {
     var ircNickMatchRE = /^<(.*)> (.*)/;
     var results = ircNickMatchRE.exec(msg.text);
@@ -289,6 +302,12 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
     })[0];
 
     if (!channel) {
+        channel = config.channels.filter(function(channel) {
+            return msg.chat.type === 'private' && channel.tgGroup === msg.chat.username;
+        })[0];
+    }
+
+    if (!channel) {
         logger.verbose('Telegram group not found in config: "' +
                     msg.chat.title + '", dropping message...');
         return callback();
@@ -305,6 +324,18 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
         logger.info('storing chat ID: ' + msg.chat.id);
         channel.tgChatId = msg.chat.id;
         exports.writeChatId(channel);
+    }
+
+    var userName = '';
+    if (channel && msg.chat.type === 'private') {
+        if (msg.reply_to_message && msg.reply_to_message.from.username === myUser.username)
+            userName = exports.getIRCNameOnly(msg.reply_to_message, config);
+        if (userName)
+            channel = { ircChan : userName };
+        else {
+            logger.verbose('Replied nickname not found, dropping message...');
+            return callback();
+        }
     }
 
     var date = msg.date;
@@ -382,7 +413,7 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
         msg.text = '[Edit] ' + msg.text;
     }
 
-    if (msg.reply_to_message && msg.text) {
+    if (msg.reply_to_message && msg.text && !userName) {
         var replyName;
         var replyMsg = msg.reply_to_message;
 

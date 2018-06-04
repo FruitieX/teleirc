@@ -65,10 +65,16 @@ var init = function(msgCallback) {
             return;
         }
 
-        var message = ircUtil.parseMsg(chanName, text);
+        var userName = '';
+        if (chanName.toLowerCase() === nodeIrc.user.nick.toLowerCase()) {
+            chanName = config.ircNick;
+            userName = user;
+        }
+
+        var message = ircUtil.parseMsg2(chanName, userName, text);
 
         if (message) {
-            var channel = ircUtil.lookupChannel(chanName, config.channels);
+            var channel = ircUtil.lookupChannel2(chanName, userName, config.channels);
             var ircChanReadOnly = channel.ircChanReadOnly;
             var isOverrideReadOnly = channel.ircChanOverrideReadOnly;
             var isBotHighlighted = config.hlRegexp.exec(message.text);
@@ -106,10 +112,16 @@ var init = function(msgCallback) {
             return;
         }
 
-        var notice = ircUtil.parseMsg(chanName, text);
+        var userName = '';
+        if (chanName.toLowerCase() === nodeIrc.user.nick.toLowerCase()) {
+            chanName = config.ircNick;
+            userName = user;
+        }
+
+        var notice = ircUtil.parseMsg2(chanName, userName, text);
 
         if (notice) {
-            var channel = ircUtil.lookupChannel(chanName, config.channels);
+            var channel = ircUtil.lookupChannel2(chanName, userName, config.channels);
             var ircChanReadOnly = channel.ircChanReadOnly;
             var isOverrideReadOnly = channel.ircChanOverrideReadOnly;
             var isBotHighlighted = config.hlRegexp.exec(notice.text);
@@ -144,7 +156,13 @@ var init = function(msgCallback) {
         var chanName = event.target;
         var text = event.message;
 
-        var message = ircUtil.parseMsg(chanName, text);
+        var userName = '';
+        if (chanName.toLowerCase() === nodeIrc.user.nick.toLowerCase()) {
+            chanName = config.ircNick;
+            userName = user;
+        }
+
+        var message = ircUtil.parseMsg2(chanName, userName, text);
 
         if (message) {
             var messageText = user + ': ' + message.text;
@@ -245,6 +263,13 @@ var init = function(msgCallback) {
     // new framework doesn't provide the channels....
     nodeIrc.on('quit', function(user, text, channels, message) {
         return;
+    });
+
+    nodeIrc.on('nick', function(event) {
+        if (nodeIrc.user.nick === event.nick) {
+            logger.debug('new nick:', event.new_nick);
+            nodeIrc.user.nick = event.new_nick;
+        }
     });
 
     // added since framework does not have async
