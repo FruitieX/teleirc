@@ -12,8 +12,9 @@ exports.lookupChannel2 = function(chanName, user, channels) {
         var channel = channels.filter(function(channel) {
             return channel.ircChan.toLowerCase() === user.toLowerCase();
         })[0];
-        if (channel)
+        if (channel) {
             return channel;
+        }
     }
     return channels.filter(function(channel) {
         return channel.ircChan.toLowerCase() === chanName.toLowerCase();
