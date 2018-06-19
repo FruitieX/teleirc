@@ -102,16 +102,18 @@ exports.getName = function(user, config) {
     return name;
 };
 
-exports.getIRCName = function(msg, config) {
+exports.getIRCName = function(msg, config, fallback) {
     var ircNickMatchRE = /^<(.*)> (.*)/;
     var results = ircNickMatchRE.exec(msg.text);
     var name;
-    if (!results) {
+    if (results) {
+        name = results[1];
+        msg.text = results[2];
+    } else if (fallback) {
         // Fall back to telegram name (i.e. for the topic change message)
         name = exports.getName(msg.from || msg.forward_from, config);
     } else {
-        name = results[1];
-        msg.text = results[2];
+        name = '';
     }
 
     return name;
@@ -289,6 +291,12 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
     })[0];
 
     if (!channel) {
+        channel = config.channels.filter(function(channel) {
+            return msg.chat.type === 'private' && channel.tgGroup === msg.chat.username;
+        })[0];
+    }
+
+    if (!channel) {
         logger.verbose('Telegram group not found in config: "' +
                     msg.chat.title + '", dropping message...');
         return callback();
@@ -305,6 +313,23 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
         logger.info('storing chat ID: ' + msg.chat.id);
         channel.tgChatId = msg.chat.id;
         exports.writeChatId(channel);
+    }
+
+    var userName = '';
+    if (channel && msg.chat.type === 'private') {
+        if (msg.reply_to_message && msg.reply_to_message.from.username === myUser.username) {
+            userName = exports.getIRCName(msg.reply_to_message, config, false);
+        } else if (!(msg.forward_from || msg.forward_from_chat)) {
+            userName = exports.getIRCName(msg, config, false);
+        }
+        if (userName) {
+            channel = {
+                ircChan: userName
+            };
+        } else {
+            logger.verbose('Replied nickname not found, dropping message...');
+            return callback();
+        }
     }
 
     var date = msg.date;
@@ -382,13 +407,13 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
         msg.text = '[Edit] ' + msg.text;
     }
 
-    if (msg.reply_to_message && msg.text) {
+    if (msg.reply_to_message && msg.text && !userName) {
         var replyName;
         var replyMsg = msg.reply_to_message;
 
         // is the replied to message originating from the bot?
         if (replyMsg.from.username == myUser.username) {
-            replyName = exports.getIRCName(replyMsg, config);
+            replyName = exports.getIRCName(replyMsg, config, true);
         } else {
             replyName = exports.getName(replyMsg.from, config);
         }
@@ -427,7 +452,7 @@ exports.parseMsg = function(msg, myUser, tg, callback) {
 
         // is the forwarded message originating from the bot?
         if (from.username == myUser.username) {
-            fwdName = exports.getIRCName(msg, config);
+            fwdName = exports.getIRCName(msg, config, true);
         } else {
             fwdName = exports.getName(from, config);
         }

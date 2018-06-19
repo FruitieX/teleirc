@@ -7,8 +7,37 @@ exports.lookupChannel = function(chanName, channels) {
     })[0];
 };
 
+exports.lookupChannel2 = function(chanName, user, channels) {
+    if (user) {
+        var channel = channels.filter(function(channel) {
+            return channel.ircChan.toLowerCase() === user.toLowerCase();
+        })[0];
+        if (channel) {
+            return channel;
+        }
+    }
+    return channels.filter(function(channel) {
+        return channel.ircChan.toLowerCase() === chanName.toLowerCase();
+    })[0];
+};
+
 exports.parseMsg = function(chanName, text) {
     var channel = exports.lookupChannel(chanName, config.channels);
+    if (!channel) {
+        logger.error('channel ' + chanName + ' not found in config!');
+        return;
+    }
+
+    text = text.trim();
+
+    return {
+        channel: channel,
+        text: text
+    };
+};
+
+exports.parseMsg2 = function(chanName, user, text) {
+    var channel = exports.lookupChannel2(chanName, user, config.channels);
     if (!channel) {
         logger.error('channel ' + chanName + ' not found in config!');
         return;
