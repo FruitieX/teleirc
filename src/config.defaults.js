@@ -144,7 +144,14 @@ config.channels = [
         ircChan: '!XXXXXchannel3',
         chanAlias: '!channel3',
         tgGroup: 'Tg_Group_3'
-    }
+    },
+
+    // example of multiserver
+    {
+        ircChan: '#channel4',
+        tgGroup: 'Tg_Group_4',
+        ircServer: "irc.oftc.net"
+    },
 ];
 
 // see https://node-irc.readthedocs.org/en/latest/API.html#client for
