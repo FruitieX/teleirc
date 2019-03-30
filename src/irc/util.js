@@ -21,8 +21,8 @@ exports.lookupChannel2 = function(chanName, user, channels) {
     })[0];
 };
 
-exports.parseMsg = function(chanName, text) {
-    var channel = exports.lookupChannel(chanName, config.channels);
+exports.parseMsg = function(chanName, text, channels) {
+    var channel = exports.lookupChannel(chanName, channels);
     if (!channel) {
         logger.error('channel ' + chanName + ' not found in config!');
         return;
@@ -36,8 +36,8 @@ exports.parseMsg = function(chanName, text) {
     };
 };
 
-exports.parseMsg2 = function(chanName, user, text) {
-    var channel = exports.lookupChannel2(chanName, user, config.channels);
+exports.parseMsg2 = function(chanName, user, text, channels) {
+    var channel = exports.lookupChannel2(chanName, user, channels);
     if (!channel) {
         logger.error('channel ' + chanName + ' not found in config!');
         return;
@@ -63,8 +63,8 @@ exports.topicFormat = function(channel, topic, user) {
 
 };
 
-exports.parseTopic = function(chanName, topic, user) {
-    var channel = exports.lookupChannel(chanName, config.channels);
+exports.parseTopic = function(chanName, topic, user, channels) {
+    var channel = exports.lookupChannel(chanName, channels);
     if (!channel) {
         return;
     }

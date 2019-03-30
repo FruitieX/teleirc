@@ -28,9 +28,44 @@ var shouldRelayEvent = function(event) {
 };
 
 var init = function(msgCallback) {
+    var servers = {};
+    var channelLookup = {};
+    var ircClients = {};
+
+    config.channels.forEach((channel) => {
+      var server = config.ircServer;
+      if (channel.hasOwnProperty("ircServer"))
+        server = channel.ircServer;
+
+      if (!servers.hasOwnProperty(server))
+        servers[server] = [];
+      servers[server].push(channel);
+      channelLookup[channel.ircChan] = server;
+    });
+
+    for (var server in servers) {
+      ircClients[server] = newClient(msgCallback, servers[server], {
+        ircServer: server
+      });
+    };
+
+    return {
+        send: function(message, multi) {
+          ircClients[channelLookup[message.channel.ircChan]].send(message, multi);
+        },
+        getNames: function(channel) {
+          ircClients[channelLookup[channel.ircChan]].getNames(channel);
+        },
+        getTopic: function(channel) {
+          ircClients[channelLookup[channel.ircChan]].getTopic(channel);
+        }
+    };
+}
+
+var newClient = function(msgCallback, channels, conf) {
     var nodeIrc = new NodeIrc.Client();
     nodeIrc.connect({
-        host: config.ircServer,
+        host: conf.ircServer,
         nick: config.ircNick,
         port: config.ircOptions.port,
         tls: config.ircOptions.secure,
@@ -48,7 +83,7 @@ var init = function(msgCallback) {
         config.ircPerformCmds.forEach(function(cmd) {
             nodeIrc.raw.apply(nodeIrc, cmd.split(' '));
         });
-        config.channels.forEach(function(channel) {
+        channels.forEach(function(channel) {
             nodeIrc.join(channel.ircChan, channel.chanPwd);
         });
     });
@@ -71,10 +106,10 @@ var init = function(msgCallback) {
             userName = user;
         }
 
-        var message = ircUtil.parseMsg2(chanName, userName, text);
+        var message = ircUtil.parseMsg2(chanName, userName, text, channels);
 
         if (message) {
-            var channel = ircUtil.lookupChannel2(chanName, userName, config.channels);
+            var channel = ircUtil.lookupChannel2(chanName, userName, channels);
             var ircChanReadOnly = channel.ircChanReadOnly;
             var isOverrideReadOnly = channel.ircChanOverrideReadOnly;
             var isBotHighlighted = config.hlRegexp.exec(message.text);
@@ -118,10 +153,10 @@ var init = function(msgCallback) {
             userName = user;
         }
 
-        var notice = ircUtil.parseMsg2(chanName, userName, text);
+        var notice = ircUtil.parseMsg2(chanName, userName, text, channels);
 
         if (notice) {
-            var channel = ircUtil.lookupChannel2(chanName, userName, config.channels);
+            var channel = ircUtil.lookupChannel2(chanName, userName, channels);
             var ircChanReadOnly = channel.ircChanReadOnly;
             var isOverrideReadOnly = channel.ircChanOverrideReadOnly;
             var isBotHighlighted = config.hlRegexp.exec(notice.text);
@@ -162,7 +197,7 @@ var init = function(msgCallback) {
             userName = user;
         }
 
-        var message = ircUtil.parseMsg2(chanName, userName, text);
+        var message = ircUtil.parseMsg2(chanName, userName, text, channels);
 
         if (message) {
             var messageText = user + ': ' + message.text;
@@ -189,7 +224,7 @@ var init = function(msgCallback) {
         var topic = event.topic;
         var user = event.nick || '';
 
-        var message = ircUtil.parseTopic(chanName, topic, user);
+        var message = ircUtil.parseTopic(chanName, topic, user, channels);
 
         if (message) {
             msgCallback({
@@ -211,7 +246,7 @@ var init = function(msgCallback) {
         var user = event.nick;
         var text = '';
 
-        var channel = ircUtil.lookupChannel(chanName, config.channels);
+        var channel = ircUtil.lookupChannel(chanName, channels);
         msgCallback({
             protocol: 'irc',
             type: 'join',
@@ -230,7 +265,7 @@ var init = function(msgCallback) {
         var user = event.nick;
         var text = '';
 
-        var channel = ircUtil.lookupChannel(chanName, config.channels);
+        var channel = ircUtil.lookupChannel(chanName, channels);
         msgCallback({
             protocol: 'irc',
             type: 'part',
@@ -250,7 +285,7 @@ var init = function(msgCallback) {
         var by = event.nick;
         var reason = event.message;
 
-        var channel = ircUtil.lookupChannel(chanName, config.channels);
+        var channel = ircUtil.lookupChannel(chanName, channels);
         msgCallback({
             protocol: 'irc',
             type: 'part',
@@ -275,7 +310,7 @@ var init = function(msgCallback) {
     // added since framework does not have async
     // method to return nicklist
     nodeIrc.on('wholist', function(event) {
-        var channel = ircUtil.lookupChannel(event.target, config.channels);
+        var channel = ircUtil.lookupChannel(event.target, channels);
         var users = event.users.reduce(function(usersStr, user) {
             if (usersStr === '') {
                 return user.nick;
