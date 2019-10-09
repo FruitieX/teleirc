@@ -1,3 +1,5 @@
+**NOTE**: no longer maintained, look for alternatives such as: https://github.com/42wim/matterbridge
+
 ![Logo](/extras/logo.png)
 
 A simple [Telegram](https://telegram.org/) ↔ IRC gateway.
